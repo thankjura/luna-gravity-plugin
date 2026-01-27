@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v=11
+
+key: ${project.groupId}.${project.artifactId}
+name: ${project.name}
+version: ${project.version}
+description: "${project.description}"
+vendor:
+  name: ${project.organization.name}
+  url: ${project.organization.url}
+resources:
+  - key: messages
+    type: i18n
+    path: messages
+scanPackages:
+  - ru.slie.luna.plugins.gravity
+routes:
+  - routeName: gravityConsole
+    routePath: gravity/console
+    component: frontend/ConsoleView.js
+    parent: admin
+restPackages:
+  - name: rest
+    packages:
+      - ru.slie.luna.plugins.gravity.rest
+components:
+  - key: GravityAdminSideBarSection
+    name: Gravity admin side bar section
+    className: ru.slie.luna.plugins.gravity.web.GravityAdminSideBarSection
+  - key: GravityAdminWebItem
+    name: Gravity console web item
+    className: ru.slie.luna.plugins.gravity.web.GravityAdminWebItem

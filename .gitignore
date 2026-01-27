@@ -1,0 +1,17 @@
+### Backend ###
+target/
+.mvn/
+
+### Frontend ###
+frontend/*.tsbuildinfo
+frontend/node/
+frontend/node_modules/
+frontend/dist/
+frontend/vite.config.d.ts
+frontend/vite.config.js
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
