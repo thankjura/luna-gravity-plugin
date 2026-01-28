@@ -24244,7 +24244,98 @@ function vscodeDarkInit(options) {
   });
 }
 var vscodeDark = vscodeDarkInit();
+const axios = window["axios"];
+const baseURL = "/rest/plugin/ru.slie.luna.plugins.gravity";
+const client = axios.create({ baseURL });
+class ScriptService {
+  async runScript(scriptContent, cb) {
+    try {
+      const response = await fetch(baseURL + "/gravity/script/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scriptContent })
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        cb({ error: errorText });
+        return;
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const messages = buffer.split("\n\n");
+        buffer = messages.pop() || "";
+        for (const message of messages) {
+          if (!message.trim()) continue;
+          let eventType = "log";
+          let dataContent = "";
+          const lines = message.split("\n");
+          for (const line of lines) {
+            if (line.startsWith("event:")) {
+              eventType = line.replace("event:", "").trim();
+            } else if (line.startsWith("data:")) {
+              dataContent = line.replace("data:", "").trim();
+            }
+          }
+          if (eventType === "result") {
+            cb({ result: dataContent });
+          } else {
+            cb({ log: dataContent });
+          }
+        }
+      }
+    } catch (error) {
+      cb({ error });
+    }
+  }
+  async groovyCompletionSource(context) {
+    try {
+      const { data } = await client.post("/gravity/script/autocomplete", {
+        script: context.state.doc.toString(),
+        position: context.pos,
+        limit: 20
+      });
+      return {
+        from: data.from,
+        options: data.suggestions.map((sug) => ({
+          label: sug.name,
+          type: sug.type,
+          detail: sug.detail,
+          apply(view, completion, from, to) {
+            if (sug.apply && sug.apply.startsWith("AUTO_IMPORT:")) {
+              const [, fullClass, simpleName] = sug.apply.split(":");
+              const importStatement = `import ${fullClass}
+`;
+              const content2 = view.state.doc.toString();
+              let changes = [];
+              if (!content2.includes(importStatement)) {
+                changes.push({ from: 0, insert: importStatement });
+              }
+              changes.push({ from, to, insert: simpleName });
+              view.dispatch({
+                changes,
+                selection: { anchor: from + simpleName.length + (content2.includes(importStatement) ? 0 : importStatement.length) }
+              });
+            } else {
+              view.dispatch({
+                changes: { from, to, insert: sug.apply || sug.name }
+              });
+            }
+          }
+        }))
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+}
+const scriptService = new ScriptService();
 const _useModel = window["Vue"].useModel;
+const _mergeModels = window["Vue"].mergeModels;
 const _defineComponent = window["Vue"].defineComponent;
 const _openBlock = window["Vue"].openBlock;
 const _createElementBlock = window["Vue"].createElementBlock;
@@ -24254,15 +24345,24 @@ const useTemplateRef = window["Vue"].useTemplateRef;
 const watch = window["Vue"].watch;
 const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "CodeEditor",
-  props: {
+  props: /* @__PURE__ */ _mergeModels({
+    disabled: Boolean
+  }, {
     "modelValue": {},
     "modelModifiers": {}
-  },
+  }),
   emits: ["update:modelValue"],
   setup(__props) {
     const value = _useModel(__props, "modelValue");
     const container = useTemplateRef("container");
     let editor;
+    watch(value, (newVal) => {
+      if (editor && newVal !== editor.state.doc.toString()) {
+        editor.dispatch({
+          changes: { from: 0, to: editor.state.doc.length, insert: newVal }
+        });
+      }
+    });
     onMounted(() => {
       editor = new EditorView({
         doc: value.value,
@@ -24276,17 +24376,11 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
             if (update.docChanged) {
               value.value = update.state.doc.toString();
             }
-          })
+          }),
+          autocompletion({ override: [scriptService.groovyCompletionSource] })
         ],
         parent: container.value
       });
-    });
-    watch(value, (newVal) => {
-      if (editor && newVal !== editor.state.doc.toString()) {
-        editor.dispatch({
-          changes: { from: 0, to: editor.state.doc.length, insert: newVal }
-        });
-      }
     });
     onBeforeUnmount(() => {
       if (editor) {
@@ -24296,12 +24390,14 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return (_ctx, _cache) => {
       return _openBlock(), _createElementBlock("div", {
         ref_key: "container",
-        ref: container
+        ref: container,
+        class: "gravity-code-editor"
       }, null, 512);
     };
   }
 });
 export {
-  _sfc_main as _
+  _sfc_main as _,
+  scriptService as s
 };
-//# sourceMappingURL=CodeEditor.vue_vue_type_script_setup_true_lang-BDllYHR0.js.map
+//# sourceMappingURL=CodeEditor.vue_vue_type_style_index_0_lang-DqeqcgE0.js.map

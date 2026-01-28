@@ -9,7 +9,8 @@ export default defineConfig({
       viteExternalsPlugin({
         'luna': '__LUNA_COMPONENTS__',
         'vue': 'Vue',
-        'axios': 'axios'
+        'axios': 'axios',
+        'I18N': 'I18N'
       }),
       vue(),
   ],

@@ -11,6 +11,9 @@ resources:
   - key: messages
     type: i18n
     path: messages
+  - key: css
+    type: css
+    path: frontend/frontend.css
 scanPackages:
   - ru.slie.luna.plugins.gravity
 routes:

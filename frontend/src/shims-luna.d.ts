@@ -386,6 +386,22 @@ declare module 'luna' {
       value: number
       total: number
     }, {}, {}, {}, {}, {}, {}, {}>
+export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
+  export interface NotifyComponentInterface {
+      info: (title: string, body?: string, closable?: boolean) => void;
+      warn: (title: string, body?: string, closable?: boolean) => void;
+      ok: (title: string, body?: string, closable?: boolean) => void;
+      error: (title: string, body?: string, closable?: boolean) => void;
+  }
+  export interface I18N {
+      loadMessages(locale: string): void,
+      supportedLocales: Array<string>,
+      t(text: string, ...args: Array<string|number>): string,
+      p(text: string, params: Record<string, any>, ...args: Array<string|number>): string,
+  }
+  export interface Errors {
+      [key: string]: string
+  }
   export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
   export interface User {
       id: string

@@ -1,4 +1,4 @@
-import { _ as _sfc_main } from "./CodeEditor.vue_vue_type_script_setup_true_lang-BDllYHR0.js";
+import { _ as _sfc_main } from "./CodeEditor.vue_vue_type_style_index_0_lang-DqeqcgE0.js";
 export {
   _sfc_main as default
 };
