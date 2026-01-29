@@ -21,16 +21,16 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/gravity/script")
-public class ConsoleRest {
+public class ScriptRest {
     private final ScriptRunnerService scriptService;
-    private final Logger log = LoggerFactory.getLogger(ConsoleRest.class);
+    private final Logger log = LoggerFactory.getLogger(ScriptRest.class);
     private final I18nResolver i18n;
     private final GroovyAutocompleteService autocompleteService;
 
 
-    public ConsoleRest(ScriptRunnerService scriptService,
-                       I18nResolver i18n,
-                       GroovyAutocompleteService autocompleteService) {
+    public ScriptRest(ScriptRunnerService scriptService,
+                      I18nResolver i18n,
+                      GroovyAutocompleteService autocompleteService) {
         this.scriptService = scriptService;
         this.i18n = i18n;
         this.autocompleteService = autocompleteService;
@@ -75,6 +75,10 @@ public class ConsoleRest {
         if (limit == null || limit <= 0) {
             limit = 20;
         }
-        return autocompleteService.getSuggestions(request.getScript(), request.getPosition(), limit);
+        if (request.getCode() == null || request.getLine() == null || request.getColumn() == null) {
+            return AutocompleteResult.empty();
+        }
+
+        return autocompleteService.getSuggestions(request.getCode(), request.getLine(), request.getColumn(), limit);
     }
 }

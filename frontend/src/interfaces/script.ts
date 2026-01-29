@@ -1,7 +1,9 @@
 export interface Suggestion {
-  name: string,
-  type: string,
+  label: string,
+  kind: 'Method'|'Property'|'Class'|'Keyword'|'Variable'|string,
   detail: string
-  info: string,
-  apply: string
+  content: string,
+  apply: string,
+  doc: string,
+  extra: string
 }

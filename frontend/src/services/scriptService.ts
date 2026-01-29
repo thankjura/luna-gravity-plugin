@@ -1,7 +1,6 @@
-import { CompletionContext } from "@codemirror/autocomplete";
 import { baseURL, client } from "@/utils/client.ts";
+import * as monaco from 'monaco-editor';
 import { Suggestion } from "@/interfaces/script.ts";
-import { EditorView } from "codemirror";
 
 
 class ScriptService {
@@ -55,48 +54,22 @@ class ScriptService {
     }
   }
 
-  async groovyCompletionSource(context: CompletionContext) {
-    try {
-      const { data } = await client.post<{from: number, suggestions: Array<Suggestion>}>('/gravity/script/autocomplete', {
-        script: context.state.doc.toString(),
-        position: context.pos,
-        limit: 20,
-      });
-
-      return {
-        from: data.from,
-        options: data.suggestions.map((sug: Suggestion) => ({
-          label: sug.name,
-          type: sug.type,
-          detail: sug.detail,
-          apply(view: EditorView, completion: any, from: number, to: number) {
-            if (sug.apply && sug.apply.startsWith('AUTO_IMPORT:')) {
-              const [, fullClass, simpleName] = sug.apply.split(':');
-              const importStatement = `import ${fullClass}\n`;
-
-              const content = view.state.doc.toString();
-              let changes = [];
-              if (!content.includes(importStatement)) {
-                changes.push({ from: 0, insert: importStatement });
-              }
-
-              changes.push({ from, to, insert: simpleName });
-
-              view.dispatch({
-                changes,
-                selection: { anchor: from + simpleName.length + (content.includes(importStatement) ? 0 : importStatement.length) }
-              });
-            } else {
-              view.dispatch({
-                changes: { from, to, insert: sug.apply || sug.name }
-              });
-            }
-          }
-        }))
-      }
-
-    } catch (e) {
-      return null;
+  async getSuggestions(model: monaco.editor.ITextModel, position: monaco.Position): Promise<monaco.languages.ProviderResult<monaco.languages.CompletionList>> {
+    const {data} = await client.post<{ suggestions: Array<Suggestion>, range: monaco.IRange }>('/gravity/script/autocomplete', {
+      code: model.getValue(),
+      line: position.lineNumber,
+      column: position.column,
+      limit: 20,
+    });
+    return {
+      suggestions: data.suggestions.map((item: Suggestion) => ({
+        label: item.label,
+        kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Text,
+        insertText: item.content,
+        detail: item.detail,
+        documentation: item.doc,
+        range: data.range,
+      }))
     }
   }
 }

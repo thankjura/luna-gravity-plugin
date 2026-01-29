@@ -5,12 +5,17 @@ import { viteExternalsPlugin } from "vite-plugin-externals";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: './',
+  worker: {
+    format: 'es'
+  },
   plugins: [
       viteExternalsPlugin({
         'luna': '__LUNA_COMPONENTS__',
         'vue': 'Vue',
         'axios': 'axios',
-        'I18N': 'I18N'
+        'I18N': 'I18N',
+        'monaco-editor': 'monaco',
       }),
       vue(),
   ],
@@ -21,7 +26,7 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    minify: 'terser',
+    minify: 'esbuild',
     lib: {
       entry: [
       	resolve(__dirname, 'src/views/ConsoleView.vue'),
@@ -30,13 +35,14 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'axios'],
+      external: ['vue', 'axios', 'monaco-editor'],
       output: {
         entryFileNames: '[name].js',
         exports: 'named',
         globals: {
           vue: 'Vue',
-          axios: 'axios'
+          axios: 'axios',
+          'monaco-editor': 'monaco',
         },
       },
     },

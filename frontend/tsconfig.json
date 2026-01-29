@@ -7,6 +7,8 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
+      "monaco-editor": ["./node_modules/monaco-editor"],
+      "monaco-editor/*": ["./node_modules/monaco-editor/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -31,5 +33,5 @@
   "exclude": [
     "node_modules",
     "vite.config.ts"
-  ]
+  ],
 }
