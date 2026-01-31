@@ -1,12 +1,12 @@
-import type * as MonacoEditor from 'monaco-editor';
-import { editor } from "monaco-editor";
+import type * as MonacoEditor from 'monaco-editor';;
 
 export interface Suggestion {
   label: string,
   kind: MonacoEditor.languages.CompletionItemKind,
   detail: string
   insertText: string,
-  additionalTextEdits: Array<editor.ISingleEditOperation>,
+  additionalTextEdits: Array<MonacoEditor.editor.ISingleEditOperation>,
+  insertTextRules: MonacoEditor.languages.CompletionItemInsertTextRule
   doc: string,
 }
 

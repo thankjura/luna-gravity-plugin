@@ -2,6 +2,7 @@ package ru.slie.luna.plugins.gravity.script.groovy.completion;
 
 import org.springframework.stereotype.Component;
 import ru.slie.luna.locale.I18nResolver;
+import ru.slie.luna.plugins.gravity.script.groovy.model.InsertTextRule;
 import ru.slie.luna.plugins.gravity.script.groovy.model.Suggestion;
 import ru.slie.luna.plugins.gravity.script.groovy.model.SuggestionKind;
 
@@ -65,12 +66,20 @@ public class ClassPropertyProvider {
                         .collect(Collectors.joining("\n"));
             }
 
-            response.addSuggestion(Suggestion
-                                           .builder(entry.getKey(), SuggestionKind.Method)
-                                           .detail(details)
-                                           .insertText(entry.getKey() + "($1)")
-                                           .doc(docs)
-                                           .build());
+            Suggestion.Builder builder = Suggestion.builder(entry.getKey(), SuggestionKind.Method).detail(details).doc(docs);
+            if (entry.getValue().getFirst().getParameterTypes().length == 0) {
+                builder.insertText(entry.getKey() + "()");
+            } else {
+                StringJoiner stringJoiner = new StringJoiner(", ");
+                for (int i = 1; i < entry.getValue().getFirst().getParameterTypes().length + 1; i++) {
+                    stringJoiner.add(String.format("${%s:arg%s}", i, i));
+                }
+
+                builder.insertText(String.format("%s(%s)", entry.getKey(), stringJoiner))
+                       .insertTextRule(InsertTextRule.InsertAsSnippet);
+            }
+
+            response.addSuggestion(builder.build());
             limit--;
         }
 

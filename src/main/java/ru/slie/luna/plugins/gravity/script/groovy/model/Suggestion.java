@@ -6,6 +6,7 @@ import java.util.List;
 public class Suggestion {
     private final String label;
     private final SuggestionKind kind;
+    private final InsertTextRule insertTextRules;
     private final String detail;
     private final String insertText;
     private final String doc;
@@ -18,6 +19,7 @@ public class Suggestion {
         this.insertText = builder.insertText;
         this.doc = builder.doc;
         this.additionalTextEdits = builder.additionalTextEdits;
+        this.insertTextRules = builder.insertTextRules;
     }
 
     public String getLabel() {
@@ -48,11 +50,16 @@ public class Suggestion {
         return additionalTextEdits;
     }
 
+    public InsertTextRule getInsertTextRules() {
+        return insertTextRules;
+    }
+
     public record AdditionalTextEdit(AutocompleteRange range, String text) {}
 
     public static class Builder {
         private String label;
         private SuggestionKind kind;
+        private InsertTextRule insertTextRules;
         private String detail;
         private String insertText;
         private String doc;
@@ -86,6 +93,11 @@ public class Suggestion {
 
         public Builder doc(String doc) {
             this.doc = doc;
+            return this;
+        }
+
+        public Builder insertTextRule(InsertTextRule insertTextRules) {
+            this.insertTextRules = insertTextRules;
             return this;
         }
 

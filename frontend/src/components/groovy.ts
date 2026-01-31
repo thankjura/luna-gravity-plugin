@@ -76,6 +76,7 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
           documentation: item.doc,
           additionalTextEdits: item.additionalTextEdits,
           range: data.range,
+          insertTextRules: item.insertTextRules,
         }))
       }
     }
