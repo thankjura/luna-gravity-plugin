@@ -29,6 +29,11 @@ const id = "groovy";
 const label = "Groovy";
 
 export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
+
+  // instance.languages.registerHoverProvider // документация
+  // instance.languages.registerSignatureHelpProvider // сигнатура метода
+  // instance.languages.registerCodeActionProvider // лампочка
+
   return instance.languages.registerCompletionItemProvider('groovy', {
     triggerCharacters: ["."],
     provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
@@ -42,7 +47,8 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
       const textBeforeCursor = model.getValueInRange(range);
 
       const data = await scriptService.getSuggestions(textBeforeCursor, position);
-      const out = {
+      return {
+        incomplete: data.incomplete,
         suggestions: data.suggestions.map((item: Suggestion) => ({
           label: item.label,
           kind: item.kind,
@@ -53,8 +59,6 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
           range: data.range,
         }))
       }
-      console.log(out);
-      return out;
     }
   });
 }

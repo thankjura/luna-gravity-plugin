@@ -5,15 +5,15 @@ import org.codehaus.groovy.ast.ModuleNode;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
-import org.codehaus.groovy.control.*;
+import org.codehaus.groovy.control.CompilationUnit;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.Phases;
+import org.codehaus.groovy.control.SourceUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.plugins.gravity.script.groovy.completion.ClassPropertyProvider;
 import ru.slie.luna.plugins.gravity.script.groovy.completion.LunaBeanProvider;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class AutocompleteGroovyService {
@@ -30,8 +30,6 @@ public class AutocompleteGroovyService {
     }
 
     public AutocompleteResult getSuggestions(String scriptText, int line, int column, int limit) {
-        List<Suggestion> suggestions = new ArrayList<>();
-
         if (scriptText.endsWith(".")) {
             scriptText += "__LUNA_PLACEHOLDER__";
         }
@@ -54,12 +52,14 @@ public class AutocompleteGroovyService {
         }
 
         ASTNode node = nodeFinder.getFoundNode();
+        AutocompleteResult result = new AutocompleteResult();
+
         if (node != null) {
-            AutocompleteRange range = AutocompleteRange.forNode(node);
+            result.setRange(AutocompleteRange.forNode(node));
             switch (node) {
                 case VariableExpression e -> {
                     if (e.isDynamicTyped()) {
-                        suggestions.addAll(beanProvider.getSuggestions(e.getText().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase(), limit));
+                        result.addResult(beanProvider.getSuggestions(e.getText().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase(), limit));
                     }
                 }
                 case PropertyExpression e -> {
@@ -67,19 +67,16 @@ public class AutocompleteGroovyService {
                     if (exp != null) {
                         Class<?> clazz = exp.getType().getTypeClass();
                         if (clazz != null) {
-                            range = AutocompleteRange.forNode(e.getProperty());
-
-                            suggestions.addAll(propertyProvider.getStaticSuggestions(e.getPropertyAsString().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase(), clazz, (exp instanceof VariableExpression), limit));
+                            result.setRange(AutocompleteRange.forNode(e.getProperty()));
+                            result.addResult(propertyProvider.getSuggestions(e.getPropertyAsString().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase(), clazz, (exp instanceof VariableExpression), limit));
                         }
                     }
                 }
                 default -> {}
             }
-
-            return new AutocompleteResult(suggestions, range);
         }
 
 
-        return AutocompleteResult.empty();
+        return result;
     }
 }

@@ -47,7 +47,7 @@ public class LunaBeanProvider {
         return classesCache;
     }
 
-    public List<Suggestion> getSuggestions(String term, int limit) {
+    public SuggestionsProviderResult getSuggestions(String term, int limit) {
         List<ClassWrapper> classes = getBeans();
 
         if (term != null && !term.isEmpty()) {
@@ -56,13 +56,17 @@ public class LunaBeanProvider {
 
         classes = classes.stream().sorted().limit(limit).toList();
 
-        List<Suggestion> out = new ArrayList<>();
+        SuggestionsProviderResult out = new SuggestionsProviderResult();
 
         for (ClassWrapper clazz: classes) {
+            if (limit <= 0) {
+                out.setIncomplete(true);
+                return out;
+            }
             Suggestion suggestion = Suggestion.builder(clazz.getInsertText(), clazz.getKind())
                                             .detail(clazz.getCanonicalName())
                                             .addAutoImport(clazz.getCanonicalName()).build();
-            out.add(suggestion);
+            out.addSuggestion(suggestion);
         }
 
         return out;

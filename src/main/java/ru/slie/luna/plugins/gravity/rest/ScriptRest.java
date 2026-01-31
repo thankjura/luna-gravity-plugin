@@ -73,10 +73,10 @@ public class ScriptRest {
     public AutocompleteResult getAutocomplete(@RequestBody AutocompleteRequest request) {
         Integer limit = request.getLimit();
         if (limit == null || limit <= 0) {
-            limit = 20;
+            limit = 100;
         }
         if (request.getCode() == null || request.getLine() == null || request.getColumn() == null) {
-            return AutocompleteResult.empty();
+            return new AutocompleteResult();
         }
 
         return autocompleteService.getSuggestions(request.getCode(), request.getLine(), request.getColumn(), limit);
