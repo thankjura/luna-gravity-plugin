@@ -30,11 +30,18 @@ const label = "Groovy";
 
 export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
   return instance.languages.registerCompletionItemProvider('groovy', {
+    triggerCharacters: ["."],
     provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
-      //const lineContent = model.getLineContent(position.lineNumber);
-      //const charBeforeCursor = lineContent.charAt(position.column - 2);
-      const data = await scriptService.getSuggestions(model, position);
+      const range = {
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column
+      };
 
+      const textBeforeCursor = model.getValueInRange(range);
+
+      const data = await scriptService.getSuggestions(textBeforeCursor, position);
       const out = {
         suggestions: data.suggestions.map((item: Suggestion) => ({
           label: item.label,

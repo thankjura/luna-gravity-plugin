@@ -54,9 +54,9 @@ class ScriptService {
     }
   }
 
-  async getSuggestions(model: MonacoEditor.editor.ITextModel, position: MonacoEditor.Position){
+  async getSuggestions(codeText: string, position: MonacoEditor.Position){
     const {data} = await client.post<{ suggestions: Array<Suggestion>, range: MonacoEditor.IRange }>('/gravity/script/autocomplete', {
-      code: model.getValue(),
+      code: codeText,
       line: position.lineNumber,
       column: position.column,
       limit: 20,

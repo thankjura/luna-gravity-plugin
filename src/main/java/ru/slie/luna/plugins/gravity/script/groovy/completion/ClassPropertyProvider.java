@@ -12,7 +12,7 @@ import java.util.List;
 
 @Component
 public class ClassPropertyProvider {
-    public List<Suggestion> getSuggestions(String term, Class<?> clazz, int limit) {
+    public List<Suggestion> getStaticSuggestions(String term, Class<?> clazz, boolean isInstance, int limit) {
         List<Suggestion> out = new ArrayList<>();
         for (Method method: clazz.getMethods()) {
             if (limit <= 0) {
@@ -22,7 +22,7 @@ public class ClassPropertyProvider {
             if (!Modifier.isPublic(method.getModifiers())) {
                 continue;
             }
-            if (!Modifier.isStatic(method.getModifiers())) {
+            if (!isInstance && !Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
 
