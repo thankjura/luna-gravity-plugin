@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 import type * as MonacoEditorType from 'monaco-editor';
-import { registerAutoCompleteService, registerGroovyLanguageForMonaco } from "@/components/groovy.ts";
+import {
+  registerAutoCompleteService,
+  registerGroovyLanguageForMonaco,
+  registerSignatureHelpProvider
+} from "@/components/groovy.ts";
 import { loadMonacoInstance } from "@/utils/monaco.ts";
 
 defineProps({
@@ -12,6 +16,7 @@ const value = defineModel<string>();
 const container = useTemplateRef<HTMLDivElement>('container');
 let editor: MonacoEditorType.editor.IStandaloneCodeEditor;
 let completionProvider: MonacoEditorType.IDisposable;
+let signatureProvider: MonacoEditorType.IDisposable;
 
 watch(value, (newValue) => {
   if (editor && newValue !== editor.getValue()) {
@@ -24,6 +29,10 @@ onMounted(async () => {
   if (!completionProvider) {
     completionProvider = registerAutoCompleteService(instance as typeof MonacoEditorType);
   }
+  if (!signatureProvider) {
+    signatureProvider = registerSignatureHelpProvider(instance as typeof MonacoEditorType);
+  }
+
   registerGroovyLanguageForMonaco(instance as typeof MonacoEditorType);
 
   editor = instance.editor.create(container.value, {
@@ -51,6 +60,11 @@ onBeforeUnmount(() => {
   if (completionProvider) {
     completionProvider.dispose();
     completionProvider = null;
+  }
+
+  if (signatureProvider) {
+    signatureProvider.dispose();
+    signatureProvider = null;
   }
 });
 

@@ -1,4 +1,4 @@
-package ru.slie.luna.plugins.gravity.script.groovy;
+package ru.slie.luna.plugins.gravity.script.groovy.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

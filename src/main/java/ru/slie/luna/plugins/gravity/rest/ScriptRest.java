@@ -12,8 +12,9 @@ import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.rest.request.AutocompleteRequest;
 import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
-import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteResult;
+import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
+import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,5 +81,14 @@ public class ScriptRest {
         }
 
         return autocompleteService.getSuggestions(request.getCode(), request.getLine(), request.getColumn(), limit);
+    }
+
+    @PostMapping("/signature")
+    public SignatureHelp getSignature(@RequestBody AutocompleteRequest request) {
+        if (request.getCode() == null || request.getLine() == null || request.getColumn() == null) {
+            return new SignatureHelp();
+        }
+
+        return autocompleteService.getSignatureHelp(request.getCode(), request.getLine(), request.getColumn());
     }
 }

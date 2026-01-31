@@ -28,6 +28,32 @@ const surroundingPairs = autoClosingPairs;
 const id = "groovy";
 const label = "Groovy";
 
+const getCodeBeforeCursor = (model: MonacoEditor.editor.ITextModel, position: MonacoEditor.Position) => {
+  const range = {
+    startLineNumber: 1,
+    startColumn: 1,
+    endLineNumber: position.lineNumber,
+    endColumn: position.column
+  };
+
+  return model.getValueInRange(range);
+}
+
+export const registerSignatureHelpProvider = (instance: typeof MonacoEditor) => {
+  return instance.languages.registerSignatureHelpProvider('groovy', {
+    signatureHelpTriggerCharacters: ['(', ','],
+    provideSignatureHelp: async (model, position, token, context) => {
+      const textBeforeCursor = getCodeBeforeCursor(model, position);
+      const data = await scriptService.getSignatures(textBeforeCursor, position);
+
+      return {
+        value: data,
+        dispose: () => {}
+      };
+    }
+  });
+}
+
 export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
 
   // instance.languages.registerHoverProvider // документация
@@ -37,14 +63,7 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
   return instance.languages.registerCompletionItemProvider('groovy', {
     triggerCharacters: ["."],
     provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
-      const range = {
-        startLineNumber: 1,
-        startColumn: 1,
-        endLineNumber: position.lineNumber,
-        endColumn: position.column
-      };
-
-      const textBeforeCursor = model.getValueInRange(range);
+      const textBeforeCursor = getCodeBeforeCursor(model, position);
 
       const data = await scriptService.getSuggestions(textBeforeCursor, position);
       return {

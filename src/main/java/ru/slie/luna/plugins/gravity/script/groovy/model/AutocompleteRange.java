@@ -1,4 +1,4 @@
-package ru.slie.luna.plugins.gravity.script.groovy;
+package ru.slie.luna.plugins.gravity.script.groovy.model;
 
 import org.codehaus.groovy.ast.ASTNode;
 

@@ -9,3 +9,10 @@ export interface Suggestion {
   additionalTextEdits: Array<editor.ISingleEditOperation>,
   doc: string,
 }
+
+export interface Signature {
+  label: string,
+  parameters: Array<MonacoEditor.languages.ParameterInformation>
+  documentation?: string,
+  activeParameter?: number,
+}

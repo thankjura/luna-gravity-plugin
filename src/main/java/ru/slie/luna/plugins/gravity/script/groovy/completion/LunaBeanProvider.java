@@ -5,8 +5,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import ru.slie.luna.plugins.gravity.script.groovy.Suggestion;
-import ru.slie.luna.plugins.gravity.script.groovy.SuggestionKind;
+import ru.slie.luna.plugins.gravity.script.groovy.model.Suggestion;
+import ru.slie.luna.plugins.gravity.script.groovy.model.SuggestionKind;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -15,7 +15,6 @@ const LIMIT = 300;
 const errors = ref<Errors>({});
 
 const onResultFetch = (resp: {log?: string, result?: string, error?: any}) => {
-  //console.log(resp);
   if (resp.log) {
     out.value.push(resp.log);
   }
@@ -50,6 +49,7 @@ const runScript = () => {
   }
   result.value = null;
   out.value = [];
+  errors.value = {};
   activeTab.value = 'log';
   busy.value = true;
   scriptService.runScript(value.value, onResultFetch);

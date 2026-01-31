@@ -1,6 +1,6 @@
 import { baseURL, client } from "@/utils/client.ts";
 import type * as MonacoEditor from 'monaco-editor';
-import { Suggestion } from "@/interfaces/script.ts";
+import { Signature, Suggestion } from "@/interfaces/script.ts";
 
 
 class ScriptService {
@@ -56,6 +56,16 @@ class ScriptService {
 
   async getSuggestions(codeText: string, position: MonacoEditor.Position){
     const {data} = await client.post<{ suggestions: Array<Suggestion>, range: MonacoEditor.IRange, incomplete: boolean }>('/gravity/script/autocomplete', {
+      code: codeText,
+      line: position.lineNumber,
+      column: position.column,
+    });
+
+    return data;
+  }
+
+  async getSignatures(codeText: string, position: MonacoEditor.Position){
+    const {data} = await client.post<{ signatures: Array<Signature>, activeSignature: number, activeParameter: number }>('/gravity/script/signature', {
       code: codeText,
       line: position.lineNumber,
       column: position.column,

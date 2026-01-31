@@ -1,6 +1,6 @@
 package ru.slie.luna.plugins.gravity.script.groovy.completion;
 
-import ru.slie.luna.plugins.gravity.script.groovy.Suggestion;
+import ru.slie.luna.plugins.gravity.script.groovy.model.Suggestion;
 
 import java.util.ArrayList;
 import java.util.List;

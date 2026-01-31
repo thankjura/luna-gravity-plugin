@@ -1,4 +1,4 @@
-package ru.slie.luna.plugins.gravity.script.groovy;
+package ru.slie.luna.plugins.gravity.script.groovy.model;
 
 import ru.slie.luna.plugins.gravity.script.groovy.completion.SuggestionsProviderResult;
 
