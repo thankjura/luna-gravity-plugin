@@ -1,5 +1,5 @@
 import { baseURL, client } from "@/utils/client.ts";
-import * as monaco from 'monaco-editor';
+import type * as MonacoEditor from 'monaco-editor';
 import { Suggestion } from "@/interfaces/script.ts";
 
 
@@ -54,23 +54,15 @@ class ScriptService {
     }
   }
 
-  async getSuggestions(model: monaco.editor.ITextModel, position: monaco.Position): Promise<monaco.languages.ProviderResult<monaco.languages.CompletionList>> {
-    const {data} = await client.post<{ suggestions: Array<Suggestion>, range: monaco.IRange }>('/gravity/script/autocomplete', {
+  async getSuggestions(model: MonacoEditor.editor.ITextModel, position: MonacoEditor.Position){
+    const {data} = await client.post<{ suggestions: Array<Suggestion>, range: MonacoEditor.IRange }>('/gravity/script/autocomplete', {
       code: model.getValue(),
       line: position.lineNumber,
       column: position.column,
       limit: 20,
     });
-    return {
-      suggestions: data.suggestions.map((item: Suggestion) => ({
-        label: item.label,
-        kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Text,
-        insertText: item.content,
-        detail: item.detail,
-        documentation: item.doc,
-        range: data.range,
-      }))
-    }
+
+    return data;
   }
 }
 

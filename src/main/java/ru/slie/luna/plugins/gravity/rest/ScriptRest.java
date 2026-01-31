@@ -13,7 +13,7 @@ import ru.slie.luna.plugins.gravity.rest.request.AutocompleteRequest;
 import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteResult;
-import ru.slie.luna.plugins.gravity.script.groovy.GroovyAutocompleteService;
+import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +25,12 @@ public class ScriptRest {
     private final ScriptRunnerService scriptService;
     private final Logger log = LoggerFactory.getLogger(ScriptRest.class);
     private final I18nResolver i18n;
-    private final GroovyAutocompleteService autocompleteService;
+    private final AutocompleteGroovyService autocompleteService;
 
 
     public ScriptRest(ScriptRunnerService scriptService,
                       I18nResolver i18n,
-                      GroovyAutocompleteService autocompleteService) {
+                      AutocompleteGroovyService autocompleteService) {
         this.scriptService = scriptService;
         this.i18n = i18n;
         this.autocompleteService = autocompleteService;

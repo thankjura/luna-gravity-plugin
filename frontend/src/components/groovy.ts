@@ -1,5 +1,6 @@
 import { scriptService } from "@/services/scriptService.ts";
 import type * as MonacoEditor from 'monaco-editor';
+import { Suggestion } from "@/interfaces/script.ts";
 
 function getTokens(tokens: string, divider = "|"): string[] {
   return tokens.split(divider);
@@ -30,11 +31,23 @@ const label = "Groovy";
 export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
   return instance.languages.registerCompletionItemProvider('groovy', {
     provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
-      const lineContent = model.getLineContent(position.lineNumber);
-      const charBeforeCursor = lineContent.charAt(position.column - 2);
-      if ( context.triggerKind === 0 || charBeforeCursor === '.' ) {
-        return await scriptService.getSuggestions(model, position);
+      //const lineContent = model.getLineContent(position.lineNumber);
+      //const charBeforeCursor = lineContent.charAt(position.column - 2);
+      const data = await scriptService.getSuggestions(model, position);
+
+      const out = {
+        suggestions: data.suggestions.map((item: Suggestion) => ({
+          label: item.label,
+          kind: item.kind,
+          insertText: item.insertText,
+          detail: item.detail,
+          documentation: item.doc,
+          additionalTextEdits: item.additionalTextEdits,
+          range: data.range,
+        }))
       }
+      console.log(out);
+      return out;
     }
   });
 }
