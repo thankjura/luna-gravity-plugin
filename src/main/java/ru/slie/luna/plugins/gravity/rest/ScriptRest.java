@@ -12,8 +12,8 @@ import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.rest.request.AutocompleteRequest;
 import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
-import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
+import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
 import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
 
 import java.util.HashMap;

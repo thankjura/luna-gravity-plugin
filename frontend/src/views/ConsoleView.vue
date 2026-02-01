@@ -29,7 +29,7 @@ const onResultFetch = (resp: {log?: string, result?: string, error?: any}) => {
     activeTab.value = 'result';
   }
 
-  if (resp.error) {
+  if (resp.error != undefined) {
     busy.value = false;
     $notify.error($i18n.t("Failed to execute script"));
     if (typeof resp.error == 'string') {

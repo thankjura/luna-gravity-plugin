@@ -1,23 +1,23 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
-import { viteExternalsPlugin } from "vite-plugin-externals";
+import pluginExternal from "vite-plugin-external";
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  worker: {
-    format: 'es'
-  },
   plugins: [
-      viteExternalsPlugin({
+    pluginExternal({
+      externals: {
         'luna': '__LUNA_COMPONENTS__',
         'vue': 'Vue',
         'axios': 'axios',
         'I18N': 'I18N',
+        'sortablejs': 'Sortable',
         'monaco-editor': 'monaco',
-      }),
-      vue(),
+      }
+    }),
+    vue()
   ],
   resolve: {
     alias: {
@@ -26,24 +26,17 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    minify: 'esbuild',
+    minify: 'terser',
     lib: {
       entry: [
-      	resolve(__dirname, 'src/views/ConsoleView.vue'),
-      	resolve(__dirname, 'src/components/CodeEditor.vue')
+        resolve(__dirname, 'src/views/ConsoleView.vue'),
       ],
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'axios', 'monaco-editor'],
       output: {
         entryFileNames: '[name].js',
         exports: 'named',
-        globals: {
-          vue: 'Vue',
-          axios: 'axios',
-          'monaco-editor': 'monaco',
-        },
       },
     },
     outDir: resolve(__dirname, '../src/main/resources/frontend'),
