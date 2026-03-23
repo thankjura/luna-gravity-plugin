@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v=11
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v=12
 
 key: ${project.groupId}.${project.artifactId}
 name: ${project.name}
@@ -25,10 +25,35 @@ restPackages:
   - name: rest
     packages:
       - ru.slie.luna.plugins.gravity.rest
-components:
+webSections:
   - key: GravityAdminSideBarSection
     name: Gravity admin side bar section
     className: ru.slie.luna.plugins.gravity.web.GravityAdminSideBarSection
+webItems:
   - key: GravityAdminWebItem
     name: Gravity console web item
     className: ru.slie.luna.plugins.gravity.web.GravityAdminWebItem
+workflowConditions:
+  - key: GravityCondition
+    name: Gravity script condition
+    className: ru.slie.luna.plugins.gravity.workflow.GravityScriptCondition
+    viewComponent:
+      path: frontend/BaseViewScriptComponent.js
+    editComponent:
+      path: frontend/BaseEditScriptComponent.js
+workflowValidators:
+  - key: GravityValidator
+    name: Gravity script validator
+    className: ru.slie.luna.plugins.gravity.workflow.GravityScriptValidator
+    viewComponent:
+      path: frontend/BaseViewScriptComponent.js
+    editComponent:
+      path: frontend/BaseEditScriptComponent.js
+workflowPostfunctions:
+  - key: GravityPostfunction
+    name: Gravity script postfunction
+    className: ru.slie.luna.plugins.gravity.workflow.GravityScriptPostfunction
+    viewComponent:
+      path: frontend/BaseViewScriptComponent.js
+    editComponent:
+      path: frontend/BaseEditScriptComponent.js
