@@ -7,16 +7,16 @@ import ru.slie.luna.web.WebItem;
 import java.util.Map;
 
 @Component
-public class GravityAdminWebItem implements WebItem {
+public class GravityAdminWorkflowsWebItem implements WebItem {
     private final I18nResolver i18n;
 
-    public GravityAdminWebItem(I18nResolver i18n) {
+    public GravityAdminWorkflowsWebItem(I18nResolver i18n) {
         this.i18n = i18n;
     }
 
     @Override
     public String getId() {
-        return "console";
+        return "workflows";
     }
 
     @Override
@@ -31,12 +31,12 @@ public class GravityAdminWebItem implements WebItem {
 
     @Override
     public String getName() {
-        return i18n.getText("gravity.web.item.label");
+        return i18n.getText("gravity.web.item.workflows.label");
     }
 
     @Override
     public String getRouteName() {
-        return "gravityConsole";
+        return "gravityWorkflows";
     }
 
     @Override

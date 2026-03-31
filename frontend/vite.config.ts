@@ -30,6 +30,7 @@ export default defineConfig({
     lib: {
       entry: [
         resolve(__dirname, 'src/views/ConsoleView.vue'),
+        resolve(__dirname, 'src/views/WorkflowsView.vue'),
         resolve(__dirname, 'src/components/workflow/BaseViewScriptComponent.vue'),
         resolve(__dirname, 'src/components/workflow/BaseEditScriptComponent.vue'),
       ],

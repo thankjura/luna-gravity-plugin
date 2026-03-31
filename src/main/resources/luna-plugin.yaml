@@ -21,6 +21,10 @@ routes:
     routePath: gravity/console
     component: frontend/ConsoleView.js
     parent: admin
+  - routeName: gravityWorkflows
+    routePath: gravity/workflows
+    component: frontend/WorkflowsView.js
+    parent: admin
 restPackages:
   - name: rest
     packages:
@@ -30,9 +34,9 @@ webSections:
     name: Gravity admin side bar section
     className: ru.slie.luna.plugins.gravity.web.GravityAdminSideBarSection
 webItems:
-  - key: GravityAdminWebItem
+  - key: GravityAdminConsoleWebItem
     name: Gravity console web item
-    className: ru.slie.luna.plugins.gravity.web.GravityAdminWebItem
+    className: ru.slie.luna.plugins.gravity.web.GravityAdminConsoleWebItem
 workflowConditions:
   - key: GravityCondition
     name: Gravity script condition

@@ -9,7 +9,7 @@ const props = defineProps({
 })
 
 const container = useTemplateRef<HTMLDivElement>('container');
-let instance;
+let instance: typeof MonacoEditorType;
 
 watch(() => props.script, (newValue) => {
   if (instance) {
@@ -21,8 +21,8 @@ watch(() => props.script, (newValue) => {
 });
 
 onMounted(async () => {
-  instance = await loadMonacoInstance();
-  registerGroovyLanguageForMonaco(instance as typeof MonacoEditorType);
+  instance = await loadMonacoInstance() as typeof MonacoEditorType;
+  registerGroovyLanguageForMonaco(instance);
 
   await instance.editor.colorizeElement(container.value, {
     mimeType: "groovy",

@@ -61,8 +61,8 @@ const runScript = () => {
   <div class="gravity-page gravity-page-console pad">
     <nav class="breadcrumbs header">
       <ol role="list">
-        <li>Gravity</li>
-        <li>Console</li>
+        <li>{{ $i18n.t("Gravity") }}</li>
+        <li>{{ $i18n.t("Console") }}</li>
       </ol>
     </nav>
     <div class="pad panel editor-panel">
