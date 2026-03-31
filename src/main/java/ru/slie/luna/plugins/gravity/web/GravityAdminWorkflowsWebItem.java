@@ -26,7 +26,7 @@ public class GravityAdminWorkflowsWebItem implements WebItem {
 
     @Override
     public int getOrder() {
-        return 0;
+        return 1;
     }
 
     @Override

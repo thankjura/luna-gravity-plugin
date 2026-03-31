@@ -37,6 +37,9 @@ webItems:
   - key: GravityAdminConsoleWebItem
     name: Gravity console web item
     className: ru.slie.luna.plugins.gravity.web.GravityAdminConsoleWebItem
+  - key: GravityAdminWorkflowsWebItem
+    name: Gravity workflows web item
+    className: ru.slie.luna.plugins.gravity.web.GravityAdminWorkflowsWebItem
 workflowConditions:
   - key: GravityCondition
     name: Gravity script condition
