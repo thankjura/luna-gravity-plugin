@@ -1,4 +1,4 @@
-// Luna exposes version: 1.0.0
+// Luna exposes version: 3.0.0-SNAPSHOT
 declare module 'luna' {
   import type { DefineComponent, AllowedComponentProps, ComponentCustomProps, VNodeProps } from 'vue'
   import RouteLocationRaw from 'vue-router'
@@ -70,7 +70,7 @@ declare module 'luna' {
   };
   export const UserAvatarComponent: DefineComponent<
     {
-      user: Partial<User>
+      user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
     }, {}, {}, {}, {}, {}, {}, {}>
   export const UserLinkComponent: DefineComponent<
     {
@@ -128,6 +128,7 @@ declare module 'luna' {
   export const DropDownLayer: DefineComponent<
     {
       fixed?: boolean
+      busy?: boolean
       prefferedAlign?: "left" | "right"
       maxWidth?: number
       zIndex?: number
@@ -150,13 +151,13 @@ declare module 'luna' {
     
       addValue: (opt: T) => void
     
-      delValue: (optId: string) => void
+      delValue: (optId: string | number) => void
     }, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string[]]
+      'update:modelValue': [value: (string | number)[]]
     
       'select': [value: T]
     
-      'remove': [value: string]
+      'remove': [value: string | number]
     }>
   export const ColorPickerDialog: DefineComponent<
     {}, {
@@ -212,15 +213,16 @@ declare module 'luna' {
       minTagLen?: number
       suggestionKey?: keyof T
       labelKey?: keyof T
+      valueKey?: keyof T
       id?: string
       cropSuggestions?: boolean
       iconRadius?: string
       missingIconLiteralKey?: keyof T
-      modelValue?: string[]
+      modelValue?: (string | number)[]
     }, {
       addValue: (opt: T) => void
     
-      delValue: (optId: string) => void
+      delValue: (optId: string | number) => void
     
       showLayer: () => void
     
@@ -228,11 +230,11 @@ declare module 'luna' {
     }, {}, {}, {}, {}, {}, {
       'select': [value: T]
     
-      'remove': [value: string]
+      'remove': [value: string | number]
     
-      'create': [value: string]
+      'create': [value: string | number]
     
-      'update:modelValue': [value: string[]]
+      'update:modelValue': [value: (string | number)[]]
     }>
   export const QsInput: DefineComponent<
     {
@@ -259,6 +261,7 @@ declare module 'luna' {
       showIcons?: boolean
       minTagLen?: number
       suggestionKey?: keyof T
+      valueKey?: keyof T
       labelKey?: keyof T | ((item: T) => string)
       name?: string
       cropSuggestions?: boolean
@@ -303,7 +306,7 @@ declare module 'luna' {
     }, {}, {}, {}, {}, {}, {}, {
       'update': [value: T[]]
     
-      'moved': [optionId: string, prevOptionId: string]
+      'moved': [optionId: string | number, prevOptionId: string | number]
     
       'deleted': [option: T]
     
@@ -387,8 +390,8 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
   export interface User {
-      id: string
-      directoryId: string,
+      id: number
+      directoryId: number,
       externalId: string,
       login: string
       email: string
@@ -402,7 +405,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       gender: 'male'|'female',
   }
   export interface DropDownOption {
-    id: string,
+    id: string|number,
     label: string;
     iconUrl?: string;
     iconTitle?: string;
@@ -417,24 +420,13 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
     selected?: boolean,
   }
   export interface DropDownGroupOption {
-    id: string,
+    id: string|number,
     label?: string;
     options: Array<DropDownOption>;
     className?: string,
   }
   export type OptionsGetterSync = () => DropDownGroupOption[]
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
-  export interface OptionsGroup<T extends Option> {
-      id: string,
-      label: string,
-      options: Array<T>
-  }
-  export interface Option {
-      id: string,
-      name: string,
-      iconUrl?: string,
-      altName?: string,
-  }
   T = any
   export type HSV = { h: number, s: number, v: number, a?: number };
   export enum IconType {
@@ -443,7 +435,8 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       Project = "projects",
       Status = "statuses",
   }
-  export type OptionsFunc<T extends Option> = (term: string | null, selected: Array<string>) => Promise<Array<T>>;
+  export type OptionsFunc<T> = (term: string | null, selected: Array<ID>) => Promise<Array<T>>;
+  export type ID = string|number;
   export interface ActivityStreamSearchQuery extends SearchQuery {
       projectKey?: string
       user?: string
@@ -459,29 +452,29 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       date: string
   }
   export interface IssueInfo extends IssueKey {
-      id: string,
+      id: number,
       summary: string,
       issueType: IssueType,
-      issueTypeId: string,
+      issueTypeId: number,
       status: Status,
       priority?: Priority,
   }
   export interface IssueType {
-      id: string,
+      id: number,
       name: string,
       description?: string,
       iconName: string,
       iconUrl: string,
   }
   export interface Status {
-      id: string,
+      id: number,
       name: string,
       description: string|null,
       category: StatusCategory,
-      categoryId: string,
+      categoryKey: string,
   }
   export interface StatusCategory {
-      id: StatusCategoryEnum,
+      key: StatusCategoryEnum,
       name: string,
   }
   export enum StatusCategoryEnum {
@@ -490,7 +483,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       DONE = "done",
   }
   export interface Priority {
-      id: string,
+      id: number,
       name: string,
       description?: string,
       iconName?: string,
@@ -498,7 +491,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       sequence: number
   }
   export interface Comment {
-      id: string,
+      id: number,
       author: User,
       created: string,
       updated?: string,
@@ -506,27 +499,27 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       text: string
   }
   export interface Worklog {
-      id: string,
+      id: number,
       author: User,
-      authorId: string,
+      authorId: number,
       created: string
       updater: User|null,
-      updaterId: string|null,
+      updaterId: number|null,
       updated: string|null,
       startDate: string,
       timeSpent: string,
       comment: string|null,
   }
   export interface ChangeItem {
-      id: string,
+      id: number,
       fieldId: string,
       fieldName: string,
       oldStringValue: string,
       newStringValue: string,
   }
   export interface Attachment {
-      id: string,
-      authorId: string,
+      id: number,
+      authorId: number,
       author: User,
       created: string,
       fileName: string,
@@ -545,15 +538,15 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       Query = "queryString",
   }
   export interface Board extends SharedObject {
-      id: string,
+      id: number,
       name: string;
-      authorId: string,
+      authorId: number,
       author: User,
       description: string,
       type: 'kanban'|'scrum',
       columns: Array<BoardColumn>,
       filters: Array<BoardFilter>,
-      filterId: string,
+      filterId: number,
       rankField: IssueField,
       rankFieldId: string,
       cardColorStrategy: ColorStrategy,
@@ -566,13 +559,13 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       activeSprints: Array<Sprint>,
   }
   export interface BoardColumn {
-      id: string,
+      id: number,
       name: string,
       color: string,
-      statusIds: string[],
+      statusIds: Array<number>,
   }
   export interface BoardFilter {
-      id: string,
+      id: number,
       name: string,
       description: string,
       queryString: string,
@@ -595,21 +588,21 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       valid: boolean,
       systemField: boolean,
       contexts?: Array<IssueFieldContext>,
-      options?: Array<Option>,
+      options?: Array<Option<number>>,
   }
   export interface IssueFieldContext {
-      id: string,
+      id: number,
       name: string,
       description?: string,
-      projectIds?: Array<string>,
-      issueTypeIds?: Array<string>,
+      projectIds?: Array<number>,
+      issueTypeIds?: Array<number>,
       projects?: Array<Project>,
       issueTypes?: Array<IssueType>,
       defaultValue?: FieldValue,
-      options?: Array<Option>,
+      options?: Array<Option<number>>,
   }
   export interface Project {
-      id: string,
+      id: number,
       key: string,
       name: string,
       description?: string,
@@ -618,7 +611,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       canAdminProject: boolean,
       created: string,
       lead: User,
-      leadId?: string,
+      leadId?: number,
       assignStrategy: AssignStrategy,
   }
   export enum AssignStrategy {
@@ -626,22 +619,28 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       AUTHOR = "author",
   }
   export type FieldValue = string | null | undefined | object | Array<string>
+  export interface Option<T> {
+      id: T,
+      name: string,
+      iconUrl?: string,
+      altName?: string,
+  }
   export interface CardColorPreset {
       strategy: ColorStrategy,
       colors: Array<CardColor>,
   }
   export interface CardColor {
-      id: string,
+      id: number,
       value: string,
       color: string,
   }
   export interface Sprint {
-      id: string;
+      id: number;
       name: string;
       author: User,
-      authorId: string;
+      authorId: number;
       goal: string;
-      boardId: string,
+      boardId: number,
       displayName: string,
       state: SprintState,
       active: boolean,
@@ -650,17 +649,17 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       finishDate: string,
       activatedDate: string,
       completedDate: string,
-      auditEntries: Array<SprintAutidEntry>
+      auditEntries: Array<SprintAuditEntry>
   }
   export enum SprintState {
       NEW = 'new',
       ACTIVE = 'active',
       COMPLETE = 'complete',
   }
-  export interface SprintAutidEntry {
-      id: string,
+  export interface SprintAuditEntry {
+      id: number,
       author: User,
-      authorId: string,
+      authorId: number,
       state: SprintState,
       created: string,
   }
@@ -676,12 +675,12 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export interface SearchResult<T> {
       total: number,
-      items: Array<T>,
+      results: Array<T>,
       page: number,
       limit: number,
   }
   export interface Issue extends IssueInfo {
-      projectId: string,
+      projectId: number,
       assignee?: User,
       author?: User,
       project: Project,
@@ -692,9 +691,9 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       estimateValue?: number,
       timeLeftValue?: number,
       timeSpentValue?: number,
-      priorityId?: string,
+      priorityId?: number,
       status: Status,
-      statusId: string,
+      statusId: number,
       summary: string,
       description: string,
       created: string,
@@ -766,21 +765,21 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       error?: string
   }
   export interface Dashboard {
-      id: string,
+      id: number,
       name: string,
       description: string,
       author: User,
       sharedForGroups: Array<string>,
-      sharedForUserIds: Array<string>,
-      widgets: Array<DashboardUserWidget>,
+      sharedForUserIds: Array<number>,
+      widgets: Array<DashboardWidget>,
   }
-  export interface DashboardUserWidget extends WidgetPosition {
-      id: string,
-      widget: DashboardWidget,
+  export interface DashboardWidget extends WidgetPosition {
+      id: number,
+      widgetType: DashboardWidgetType,
       params: WidgetParams,
   }
-  export interface DashboardWidget {
-      id: string,
+  export interface DashboardWidgetType {
+      key: string,
       name: string,
       description: string,
       previewImageUrl: string,
@@ -792,8 +791,8 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       columns: [number, number],
       rows: [number, number],
   }
-  export interface DeleteInfo {
-      deletedCount: number
+  export interface DeleteResult {
+      count: number
   }
   export interface ResponseError {
       status: number,
@@ -810,7 +809,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       iconType: string,
       url: string,
   }
-  export  interface ExportModule {
+  export interface ExportModule {
       id: string,
       name: string,
       webComponent: string,
@@ -822,7 +821,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       qs: string,
       extraParams?: {[key: string]: string},
   }
-  export interface FieldType {
+  export interface FieldTypeDescriptor {
       key: string,
       name: string,
       description?: string,
@@ -838,7 +837,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       webComponent: string,
   }
   export interface ChangeGroup {
-      id: string,
+      id: number,
       author: User,
       created: string,
       changeItems: {[key: string]: ChangeItem},
@@ -860,29 +859,29 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       storedIssuesCount: number,
   }
   export interface IssueTypeSchema {
-      id: string,
+      id: number,
       name: string,
       description?: string,
       issueTypes: Array<IssueType>,
-      issueTypeIds: Array<string>,
+      issueTypeIds: Array<number>,
   }
   export interface PriorityAffectedSchemas {
       priority: Priority,
       prioritySchemas: Array<PrioritySchema>,
   }
   export interface PrioritySchema {
-      id: string,
+      id: number,
       name: string,
       description?: string,
       priorities: Array<Priority>,
   }
   export interface Resolution {
-      id: string,
+      id: number,
       name: string,
       description?: string,
   }
   export interface ResolutionSchema {
-      id: string,
+      id: number,
       name: string,
       description?: string,
       resolutions: Array<Resolution>,
@@ -901,7 +900,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       required: boolean,
   }
   export interface FieldLayout {
-      id: string,
+      id: number,
       name: string,
       description: string,
       fieldLayoutItems: Array<FieldLayoutItem>
@@ -911,26 +910,26 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       fieldLayout: FieldLayout,
   }
   export interface FieldLayoutSchema {
-      id: string,
+      id: number,
       name: string,
       description: string,
       defaultLayout: FieldLayout,
-      defaultLayoutId: string,
+      defaultLayoutId: number,
       entries: Array<FieldLayoutSchemaEntry>
   }
   export interface IssueLinkType {
-      id: string,
+      id: number,
       name: string,
       incomingName: string,
       outgoingName: string,
   }
   export interface IssueLink {
-      id: string,
-      issueLinkTypeId: string,
+      id: number,
+      issueLinkTypeId: number,
       issueLinkType: IssueLinkType,
-      sourceIssueId: string,
+      sourceIssueId: number,
       sourceIssue: Issue,
-      targetIssueId: string,
+      targetIssueId: number,
       targetIssue: Issue,
   }
   export interface IssueLinkRequest {
@@ -949,15 +948,15 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       editable: boolean,
   }
   export interface MetaIssueTab {
-      id: string,
+      id: number,
       name: string,
       fields: Array<MetaIssueField>,
   }
   export interface MetaIssueAction {
       name: string,
       actionId: number,
-      screenId: string,
-      targetStatusId: string,
+      screenId: number,
+      targetStatusId: number,
   }
   export interface MetaIssue {
       tabs: Array<MetaIssueTab>,
@@ -1013,7 +1012,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       fieldName: string,
   }
   export interface TimeSheerReportRequest {
-      projectOrFilter: string,
+      projectOrFilter: string|number,
       startDate?: string,
       finishDate?: string,
   }
@@ -1054,25 +1053,25 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
     fieldLayoutSchemas: Array<FieldLayoutSchema>
   }
   export interface WorkflowSchema {
-      id: string,
+      id: number,
       name: string,
       description: string|null,
       defaultWorkflow: Workflow,
-      defaultWorkflowId: string,
+      defaultWorkflowId: number,
       entries: Array<WorkflowSchemaEntry>,
   }
   export interface Workflow {
-      id: string,
+      id: number,
       name: string,
       description: string | null,
       statuses: Array<Status>,
       display: {
           statusPositionMap: {
-              [kay: string]: Position
+              [kay: number]: Position
           },
           canvasPosition: Position,
           actionPorts: {
-              [key: string]: {
+              [key: number]: {
                   left: NodePort,
                   right: NodePort,
               }
@@ -1080,7 +1079,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       },
       createAction: WorkflowAction,
       actions: Array<WorkflowAction>,
-      originalId: string | null,
+      originalId: number | null,
       author: User | null,
       updater: User | null,
       created: string | null,
@@ -1091,7 +1090,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       y: number,
   }
   export interface NodePort {
-      nodeId: string,
+      nodeId: number,
       direction: Direction|null,
       index: number,
   }
@@ -1099,22 +1098,22 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   export interface WorkflowAction {
       id: number,
       name: string,
-      sourceStatusIds: Array<string>,
-      targetStatusId: string,
-      screenId: string|null,
+      sourceStatusIds: Array<number>,
+      targetStatusId: number,
+      screenId: number|null,
       screen: Screen|null,
       validators: Array<WorkflowActionFunction>,
       conditions: WorkflowActionConditionGroup,
       postfunctions: Array<WorkflowActionFunction>,
   }
   export interface Screen {
-      id: string,
+      id: number,
       name: string,
       description: string,
       tabs: Array<ScreenTab>
   }
   export interface ScreenTab {
-      id: string,
+      id: number,
       name: string,
       fieldIds: Array<string>,
       fields: Array<IssueField>,
@@ -1142,47 +1141,47 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       workflow: Workflow,
   }
   export interface IssueTypeScreenSchema {
-      id: string,
+      id: number,
       name: string,
       description?: string | null,
       defaultScreenSchema: ScreenSchema,
-      defaultScreenSchemaId: string,
+      defaultScreenSchemaId: number,
       entries: {
-          [key: string]: ScreenSchema
+          [key: number]: ScreenSchema
       },
-      assignedIssueTypesMap: {[key: string]: IssueType}
+      assignedIssueTypesMap: {[key: number]: IssueType}
   }
   export interface ScreenSchema {
-      id: string,
+      id: number,
       name: string,
       description?: string | null,
       defaultScreen: Screen,
-      defaultScreenId: string,
+      defaultScreenId: number,
       createScreen?: Screen,
-      createScreenId?: string,
+      createScreenId?: number,
       editScreen?: Screen,
-      editScreenId?: string,
+      editScreenId?: number,
       viewScreen?: Screen,
-      viewScreenId?: string,
+      viewScreenId?: number,
   }
   export interface ScreenSchemaAffectedSchemas {
       screenSchema: ScreenSchema,
       issueTypeScreenSchemas: Array<IssueTypeScreenSchema>,
   }
   export interface SearchFilter extends SharedObject {
-      id: string,
+      id: number,
       name: string,
       description: string,
       queryString: string,
       author: User,
-      authorId: string,
-      updateAuthorId?: string,
+      authorId: number,
+      updateAuthorId?: number,
       created: string,
       updated?: string,
   
   }
   export interface SearchFilterQueryParams extends SearchQuery {
-      author?: Array<string>,
+      author?: Array<number>,
       favorite?: 0|1,
   }
   export interface WorkflowFunction {
@@ -1197,34 +1196,34 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export type WorkflowFunctionType = 'postfunction' | 'validator' | 'condition';
   export interface WorkflowSchemaSimple {
-      id: string,
+      id: number,
       name: string,
       description: string|null,
-      workflowIds: Array<string>,
+      workflowIds: Array<number>,
   }
   export interface WorkflowSearchResult extends SearchResult<Workflow>{
       drafts: Array<Workflow>,
       schemas: Array<WorkflowSchemaSimple>,
   }
   export interface Directory {
-      id: string
+      id: number
       name: string,
       description: string,
-      typeId: string,
-      type: DirectoryType,
+      directoryTypeKey: string,
+      directoryType: DirectoryType,
       attributes: DirectoryAttributes,
       active: boolean,
       sequence: number,
   }
   export interface DirectoryType {
-      id: string,
+      key: string,
       name: string,
       description: string,
       webComponent: string,
   }
   export type DirectoryAttributes = {[key: string]: string};
   export interface Group {
-      id: string,
+      id: number,
       name: string,
   }
   export interface IncludedBy {
@@ -1232,10 +1231,10 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       groups: Array<string>,
   }
   export interface ProjectRoleMap {
-      projectId: string;
+      projectId: number;
       projectName: string;
       projectKey: string;
-      rolesMap: Record<string, IncludedBy>
+      rolesMap: Record<number, IncludedBy>
   }
   export interface UserProjectRoles {
       user: User,
@@ -1243,34 +1242,30 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       projectRoleMaps: Array<ProjectRoleMap>,
   }
   export interface ProjectRole {
-      id: string,
+      id: number,
       name: string,
       description?: string
   }
   export interface UserActivity {
-      dashboard: Dashboard|null,
-      dashboardId: string|null,
+      dashboardId: number|null,
       navigatorQs: string | null,
-      navigatorFilterId: string | null,
+      navigatorFilterId: number | null,
       navigatorColumnIds: Array<string>,
-      lastVisitedIssuesIds: Array<string>,
-      lastVisitedProjectIds: Array<string>,
+      lastVisitedIssuesIds: Array<number>,
+      lastVisitedProjectIds: Array<number>,
       navigatorColumns: Array<IssueField>,
-      lastVisitedIssues: Array<Issue>,
-      lastVisitedProjects: Array<Project>,
-      lastVisitedFilterIds: Array<string>,
+      lastVisitedFilterIds: Array<number>,
       lastVisitedFilters: Array<SearchFilter>,
-      lastVisitedBoardIds: Array<string>,
-      favoriteFilterIds: Array<string>,
-      favoriteBoardIds: Array<string>,
-      lastVisitedBoards: Array<Board>,
+      lastVisitedBoardIds: Array<number>,
+      favoriteFilterIds: Array<number>,
+      favoriteBoardIds: Array<number>,
   }
   export interface UserActivityRequest {
       navigatorColumnIds: Array<string>,
-      favoriteFilterIds: Array<string>,
-      unFavoriteFilterIds: Array<string>,
-      favoriteBoardIds: Array<string>,
-      unFavoriteBoardIds: Array<string>,
+      favoriteFilterIds: Array<number>,
+      unFavoriteFilterIds: Array<number>,
+      favoriteBoardIds: Array<number>,
+      unFavoriteBoardIds: Array<number>,
   }
   export interface UserProfile extends User {
       activity: UserActivity,
@@ -1291,7 +1286,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       ed?: Direction|null,
   }
   export interface NodeModel {
-      id: string,
+      id: number,
       position: Position,
       name: string,
       startNode: boolean,
@@ -1309,39 +1304,43 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   export interface WorkflowLink extends NodeLink {
       actionId: number,
   }
+  export interface BaseOption {
+      name: string;
+      [key: string]: any;
+  }
   export interface ProjectWithIssueTypes extends Project {
       issueTypes: Array<IssueType>
   }
   export interface ProjectWithSchemaIds extends Project {
-      issueTypeSchemaId: string | null,
-      resolutionSchemaId: string | null,
-      issueTypeScreenSchemaId: string | null,
-      fieldLayoutSchemaId: string | null,
-      prioritySchemaId: string | null,
-      workflowSchemaId: string|null,
-      permissionSchemaId: string|null,
-      notificationSchemaId: string|null,
+      issueTypeSchemaId: number | null,
+      resolutionSchemaId: number | null,
+      issueTypeScreenSchemaId: number | null,
+      fieldLayoutSchemaId: number | null,
+      prioritySchemaId: number | null,
+      workflowSchemaId: number|null,
+      permissionSchemaId: number|null,
+      notificationSchemaId: number|null,
   }
   export interface ProjectWithSchemas extends Project {
-      issueTypeSchemaId: string | null,
-      resolutionSchemaId: string | null,
-      issueTypeScreenSchemaId: string | null,
-      fieldLayoutSchemaId: string | null,
+      issueTypeSchemaId: number | null,
+      resolutionSchemaId: number | null,
+      issueTypeScreenSchemaId: number | null,
+      fieldLayoutSchemaId: number | null,
       fieldLayoutSchema: FieldLayoutSchema | null,
-      prioritySchemaId: string | null,
+      prioritySchemaId: number | null,
       issueTypeSchema: IssueTypeSchema | null,
       resolutionSchema: ResolutionSchema | null,
       issueTypeScreenSchema: IssueTypeScreenSchema | null,
       prioritySchema: PrioritySchema | null,
-      workflowSchemaId: string|null,
+      workflowSchemaId: number|null,
       workflowSchema: WorkflowSchema|null,
-      permissionSchemaId: string|null,
+      permissionSchemaId: number|null,
       permissionSchema: PermissionSchema|null,
-      notificationSchemaId: string|null,
+      notificationSchemaId: number|null,
       notificationSchema: NotificationSchema|null,
   }
   export interface PermissionSchema {
-      id: string,
+      id: number,
       name: string,
       description: string|null,
       permissionsMap: {
@@ -1349,21 +1348,21 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       }
   }
   export interface PermissionSchemaEntry {
-      userIds: Array<string>,
+      userIds: Array<number>,
       groupNames: Array<string>,
-      projectRoleIds: Array<string>,
+      projectRoleIds: Array<number>,
       userFieldIds: Array<string>,
   }
   export interface NotificationSchema {
-      id: string,
-          name: string,
-          description: string|null,
-          notificationsMap: {
+      id: number,
+      name: string,
+      description: string|null,
+      notificationsMap: {
           [key: string]: NotificationSchemaEntry
       }
   }
   export interface NotificationSchemaEntry {
-      userIds: Array<string>,
+      userIds: Array<number>,
       groupNames: Array<string>,
       projectRoleIds: Array<string>,
       userFieldIds: Array<string>,
@@ -1372,10 +1371,10 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       project: Project,
       projectRoles: Array<ProjectRole>,
       usersMap: {
-          [key: string]: Array<User>
+          [key: number]: Array<User>
       },
       groupsMap: {
-          [key: string]: Array<string>
+          [key: number]: Array<string>
       },
   }
   export interface ProjectTemplate {
@@ -1415,7 +1414,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       groups?: Array<string>
   }
   export interface IssueSearchQuery extends SearchQuery {
-      filter?: string,
+      filter?: number,
       qs?: string,
       fields?: Array<string>
   }
@@ -1423,7 +1422,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       term?: string,
       page?: number,
       limit?: number,
-      excludes?: Array<string>
+      excludes?: Array<string|number>
   }
   export interface ProjectOrFilter {
       filterId?: string,
@@ -1431,7 +1430,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export interface ShareEntry  {
       users: Array<User>;
-      userIds: Array<string>;
+      userIds: Array<number>;
       groupNames: Array<string>;
   }
   export interface ApplicationProperties {
@@ -1440,13 +1439,26 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       defaultLocale: string,
       indexingLocale: string,
   }
+  export interface SystemInfo {
+    groups: Array<SystemInfoGroup>;
+  }
+  export interface SystemInfoGroup {
+    key: string,
+    label: string,
+    entries: Array<SystemInfoEntry>,
+  }
+  export interface SystemInfoEntry {
+    key: string,
+    label: string,
+    value: string,
+  }
   export interface LoggingEntry {
     id: string,
     packageName: string,
     level: string,
   }
   export interface IncomingMailServer {
-      id: string,
+      id: number,
       name: string,
       description: string,
       protocol: 'pop3' | 'imap',
@@ -1459,7 +1471,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       password: string,
   }
   export interface OutgoingMailServer {
-      id: string,
+      id: number,
       name: string,
       description: string | null,
       fromEmail: string,
@@ -1485,26 +1497,26 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       contentType: string,
   }
   export interface QueueMail extends Mail {
-      id: string,
-      mailServerId: string,
+      id: number,
+      mailServerId: number,
       created: string,
       state: string,
       errorMessage: string,
   }
   export interface MessageHandlerFactory {
-      id: string,
+      key: string,
       name: string,
       description: string,
       webComponent: string,
   }
   export interface MessageHandlerModel {
-      id: string,
+      id: number,
       name: string,
       description: string,
       factory: MessageHandlerFactory,
-      factoryId: string,
+      factoryKey: string,
       mailServer: IncomingMailServer,
-      mailServerId: string,
+      mailServerId: number,
       handlerParams: Record<string, string>,
       delayMinutes: number,
       folderName: string,
@@ -1545,12 +1557,6 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       hasViewAccess: boolean,
       viewPerms: ShareEntry,
       editPerms: ShareEntry,
-  }
-  export interface ShareRequest {
-      viewUsers?: Array<string>,
-      viewGroups?: Array<string>,
-      editUsers?: Array<string>,
-      editGroups?: Array<string>,
   }
   export interface PluginModel {
       key: string,
@@ -1631,21 +1637,17 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       progress?: number,
       plannedCompleteDate?: string,
   }
-  export interface WebSection {
-      id: string,
+  export interface WebNode {
+      id: number,
       name: string,
-      location: string,
-      sections: Array<WebSection>,
-      items: Array<WebItem>,
-      order: number,
-  }
-  export interface WebItem {
-      id: string,
-      name: string,
-      location: string,
       routeName: string,
-      params: {[key: string]: string},
-      order: number,
+      routeParams: {[key: string]: string},
+      routeQuery: {[key: string]: string},
+      iconUrl: string,
+      iconTitle: string,
+      hint: string,
+      children: Array<WebNode>,
+      section: boolean,
   }
   export interface WebRoute {
       routeName: string,
