@@ -20,7 +20,7 @@ public class WorkflowScript {
         this.functionType = functionType;
     }
 
-    public String getWorkflowId() {
+    public Long getWorkflowId() {
         return workflow.getId();
     }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-
 import { $i18n } from "@/utils/i18n.ts";
+
 </script>
 
 <template>
