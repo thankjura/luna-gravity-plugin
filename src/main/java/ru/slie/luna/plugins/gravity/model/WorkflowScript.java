@@ -32,6 +32,10 @@ public class WorkflowScript {
         return action.getId();
     }
 
+    public String getActionName() {
+        return action.getName();
+    }
+
     public String getScript() {
         return function.getParams().get("script");
     }

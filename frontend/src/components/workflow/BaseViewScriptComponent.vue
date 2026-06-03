@@ -12,16 +12,12 @@ defineProps({
 
 <template>
   <span class="gravity-view-function">
-    <CodeView :script="func?.viewParams?.script"></CodeView>
+    <CodeView class="code-viewer" :script="func?.viewParams?.script" max-height="100px"></CodeView>
   </span>
 </template>
 
 <style>
   .gravity-view-function {
     width: 100%;
-
-    .code-viewer {
-      min-height: 200px;
-    }
   }
 </style>

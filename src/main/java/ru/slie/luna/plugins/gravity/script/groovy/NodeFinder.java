@@ -1,12 +1,13 @@
 package ru.slie.luna.plugins.gravity.script.groovy;
 
 import org.codehaus.groovy.ast.ASTNode;
-import org.codehaus.groovy.ast.CodeVisitorSupport;
+import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
+import org.codehaus.groovy.control.SourceUnit;
 
-public class NodeFinder extends CodeVisitorSupport {
+public class NodeFinder extends ClassCodeVisitorSupport {
     private final int targetLine;
     private final int targetColumn;
     private ASTNode foundNode;
@@ -46,4 +47,9 @@ public class NodeFinder extends CodeVisitorSupport {
     }
 
     public ASTNode getFoundNode() { return foundNode; }
+
+    @Override
+    protected SourceUnit getSourceUnit() {
+        return null;
+    }
 }

@@ -52,7 +52,7 @@ const runScript = () => {
   errors.value = {};
   activeTab.value = 'log';
   busy.value = true;
-  scriptService.runScript(value.value, onResultFetch);
+  scriptService.runScript(value.value, {}, onResultFetch);
 }
 
 </script>

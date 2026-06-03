@@ -1,16 +1,17 @@
 package ru.slie.luna.plugins.gravity.script.groovy;
 
-import org.codehaus.groovy.ast.ASTNode;
-import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.Phases;
 import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.plugins.gravity.script.groovy.completion.ClassPropertyProvider;
+import ru.slie.luna.plugins.gravity.script.groovy.completion.DynamicBindingCustomizer;
 import ru.slie.luna.plugins.gravity.script.groovy.completion.LunaBeanProvider;
 import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteRange;
 import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
@@ -19,6 +20,7 @@ import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AutocompleteGroovyService {
@@ -34,17 +36,37 @@ public class AutocompleteGroovyService {
         this.propertyProvider = propertyProvider;
     }
 
-    private ASTNode getNode(String scriptText, int line, int column) {
+    private ASTNode getNode(String scriptText, int line, int column, Map<String, Class<?>> contextVariables) {
         CompilerConfiguration config = new CompilerConfiguration();
         config.setTolerance(10);
-        CompilationUnit cu = new CompilationUnit();
+
+        ImportCustomizer importCustomizer = new ImportCustomizer();
+        contextVariables.values().forEach(clazz -> importCustomizer.addImports(clazz.getName()));
+        config.addCompilationCustomizers(importCustomizer);
+
+        CompilationUnit cu = new CompilationUnit(config);
+
+        DynamicBindingCustomizer dynamicFields = new DynamicBindingCustomizer(contextVariables);
+        cu.addPhaseOperation((source, context, classNode) -> {
+            try {
+                dynamicFields.call(source, context, classNode);
+            } catch (Exception e) {
+                log.error("Customizer error", e);
+            }
+        }, Phases.CONVERSION);
+
         SourceUnit su = cu.addSource(new SourceUnit("script.groovy", scriptText, config, null, new CustomErrorCollector(config)));
 
         NodeFinder nodeFinder = new NodeFinder(line, column);
         try {
-            cu.compile(Phases.CANONICALIZATION);
+            cu.compile(Phases.SEMANTIC_ANALYSIS);
             ModuleNode module = su.getAST();
-            module.getStatementBlock().visit(nodeFinder);
+            //module.getStatementBlock().visit(nodeFinder);
+            if (module != null && module.getClasses() != null) {
+                for (ClassNode classNode : module.getClasses()) {
+                    classNode.visitContents(nodeFinder);
+                }
+            }
         } catch (Exception e) {
             log.error("parse error", e);
         }
@@ -63,10 +85,10 @@ public class AutocompleteGroovyService {
         return expressions.size();
     }
 
-    public SignatureHelp getSignatureHelp(String scriptText, int line, int column) {
+    public SignatureHelp getSignatureHelp(String scriptText, int line, int column, Map<String, Class<?>> contextVariables) {
         scriptText += ")";
 
-        ASTNode node = getNode(scriptText, line, column);
+        ASTNode node = getNode(scriptText, line, column, contextVariables);
         SignatureHelp signatureHelp = new SignatureHelp();
 
         if (node == null) {
@@ -75,7 +97,7 @@ public class AutocompleteGroovyService {
 
         if (node instanceof MethodCallExpression call) {
             Expression objectExpr = call.getObjectExpression();
-            Class<?> targetClass = resolveClass(objectExpr);
+            Class<?> targetClass = resolveClass(objectExpr, contextVariables);
             if (targetClass == null) {
                 return signatureHelp;
             }
@@ -110,12 +132,12 @@ public class AutocompleteGroovyService {
         return signatureHelp;
     }
 
-    public AutocompleteResult getSuggestions(String scriptText, int line, int column, int limit) {
+    public AutocompleteResult getSuggestions(String scriptText, int line, int column, int limit, Map<String, Class<?>> contextVariables) {
         if (scriptText.endsWith(".")) {
             scriptText += "__LUNA_PLACEHOLDER__";
         }
 
-        ASTNode node = getNode(scriptText, line, column);
+        ASTNode node = getNode(scriptText, line, column, contextVariables);
         AutocompleteResult result = new AutocompleteResult();
 
         if (node == null) {
@@ -126,16 +148,16 @@ public class AutocompleteGroovyService {
         switch (node) {
             case VariableExpression e -> {
                 if (e.isDynamicTyped()) {
-                    result.addResult(beanProvider.getSuggestions(e.getText().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase(), limit));
+                    result.addResult(beanProvider.getSuggestions(e.getText().replace(LUNA_PLACEHOLDER, "").toLowerCase(), limit));
                 }
             }
             case PropertyExpression e -> {
                 Expression exp = e.getObjectExpression();
                 if (exp != null) {
-                    Class<?> clazz = resolveClass(exp);
+                    Class<?> clazz = resolveClass(exp, contextVariables);
                     if (clazz != null) {
                         result.setRange(AutocompleteRange.forNode(e.getProperty()));
-                        String prefix = e.getPropertyAsString().replaceAll(LUNA_PLACEHOLDER, "").toLowerCase();
+                        String prefix = e.getPropertyAsString().replace(LUNA_PLACEHOLDER, "").toLowerCase();
                         boolean isStaticContext = (exp instanceof ClassExpression);
                         result.addResult(propertyProvider.getSuggestions(prefix, clazz, !isStaticContext, limit));
                     }
@@ -146,7 +168,7 @@ public class AutocompleteGroovyService {
         return result;
     }
 
-    private Class<?> resolveClass(Expression exp) {
+    private Class<?> resolveClass(Expression exp, Map<String, Class<?>> contextVariables) {
         // UserManager
         if (exp instanceof ClassExpression ce) {
             return ce.getType().getTypeClass();
@@ -154,12 +176,27 @@ public class AutocompleteGroovyService {
 
         // um
         if (exp instanceof VariableExpression ve) {
+            Variable var = ve.getAccessedVariable();
+            if (var != null && !(var instanceof DynamicVariable)) {
+                try {
+                    Class<?> localType = var.getType().getTypeClass();
+                    if (localType != Object.class) {
+                        return localType;
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            String varName = ve.getName();
+            if (contextVariables != null && contextVariables.containsKey(varName)) {
+                return contextVariables.get(varName);
+            }
+
             return ve.getType().getTypeClass();
         }
 
         // System.out
         if (exp instanceof PropertyExpression pe) {
-            Class<?> parentClazz = resolveClass(pe.getObjectExpression());
+            Class<?> parentClazz = resolveClass(pe.getObjectExpression(), contextVariables);
             if (parentClazz != null) {
                 try {
                     String propName = pe.getPropertyAsString();

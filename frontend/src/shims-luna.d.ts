@@ -1,4 +1,4 @@
-// Luna exposes version: 3.0.0-SNAPSHOT
+// Luna exposes version: 3.0.1-SNAPSHOT
 declare module 'luna' {
   import type { DefineComponent, AllowedComponentProps, ComponentCustomProps, VNodeProps } from 'vue'
   import RouteLocationRaw from 'vue-router'
@@ -7,6 +7,7 @@ declare module 'luna' {
     {}, {}, {}, {}, {}, {}, {}, {}>
   export const ButtonBusy: DefineComponent<
     {
+      type?: "button" | "submit" | "reset"
       busy?: boolean
       disabled?: boolean
     }, {}, {}, {}, {}, {}, {}, {}> & { $slots: {
@@ -70,11 +71,13 @@ declare module 'luna' {
   };
   export const UserAvatarComponent: DefineComponent<
     {
+      size?: IconSize
       user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
     }, {}, {}, {}, {}, {}, {}, {}>
   export const UserLinkComponent: DefineComponent<
     {
       user?: User
+      label?: string
     }, {}, {}, {}, {}, {}, {}, {}>
   export const BaseDialog: DefineComponent<
     {
@@ -134,7 +137,7 @@ declare module 'luna' {
       zIndex?: number
       align?: "left" | "right" | "auto"
       options?: DropDownGroupOption[]
-      parentPosition?: { x: number; y: number; width: number; height: number; }
+      parentPosition?: ElemRect
     }, {}, {}, {}, {}, {}, {}, {
       'clicked': [_option: DropDownOption, _event: MouseEvent]
     }>
@@ -142,10 +145,14 @@ declare module 'luna' {
     {
       option?: DropDownOption
     }, {}, {}, {}, {}, {}, {}, {}>
-  export const CheckboxesComponent: DefineComponent<
+  export const CheckBoxesComponent: DefineComponent<
     {
-      modelValue: string[]
       optionGroups: OptionsGroup<T>[]
+      valueKey?: keyof T
+      disabled?: boolean
+      busyValue?: string | number
+      emitsOnly?: boolean
+      modelValue?: (string | number)[]
     }, {
       focusTerm: () => void
     
@@ -153,11 +160,11 @@ declare module 'luna' {
     
       delValue: (optId: string | number) => void
     }, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: (string | number)[]]
-    
       'select': [value: T]
     
       'remove': [value: string | number]
+    
+      'update:modelValue': [value: (string | number)[]]
     }>
   export const ColorPickerDialog: DefineComponent<
     {}, {
@@ -232,7 +239,7 @@ declare module 'luna' {
     
       'remove': [value: string | number]
     
-      'create': [value: string | number]
+      'create': [value: string]
     
       'update:modelValue': [value: (string | number)[]]
     }>
@@ -242,11 +249,11 @@ declare module 'luna' {
       modelValue?: string
       error?: string
     }, {}, {}, {}, {}, {}, {}, {
+      'submit': []
+    
       'update:modelValue': [value: string]
     
       'update:error': [value: string]
-    
-      'submit': []
     
       'heightChanged': []
     }>
@@ -335,6 +342,7 @@ declare module 'luna' {
       term?: string
       field?: HTMLElement
       tag?: string
+      valueKey: keyof T
       suggestionKey?: keyof T | ((item: T) => string)
       cropSuggestions: boolean
       iconRadius?: string
@@ -372,6 +380,10 @@ declare module 'luna' {
       value: number
       total: number
     }, {}, {}, {}, {}, {}, {}, {}>
+  export const ImageViewer: DefineComponent<
+    {}, {
+      show: (imagesData: ImageItem[], idx?: number) => void
+    }, {}, {}, {}, {}, {}, {}>
 export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
   export interface NotifyComponentInterface {
       info: (title: string, body?: string, closable?: boolean) => void;
@@ -389,6 +401,13 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       [key: string]: string
   }
   export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
+  export enum IconSize {
+      ORIGINAL = "original",
+      SMALL = "32x32",
+      MEDIUM = "64x64",
+      LARGE = "128x128",
+      X_LARGE = "256x256",
+  }
   export interface User {
       id: number
       directoryId: number,
@@ -400,9 +419,10 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       displayName: string | null
       groups?: Array<string>,
       locale: string,
-      iconName?: string,
+      iconPath?: string,
       iconUrl?: string,
       gender: 'male'|'female',
+      active: boolean,
   }
   export interface DropDownOption {
     id: string|number,
@@ -427,16 +447,29 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export type OptionsGetterSync = () => DropDownGroupOption[]
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
+  export interface ElemRect {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  }
   T = any
   export type HSV = { h: number, s: number, v: number, a?: number };
   export enum IconType {
-      IssueType = "issuetypes",
-      Priority = "priorities",
-      Project = "projects",
-      Status = "statuses",
+      ISSUE_TYPE = "issuetypes",
+      PRIORITY = "priorities",
+      PROJECT = "projects",
+      AVATAR = "users",
   }
   export type OptionsFunc<T> = (term: string | null, selected: Array<ID>) => Promise<Array<T>>;
   export type ID = string|number;
+  export interface ImageItem {
+    id: number,
+    name: string,
+    description?: string,
+    imageUrl: string,
+    thumbUrl?: string,
+  }
   export interface ActivityStreamSearchQuery extends SearchQuery {
       projectKey?: string
       user?: string
@@ -463,7 +496,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       id: number,
       name: string,
       description?: string,
-      iconName: string,
+      iconPath: string,
       iconUrl: string,
   }
   export interface Status {
@@ -486,9 +519,9 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       id: number,
       name: string,
       description?: string,
-      iconName?: string,
+      iconPath?: string,
       iconUrl?: string,
-      sequence: number
+      position: number
   }
   export interface Comment {
       id: number,
@@ -606,7 +639,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       key: string,
       name: string,
       description?: string,
-      iconName?: string,
+      iconPath?: string,
       iconUrl?: string,
       canAdminProject: boolean,
       created: string,
@@ -701,12 +734,17 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       color?: string,
       sprint?: Sprint,
       rank?: string,
-      watchers: WatchersInfo,
+      labels?: Array<Label>,
+      watchers?: WatchersInfo,
       fields?: {
           [key: string]: FieldValue
       },
       issuePerms: IssuePerms,
       [key: string]: any
+  }
+  export interface Label {
+      id: number,
+      name: string,
   }
   export interface WatchersInfo {
       count: number,
@@ -775,10 +813,10 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   }
   export interface DashboardWidget extends WidgetPosition {
       id: number,
-      widgetType: DashboardWidgetType,
+      widgetDescriptor: DashboardWidgetDescriptor,
       params: WidgetParams,
   }
-  export interface DashboardWidgetType {
+  export interface DashboardWidgetDescriptor {
       key: string,
       name: string,
       description: string,
@@ -799,23 +837,64 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       reason: string,
       errors: Errors
   }
+  export interface MessageSet {
+      errorMessages: Array<string>
+      warningMessages: Array<string>
+  }
   export interface IssueEventType {
       id: string,
       name: string,
       description: string | null
   }
+  export interface IconKey {
+      key: string,
+      type: IconType,
+      format: IconFormat,
+      path: string,
+  }
+  export enum IconFormat {
+      SVG = "svg",
+      PNG = "png",
+  }
   export interface Icon {
-      name: string,
-      iconType: string,
+      id: number,
+      key: IconKey,
+      fileName: string,
+      path: string,
       url: string,
   }
+  export interface BulkActionDescriptor {
+    key: string,
+    name: string,
+    description: string,
+    paramsComponent: string,
+    confirmComponent: string,
+  }
+  export interface BulkActionProgress {
+    taskId: string,
+    actionKey: string,
+    actionName: string,
+    actionDescription: string,
+    initiator: User,
+    startDate: string,
+    finishDate?: string,
+    progress: number,
+    progressMessage: string,
+    active: boolean,
+    duration: number,
+  }
+  export interface BulkActionRequest {
+    actionKey: string,
+    actionParams: any,
+    issueKeys: Array<string>,
+  }
   export interface ExportModule {
-      id: string,
+      key: string,
       name: string,
       webComponent: string,
   }
   export interface ExportParams {
-      moduleId: string,
+      moduleKey: string,
       limit: number,
       fields: Array<string>,
       qs: string,
@@ -830,33 +909,16 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       viewComponents?: Array<string>,
       editComponents?: Array<string>,
   }
-  export interface FieldSearcher {
+  export interface FieldSearcherDescriptor {
       key: string,
       name: string,
       description?: string,
-      webComponent: string,
   }
   export interface ChangeGroup {
       id: number,
       author: User,
       created: string,
       changeItems: {[key: string]: ChangeItem},
-  }
-  export interface IndexingStatus {
-      startDate: string,
-      finishDate: string,
-      time: number,
-      total: number,
-      completed: number,
-      failures: number,
-      state: 'calc' | 'indexing' | 'done' | 'fail',
-      running: boolean,
-      progress: number,
-      planningCompleteDate: string,
-  }
-  export interface IndexingStats {
-      indexedIssuesCount: number,
-      storedIssuesCount: number,
   }
   export interface IssueTypeSchema {
       id: number,
@@ -972,6 +1034,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       requiredFields: Array<string>,
       descriptionField: MetaIssueField,
       priorityField: MetaIssueField,
+      labelField: MetaIssueField,
   }
   export interface IssueMoveResponse {
       project: Project,
@@ -1002,14 +1065,28 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       minimumRequiredArguments: boolean,
   }
   export interface QuerySearcher {
-      fieldId: string,
-      fieldName: string,
+      id: string,
+      name: string,
+      nameQs: string,
       valueType: string,
       allowedOperators: Array<QueryOperator>,
+      supportBasicSearch: boolean,
   }
   export interface QuerySorter {
-      fieldId: string,
-      fieldName: string,
+      id: string,
+      name: string,
+  }
+  export interface SearcherRepresentation {
+      id: string,
+      name: string,
+      qsFragment: string,
+      viewLabel: string,
+      editComponent: string,
+      formValue: any,
+  }
+  export interface QueryRepresentation {
+      valid: boolean,
+      searchers: Array<SearcherRepresentation>,
   }
   export interface TimeSheerReportRequest {
       projectOrFilter: string|number,
@@ -1213,7 +1290,7 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       directoryType: DirectoryType,
       attributes: DirectoryAttributes,
       active: boolean,
-      sequence: number,
+      position: number,
   }
   export interface DirectoryType {
       key: string,
@@ -1307,6 +1384,19 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   export interface BaseOption {
       name: string;
       [key: string]: any;
+  }
+  export interface ProgressStep {
+      id: string,
+      name: string,
+      description?: string,
+  }
+  export interface ProjectInfo {
+      id: number,
+      key: string,
+      name: string,
+      description: string,
+      iconPath: string,
+      iconUrl: string,
   }
   export interface ProjectWithIssueTypes extends Project {
       issueTypes: Array<IssueType>
@@ -1416,7 +1506,8 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   export interface IssueSearchQuery extends SearchQuery {
       filter?: number,
       qs?: string,
-      fields?: Array<string>
+      fields?: Array<string>,
+      updateActivity?: 1|0,
   }
   export interface SearchQueryExt {
       term?: string,
@@ -1439,6 +1530,62 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       defaultLocale: string,
       indexingLocale: string,
   }
+  export interface BackupTableStatus {
+    tableName: string,
+    totalRows: number,
+    completedRows: number,
+  }
+  export enum BackupPhase {
+    CALC = "calc",
+    BACKUP = "backup",
+    DONE = "done",
+    FAIL = "fail",
+    CANCELED = "canceled",
+  }
+  export interface BackupStatus {
+    startDate: string,
+    finishDate: string,
+    duration: number,
+    progress: number,
+    planningCompleteDate: string,
+    phase: BackupPhase,
+    totalRows: number,
+    completedRows: number,
+    filePath: string,
+    tableStatus: BackupTableStatus,
+    cancelled: boolean,
+    running: boolean,
+  }
+  export interface BackupStatusResponse {
+    status: BackupStatus,
+    backupDir: string
+  }
+  export interface OpenApiDoc {
+    url: string,
+    name: string,
+  }
+  export enum IndexingPhase {
+      CALC = 'calc',
+      INDEXING = 'indexing',
+      DONE = 'done',
+      FAIL = 'fail',
+  }
+  export interface IndexingStatus {
+      startDate: string,
+      finishDate: string,
+      duration: number,
+      total: number,
+      completed: number,
+      failures: number,
+      phase: IndexingPhase,
+      running: boolean,
+      progress: number,
+      planningCompleteDate: string,
+  }
+  export interface IndexingStats {
+      indexedIssuesCount: number,
+      storedIssuesCount: number,
+  }
   export interface SystemInfo {
     groups: Array<SystemInfoGroup>;
   }
@@ -1452,18 +1599,43 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
     label: string,
     value: string,
   }
+  export enum LicenceType {
+    DEVELOPMENT = 'development',
+    COMMERCIAL = 'commercial',
+    TRIAL = 'trial',
+  }
+  export interface LicenseDetails {
+    id: string,
+    serverId: string,
+    app: string,
+    type: LicenceType,
+    version: number,
+    startAt: string,
+    expiresAt: string,
+    userLimit: number,
+    current: boolean,
+    expired: boolean,
+  
+    customerName: string,
+    issuedAt: string,
+  }
+  export interface AppLicenseResponse {
+    licenses: Array<LicenseDetails>,
+    activeUserCount: number,
+  }
   export interface LoggingEntry {
     id: string,
     packageName: string,
     level: string,
   }
+  export type MailEncryption = 'start_tls' | 'ssl_tls';
   export interface IncomingMailServer {
       id: number,
       name: string,
       description: string,
       protocol: 'pop3' | 'imap',
-      useSSL: boolean,
-      startTLS: boolean,
+      encryption: MailEncryption | null,
+      disableCertVerification: boolean,
       timeout: number,
       host: string,
       port: number,
@@ -1479,8 +1651,8 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       host: string,
       port: number,
       timeout: number,
-      startTLS: boolean,
-      useSSL: boolean,
+      encryption: MailEncryption | null,
+      disableCertVerification: boolean,
       username: string,
       password?: string,
   }
@@ -1565,8 +1737,9 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       version: string,
       vendor: PluginVendor,
       enabled: boolean,
-      components: Array<PluginComponent>
-      resources: Array<PluginResource>
+      components: Array<PluginComponent>,
+      resources: Array<PluginResource>,
+      activeDocs: Array<string>
   }
   export interface PluginVendor {
       name?: string,
@@ -1587,13 +1760,18 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
       enabled: boolean,
       resourceUrl: string,
   }
+  export enum RankingPhase {
+    CALC = 'calc',
+    RANKING = 'ranking',
+    DONE = 'done',
+  }
   export interface RankingStatus {
     startDate: string,
     finishDate: string,
-    time: number,
+    duration: number,
     total: number,
     completed: number,
-    state: 'calc' | 'ranking' | 'done',
+    phase: RankingPhase,
     running: boolean,
     planningCompleteDate: string,
     progress: number,
@@ -1602,6 +1780,74 @@ export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale:
   export interface RankingStats {
     issueField: IssueField,
     missingCount: number,
+  }
+  export interface BackupMetaProject {
+    id: number,
+    key: string,
+    name: string,
+    description: string,
+    issueCount: number,
+    parseResult?: ProjectParseResult,
+  }
+  export interface ProjectParseResult {
+    startDate: string,
+    finishDate: string,
+    errors: Record<string, MessageSet>,
+    valid: boolean,
+    issueCount: number,
+    attachmentCount: number,
+    commentCount: number,
+    watcherCount: number,
+    worklogCount: number,
+    changeGroupCount: number,
+    changeItemCount: number,
+  }
+  export interface BackupMeta {
+    backupName: string,
+    backupCRC32: number,
+    backupSize: number,
+    backupDate: string,
+    parseStartDate: string,
+    parseFinishDate: string,
+    projects: Array<BackupMetaProject>,
+  }
+  export interface ProjectImportResult {
+    startDate: string,
+    finishDate: string,
+    errors: Record<string, MessageSet>,
+    issueCount: number,
+    attachmentCount: number,
+    commentCount: number,
+    watcherCount: number,
+    worklogCount: number,
+    changeGroupCount: number,
+    changeItemCount: number,
+  }
+  export enum ProjectImportPhase {
+      IDLE = "idle",
+      ANALYZING = "analyzing",
+      VALIDATING = "validating",
+      IMPORTING = "importing",
+  }
+  export interface ProjectImportProgress  {
+    percent: number,
+    message: string,
+  }
+  export interface ProjectImportSession {
+    backupFile: string,
+    backupName: string,
+    phaseStartDate: string,
+    phaseFinishDate: string,
+    phaseProgress: ProjectImportProgress,
+    phase: ProjectImportPhase,
+    errors: Record<string, string>,
+    backupMeta: BackupMeta,
+    selectedProjectKey: string,
+    projectParseResult?: ProjectParseResult,
+    projectImportResult?: ProjectImportResult,
+  }
+  export interface RestoreInfoResponse {
+    importDirectory: string,
   }
   export interface Scheduler {
     cronExpression?: string,

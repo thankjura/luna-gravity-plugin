@@ -47,7 +47,7 @@ public class ScriptManager {
     public List<WorkflowScript> getWorkflowScripts() {
         List<WorkflowScript> workflowScripts = new ArrayList<>();
 
-        try (Stream<Workflow> workflowStream = workflowManager.getAllWorkflows()) {
+        try (Stream<Workflow> workflowStream = workflowManager.getAll()) {
             workflowStream.forEach(workflow -> {
                 for (WorkflowAction action : workflow.getActions()) {
                     if (action.getConditions() != null) {

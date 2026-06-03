@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import ru.slie.luna.issue.Issue;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.rest.request.AutocompleteRequest;
 import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
@@ -15,6 +16,7 @@ import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
 import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
 import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
+import ru.slie.luna.user.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +82,7 @@ public class ScriptRest {
             return new AutocompleteResult();
         }
 
-        return autocompleteService.getSuggestions(request.getCode(), request.getLine(), request.getColumn(), limit);
+        return autocompleteService.getSuggestions(request.getCode(), request.getLine(), request.getColumn(), limit, getContextVariables(request.getContext()));
     }
 
     @PostMapping("/signature")
@@ -89,6 +91,29 @@ public class ScriptRest {
             return new SignatureHelp();
         }
 
-        return autocompleteService.getSignatureHelp(request.getCode(), request.getLine(), request.getColumn());
+        return autocompleteService.getSignatureHelp(request.getCode(), request.getLine(), request.getColumn(), getContextVariables(request.getContext()));
+    }
+
+    Map<String, Class<?>> getContextVariables(Map<String, String> context) {
+        Map<String, Class<?>> map = new HashMap<>();
+        if (context == null) {
+            return map;
+        }
+
+        if (context.containsKey("__context__")) {
+            if ("workflowFunction".equals(context.get("__context__"))) {
+                map.put("issue", Issue.class);
+                map.put("currentUser", User.class);
+            }
+        }
+
+        for (Map.Entry<String, String> entry : context.entrySet()) {
+            switch (entry.getValue()) {
+                case "issue" -> map.put(entry.getKey(), Issue.class);
+                case "user" -> map.put(entry.getKey(), User.class);
+            }
+        }
+
+        return map;
     }
 }

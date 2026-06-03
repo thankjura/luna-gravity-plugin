@@ -1,21 +1,29 @@
 package ru.slie.luna.plugins.gravity.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import ru.slie.luna.plugins.gravity.workflow.GravityScriptCondition;
 import ru.slie.luna.plugins.gravity.workflow.GravityScriptPostfunction;
 import ru.slie.luna.plugins.gravity.workflow.GravityScriptValidator;
 
 public enum WorkflowFunctionType {
-    CONDITION(GravityScriptCondition.class),
-    VALIDATOR(GravityScriptValidator.class),
-    POSTFUNCTION(GravityScriptPostfunction.class);
+    CONDITION("condition", GravityScriptCondition.class),
+    VALIDATOR("validator", GravityScriptValidator.class),
+    POSTFUNCTION("postfunction", GravityScriptPostfunction.class);
 
-    private final  String className;
+    private final String key;
+    private final String className;
 
-    WorkflowFunctionType(Class<?> clazz) {
+    WorkflowFunctionType(String key, Class<?> clazz) {
+        this.key = key;
         this.className = clazz.getCanonicalName();
     }
 
     public String getClassName() {
         return className;
+    }
+
+    @JsonValue
+    public String getKey() {
+        return key;
     }
 }

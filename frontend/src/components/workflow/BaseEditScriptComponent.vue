@@ -11,12 +11,16 @@ type Params = {
   script: string;
 }
 
+const context = {
+  __context__: "workflowFunction",
+}
+
 const value = defineModel<Params>();
 </script>
 
 <template>
   <span class="gravity-edit-function">
-    <CodeEditor v-model="value.script"></CodeEditor>
+    <CodeEditor v-model="value.script" :context="context"></CodeEditor>
   </span>
 </template>
 

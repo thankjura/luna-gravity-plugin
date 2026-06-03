@@ -39,12 +39,14 @@ const getCodeBeforeCursor = (model: MonacoEditor.editor.ITextModel, position: Mo
   return model.getValueInRange(range);
 }
 
-export const registerSignatureHelpProvider = (instance: typeof MonacoEditor) => {
+export const registerSignatureHelpProvider = (instance: typeof MonacoEditor, getContext:() => Record<string, string>) => {
   return instance.languages.registerSignatureHelpProvider('groovy', {
     signatureHelpTriggerCharacters: ['(', ','],
     provideSignatureHelp: async (model, position, token, context) => {
       const textBeforeCursor = getCodeBeforeCursor(model, position);
-      const data = await scriptService.getSignatures(textBeforeCursor, position);
+      const currentContext = getContext();
+
+      const data = await scriptService.getSignatures(textBeforeCursor, position, currentContext);
 
       return {
         value: data,
@@ -54,7 +56,7 @@ export const registerSignatureHelpProvider = (instance: typeof MonacoEditor) => 
   });
 }
 
-export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
+export const registerAutoCompleteService = (instance: typeof MonacoEditor, getContext:() => Record<string, string>) => {
 
   // instance.languages.registerHoverProvider // документация
   // instance.languages.registerSignatureHelpProvider // сигнатура метода
@@ -64,8 +66,8 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor) => {
     triggerCharacters: ["."],
     provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
       const textBeforeCursor = getCodeBeforeCursor(model, position);
-
-      const data = await scriptService.getSuggestions(textBeforeCursor, position);
+      const currentContext = getContext();
+      const data = await scriptService.getSuggestions(textBeforeCursor, position, currentContext);
       return {
         incomplete: data.incomplete,
         suggestions: data.suggestions.map((item: Suggestion) => ({

@@ -4,12 +4,12 @@ import { Signature, Suggestion } from "@/interfaces/script.ts";
 
 
 class ScriptService {
-  async runScript(scriptContent: string, cb: (resp: {log?: string, result?: string, error?: any}) => void) {
+  async runScript(scriptContent: string, context: Record<string, string>, cb: (resp: {log?: string, result?: string, error?: any}) => void) {
     try {
       const response = await fetch(baseURL + '/gravity/script/execute', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({scriptContent})
+        body: JSON.stringify({scriptContent, context}),
       });
 
       if (!response.ok) {
@@ -54,21 +54,23 @@ class ScriptService {
     }
   }
 
-  async getSuggestions(codeText: string, position: MonacoEditor.Position){
+  async getSuggestions(codeText: string, position: MonacoEditor.Position, context: Record<string, string>){
     const {data} = await client.post<{ suggestions: Array<Suggestion>, range: MonacoEditor.IRange, incomplete: boolean }>('/gravity/script/autocomplete', {
       code: codeText,
       line: position.lineNumber,
       column: position.column,
+      context,
     });
 
     return data;
   }
 
-  async getSignatures(codeText: string, position: MonacoEditor.Position){
+  async getSignatures(codeText: string, position: MonacoEditor.Position, context: Record<string, string>){
     const {data} = await client.post<{ signatures: Array<Signature>, activeSignature: number, activeParameter: number }>('/gravity/script/signature', {
       code: codeText,
       line: position.lineNumber,
       column: position.column,
+      context,
     });
 
     return data;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
+import { onBeforeUnmount, onMounted, PropType, useTemplateRef, watch } from "vue";
 import type * as MonacoEditorType from 'monaco-editor';
 import {
   registerAutoCompleteService,
@@ -8,9 +8,10 @@ import {
 } from "@/components/groovy.ts";
 import { loadMonacoInstance } from "@/utils/monaco.ts";
 
-defineProps({
-  disabled: Boolean
-})
+const props = defineProps({
+  disabled: Boolean,
+  context: Object as PropType<Record<string, string>>,
+});
 
 const value = defineModel<string>();
 const container = useTemplateRef<HTMLDivElement>('container');
@@ -27,10 +28,10 @@ watch(value, (newValue) => {
 onMounted(async () => {
   const instance = await loadMonacoInstance();
   if (!completionProvider) {
-    completionProvider = registerAutoCompleteService(instance as typeof MonacoEditorType);
+    completionProvider = registerAutoCompleteService(instance as typeof MonacoEditorType, () => props.context);
   }
   if (!signatureProvider) {
-    signatureProvider = registerSignatureHelpProvider(instance as typeof MonacoEditorType);
+    signatureProvider = registerSignatureHelpProvider(instance as typeof MonacoEditorType, () => props.context);
   }
 
   registerGroovyLanguageForMonaco(instance as typeof MonacoEditorType);
@@ -41,7 +42,11 @@ onMounted(async () => {
     automaticLayout: true,
     suggestOnTriggerCharacters: true,
     theme: "vs-dark",
-    fixedOverflowWidgets: true,
+    padding: {
+      top: 10,
+      bottom: 10
+    },
+    //fixedOverflowWidgets: true,
     suggest: {
       showWords: false
     }
@@ -50,6 +55,7 @@ onMounted(async () => {
   editor.onDidChangeModelContent(() => {
     value.value = editor.getValue();
   });
+  editor.layout();
 });
 
 onBeforeUnmount(() => {
@@ -81,10 +87,9 @@ onBeforeUnmount(() => {
     height: 400px;
     border: 1px solid #ccc;
     text-align: left;
+    position: relative;
 
     .monaco-editor {
-      padding: 10px 0;
-
       .suggest-widget.message {
         height: auto!important;
         width: 255px!important;

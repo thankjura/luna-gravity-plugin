@@ -87,7 +87,7 @@ public class LunaBeanProvider {
             this.face = Arrays.stream(clazz.getInterfaces())
                                 .filter(f -> f.getSimpleName()
                                                      .equals(clazz.getSimpleName()
-                                                                     .replaceAll("Impl", "")))
+                                                                     .replace("Impl", "")))
                                 .findFirst().orElse(null);
         }
 
