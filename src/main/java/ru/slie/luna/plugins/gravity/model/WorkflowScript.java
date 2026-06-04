@@ -3,12 +3,18 @@ package ru.slie.luna.plugins.gravity.model;
 import ru.slie.luna.issue.workflow.Workflow;
 import ru.slie.luna.issue.workflow.action.WorkflowAction;
 import ru.slie.luna.issue.workflow.action.WorkflowActionFunction;
+import ru.slie.luna.plugins.gravity.workflow.AbstractGravityFunction;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WorkflowScript {
     private final Workflow workflow;
     private final WorkflowAction action;
     private final WorkflowActionFunction function;
     private final WorkflowFunctionType functionType;
+    private final Set<String> projectKeys;
 
     public WorkflowScript(Workflow workflow,
                           WorkflowAction action,
@@ -18,6 +24,19 @@ public class WorkflowScript {
         this.action = action;
         this.function = function;
         this.functionType = functionType;
+        this.projectKeys = new HashSet<>();
+    }
+
+    public String getId() {
+        return function.getId();
+    }
+
+    public boolean isDraft() {
+        return workflow.getOriginalId() != null;
+    }
+
+    public Long getOriginalId() {
+        return workflow.getOriginalId();
     }
 
     public Long getWorkflowId() {
@@ -42,5 +61,17 @@ public class WorkflowScript {
 
     public WorkflowFunctionType getFunctionType() {
         return functionType;
+    }
+
+    public String getScriptNote() {
+        return function.getParams().get(AbstractGravityFunction.SCRIPT_NOTE);
+    }
+
+    public Set<String> getProjectKeys() {
+        return projectKeys;
+    }
+
+    public void addProjectKeys(Collection<String> projectKeys) {
+        this.projectKeys.addAll(projectKeys);
     }
 }

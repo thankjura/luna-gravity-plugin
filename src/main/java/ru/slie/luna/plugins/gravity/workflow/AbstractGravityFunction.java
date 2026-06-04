@@ -13,6 +13,7 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
     protected final I18nResolver i18n;
     protected final ScriptRunnerService scriptRunnerService;
     public static String SCRIPT_KEY = "script";
+    public static String SCRIPT_NOTE = "note";
 
     protected AbstractGravityFunction(I18nResolver i18n,
                                       ScriptRunnerService scriptRunnerService) {

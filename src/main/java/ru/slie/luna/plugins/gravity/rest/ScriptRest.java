@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ru.slie.luna.issue.Issue;
+import ru.slie.luna.issue.MutableIssue;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.rest.request.AutocompleteRequest;
 import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
@@ -16,6 +17,7 @@ import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
 import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
 import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
+import ru.slie.luna.project.ProjectManager;
 import ru.slie.luna.user.User;
 
 import java.util.HashMap;
@@ -29,14 +31,16 @@ public class ScriptRest {
     private final Logger log = LoggerFactory.getLogger(ScriptRest.class);
     private final I18nResolver i18n;
     private final AutocompleteGroovyService autocompleteService;
-
+    private final ProjectManager projectManager;
 
     public ScriptRest(ScriptRunnerService scriptService,
                       I18nResolver i18n,
-                      AutocompleteGroovyService autocompleteService) {
+                      AutocompleteGroovyService autocompleteService,
+                      ProjectManager projectManager) {
         this.scriptService = scriptService;
         this.i18n = i18n;
         this.autocompleteService = autocompleteService;
+        this.projectManager = projectManager;
     }
 
     @PostMapping(value = "/execute", produces = MediaType.TEXT_EVENT_STREAM_VALUE + ";charset=UTF-8")
@@ -101,9 +105,15 @@ public class ScriptRest {
         }
 
         if (context.containsKey("__context__")) {
-            if ("workflowFunction".equals(context.get("__context__"))) {
-                map.put("issue", Issue.class);
-                map.put("currentUser", User.class);
+            switch (context.get("__context__")) {
+                case "workflowPostFunction" -> {
+                    map.put("issue", MutableIssue.class);
+                    map.put("currentUser", User.class);
+                }
+                case "workflowCondition", "workflowValidator" -> {
+                    map.put("issue", Issue.class);
+                    map.put("currentUser", User.class);
+                }
             }
         }
 

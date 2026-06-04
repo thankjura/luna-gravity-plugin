@@ -3,15 +3,17 @@ import { $i18n } from "@/utils/i18n.ts";
 import { WorkflowScript } from "@/interfaces/workflow.ts";
 import { onMounted, ref } from "vue";
 import { workflowService } from "@/services/workflowService.ts";
-import {LoadOverlayComponent} from 'luna';
+import { LoadOverlayComponent, ProjectInfo } from 'luna';
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
+const projects = ref<Record<string, ProjectInfo>>({});
 
 const loadScripts = () => {
   busy.value = true;
   workflowService.getScripts().then((data) => {
-    scripts.value = data.data;
+    scripts.value = data.data.scripts;
+    projects.value = data.data.projects;
   }).finally(() => {
     busy.value = false;
   });
@@ -33,6 +35,10 @@ onMounted(() => {
     </nav>
 
     <div class="pad panel workflow-scripts-list">
+      <div class="workflow-script" v-for="s in scripts">
+        {{ s.workflowName }}
+      </div>
+
       <LoadOverlayComponent v-if="busy"></LoadOverlayComponent>
     </div>
 

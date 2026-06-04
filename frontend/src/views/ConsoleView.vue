@@ -66,7 +66,7 @@ const runScript = () => {
       </ol>
     </nav>
     <div class="pad panel editor-panel">
-      <CodeEditor v-model="value" :diabled="busy"></CodeEditor>
+      <CodeEditor class="inline-code-editor" v-model="value" :diabled="busy"></CodeEditor>
       <ButtonBusy :busy="busy" :disabled="busy" @click="runScript">{{ $i18n.t("Execute") }}</ButtonBusy>
     </div>
 
@@ -74,10 +74,10 @@ const runScript = () => {
     <div class="tabs-header no-border">
       <ul>
         <li :class="{active: activeTab == 'result'}">
-          <button type="button" @click="activeTab='result'">Result</button>
+          <button type="button" @click="activeTab='result'">{{ $i18n.t("Result") }}</button>
         </li>
         <li :class="{active: activeTab == 'log'}">
-          <button type="button" @click="activeTab='log'">Log</button>
+          <button type="button" @click="activeTab='log'">{{ $i18n.t("Log") }}</button>
         </li>
       </ul>
     </div>
@@ -102,6 +102,10 @@ const runScript = () => {
       display: flex;
       flex-direction: column;
       gap: 20px;
+
+      .inline-code-editor {
+        min-height: 400px;
+      }
     }
 
     .log-tab {

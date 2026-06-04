@@ -11,13 +11,18 @@ defineProps({
 </script>
 
 <template>
-  <span class="gravity-view-function">
-    <CodeView class="code-viewer" :script="func?.viewParams?.script" max-height="100px"></CodeView>
-  </span>
+  <div class="gravity-view-function-container">
+    <div class="note" v-if="func?.viewParams?.note">{{ func.viewParams['note'] }}</div>
+    <div class="gravity-view-function">
+      <CodeView class="code-viewer" :script="func?.viewParams?.script" max-height="100px"></CodeView>
+    </div>
+  </div>
 </template>
 
 <style>
-  .gravity-view-function {
-    width: 100%;
+  .gravity-view-function-container {
+    .gravity-view-function {
+      width: 100%;
+    }
   }
 </style>

@@ -1,8 +1,4 @@
-export enum WorkflowFunctionType {
-  CONDITION = "condition",
-  VALIDATOR = "validator",
-  POSTFUNCTION = "postfunction",
-}
+import { ProjectInfo, WorkflowFunctionType } from "luna";
 
 export interface WorkflowScript {
   workflowId: string,
@@ -10,5 +6,11 @@ export interface WorkflowScript {
   actionId: string,
   actionName: string,
   script: string,
-  functionType: string,
+  functionType: WorkflowFunctionType,
 }
+
+export interface WorkflowScriptsResponse {
+  scripts: Array<WorkflowScript>,
+  projects: Record<string, ProjectInfo>
+}
+

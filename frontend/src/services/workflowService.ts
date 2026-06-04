@@ -1,9 +1,9 @@
 import { client } from "@/utils/client.ts";
-import { WorkflowScript } from "@/interfaces/workflow.ts";
+import { WorkflowScriptsResponse } from "@/interfaces/workflow.ts";
 
 class WorkflowService {
   getScripts() {
-    return client.get<Array<WorkflowScript>>('/gravity/workflow/scripts');
+    return client.get<WorkflowScriptsResponse>('/gravity/workflow/scripts');
   }
 }
 

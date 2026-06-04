@@ -41,6 +41,11 @@ onMounted(async () => {
     language: "groovy",
     automaticLayout: true,
     suggestOnTriggerCharacters: true,
+    scrollBeyondLastLine: false,
+    scrollbar: {
+      vertical: 'auto',
+      handleMouseWheel: true
+    },
     theme: "vs-dark",
     padding: {
       top: 10,
@@ -49,7 +54,7 @@ onMounted(async () => {
     //fixedOverflowWidgets: true,
     suggest: {
       showWords: false
-    }
+    },
   });
 
   editor.onDidChangeModelContent(() => {
@@ -84,7 +89,7 @@ onBeforeUnmount(() => {
   .gravity-code-editor {
     border-radius: 6px;
     overflow: hidden;
-    height: 400px;
+    min-height: 400px;
     border: 1px solid #ccc;
     text-align: left;
     position: relative;
