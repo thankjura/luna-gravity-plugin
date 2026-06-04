@@ -3,6 +3,8 @@ package ru.slie.luna.plugins.gravity.rest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.slie.luna.issue.status.Status;
+import ru.slie.luna.issue.status.StatusManager;
 import ru.slie.luna.issue.workflow.WorkflowManager;
 import ru.slie.luna.issue.workflow.WorkflowSchema;
 import ru.slie.luna.issue.workflow.WorkflowSchemaEntry;
@@ -22,13 +24,16 @@ public class WorkflowRest {
     private final ScriptManager scriptManager;
     private final ProjectManager projectManager;
     private final WorkflowManager workflowManager;
+    private final StatusManager statusManager;
 
     public WorkflowRest(ScriptManager scriptManager,
                         ProjectManager projectManager,
-                        WorkflowManager workflowManager) {
+                        WorkflowManager workflowManager,
+                        StatusManager statusManager) {
         this.scriptManager = scriptManager;
         this.projectManager = projectManager;
         this.workflowManager = workflowManager;
+        this.statusManager = statusManager;
     }
 
     @GetMapping("/scripts")
@@ -59,8 +64,11 @@ public class WorkflowRest {
         }
 
         Map<String, ProjectInfo> affectedProject = new HashMap<>();
+        Set<Long> statuses = new HashSet<>();
 
-        for (WorkflowScript workflowScript : scripts) {
+        for (WorkflowScript workflowScript: scripts) {
+            statuses.addAll(workflowScript.getTransition().getSourceStatuses());
+            statuses.add(workflowScript.getTransition().getTargetStatus());
             if (workflowProjectKeysMap.containsKey(workflowScript.getWorkflowId())) {
                 for (String projectKey : workflowProjectKeysMap.get(workflowScript.getWorkflowId())) {
                     if (!affectedProject.containsKey(projectKey)) {
@@ -71,7 +79,12 @@ public class WorkflowRest {
             }
         }
 
-        return new WorkflowScriptsResponse(scripts, affectedProject);
+        Map<Long, Status> statusesMap = new HashMap<>();
+        for (Status status: statusManager.getByIds(statuses)) {
+            statusesMap.put(status.getId(), status);
+        }
 
+
+        return new WorkflowScriptsResponse(scripts, affectedProject, statusesMap);
     }
 }

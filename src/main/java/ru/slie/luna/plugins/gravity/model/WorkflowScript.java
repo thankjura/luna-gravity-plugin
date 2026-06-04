@@ -15,6 +15,7 @@ public class WorkflowScript {
     private final WorkflowActionFunction function;
     private final WorkflowFunctionType functionType;
     private final Set<String> projectKeys;
+    private final WorkflowTransition transition;
 
     public WorkflowScript(Workflow workflow,
                           WorkflowAction action,
@@ -25,6 +26,7 @@ public class WorkflowScript {
         this.function = function;
         this.functionType = functionType;
         this.projectKeys = new HashSet<>();
+        this.transition = new WorkflowTransition(action);
     }
 
     public String getId() {
@@ -73,5 +75,9 @@ public class WorkflowScript {
 
     public void addProjectKeys(Collection<String> projectKeys) {
         this.projectKeys.addAll(projectKeys);
+    }
+
+    public WorkflowTransition getTransition() {
+        return transition;
     }
 }
