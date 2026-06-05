@@ -2,11 +2,11 @@ package ru.slie.luna.plugins.gravity.workflow;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.issue.workflow.WorkflowTransientVars;
 import ru.slie.luna.issue.workflow.validator.WorkflowValidator;
 import ru.slie.luna.locale.I18nResolver;
-import ru.slie.luna.plugins.gravity.metrics.ScriptMetricsListener;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import java.util.Map;
 public class GravityScriptValidator extends AbstractGravityFunction implements WorkflowValidator {
     private final static Logger log = LoggerFactory.getLogger(GravityScriptValidator.class);
 
-    public GravityScriptValidator(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ScriptMetricsListener scriptMetricsListener) {
-        super(i18n, scriptRunnerService, scriptMetricsListener);
+    public GravityScriptValidator(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ApplicationEventPublisher eventPublisher) {
+        super(i18n, scriptRunnerService, eventPublisher);
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 
@@ -33,8 +34,8 @@ public class ScriptMetricsListener implements InitializingBean, DisposableBean {
         scriptMetricsExecutor.scheduleWithFixedDelay(this::flushBatch, 5, 5, TimeUnit.SECONDS);
     }
 
-    // TODO: global event publisher
-    public void enqueue(ScriptRunEvent event) {
+    @EventListener
+    public void handleScriptRunEvent(ScriptRunEvent event) {
         scriptMetricsExecutor.submit(() -> {
             boolean accepted = batchQueue.offer(event);
             if (accepted && batchQueue.size() >= BATCH_SIZE) {

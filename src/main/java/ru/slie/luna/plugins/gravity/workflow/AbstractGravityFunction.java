@@ -1,9 +1,9 @@
 package ru.slie.luna.plugins.gravity.workflow;
 
+import org.springframework.context.ApplicationEventPublisher;
 import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.issue.workflow.WorkflowFunction;
 import ru.slie.luna.locale.I18nResolver;
-import ru.slie.luna.plugins.gravity.metrics.ScriptMetricsListener;
 import ru.slie.luna.plugins.gravity.script.ScriptParseErrorException;
 import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractGravityFunction implements WorkflowFunction  {
     protected final I18nResolver i18n;
     protected final ScriptRunnerService scriptRunnerService;
-    private final ScriptMetricsListener eventListener;
+    private final ApplicationEventPublisher eventPublisher;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static String SCRIPT_KEY = "script";
@@ -28,10 +28,10 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
 
     protected AbstractGravityFunction(I18nResolver i18n,
                                       ScriptRunnerService scriptRunnerService,
-                                      ScriptMetricsListener eventListener) {
+                                      ApplicationEventPublisher eventPublisher) {
         this.i18n = i18n;
         this.scriptRunnerService = scriptRunnerService;
-        this.eventListener = eventListener;
+        this.eventPublisher = eventPublisher;
     }
 
     protected void logConsumer(String msg) {
@@ -108,7 +108,7 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
             long executionTimeMs = (endWallTimeNano - startWallTimeNano) / 1_000_000;
             long cpuTimeMs = isCpuTimeSupported ? (endCpuTimeNano - startCpuTimeNano) / 1_000_000 : 0;
 
-            eventListener.enqueue(new ScriptRunEvent(
+            eventPublisher.publishEvent(new ScriptRunEvent(
                     functionId, now, cpuTimeMs, executionTimeMs, stackTrace, payload
             ));
         }
