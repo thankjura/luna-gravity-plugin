@@ -92,12 +92,13 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
         LocalDateTime now = LocalDateTime.now();
         long startWallTimeNano = System.nanoTime();
         long startCpuTimeNano = isCpuTimeSupported ? threadBean.getCurrentThreadCpuTime() : 0;
+        StringBuilder builder = new StringBuilder();
 
         String stackTrace = null;
         String payload = getPayloadString(scriptEnv);
 
         try {
-            return scriptRunnerService.execute(script, scriptEnv, this::logConsumer);
+            return scriptRunnerService.execute(script, scriptEnv, builder::append);
         } catch (Exception e) {
             stackTrace = ExceptionHelper.stackTraceToString(e);
             throw e;
@@ -109,7 +110,7 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
             long cpuTimeMs = isCpuTimeSupported ? (endCpuTimeNano - startCpuTimeNano) / 1_000_000 : 0;
 
             eventPublisher.publishEvent(new ScriptRunEvent(
-                    functionId, now, cpuTimeMs, executionTimeMs, stackTrace, payload
+                    functionId, now, cpuTimeMs, executionTimeMs, stackTrace, payload, builder.toString()
             ));
         }
     }

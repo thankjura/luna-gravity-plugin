@@ -29,9 +29,9 @@ public class ScriptMetricsManager {
         return new ScriptRunResult(scriptRunResultEntity);
     }
 
-    public SearchResult<ScriptRunResult> getResults(String functionId, SearchParams searchParams) {
+    public SearchResult<ScriptRunResult> searchResults(String scriptId, SearchParams searchParams) {
         Query<ScriptRunResultEntity> query = activeDocManager.query(ScriptRunResultEntity.class);
-        query.filter(Filters.eq("functionId", functionId));
+        query.filter(Filters.eq("scriptId", scriptId));
         FindOptions options = new FindOptions();
         options.sort("startAt");
         return new SearchResultImpl<>(query, searchParams, options, this::wrap);
@@ -42,12 +42,13 @@ public class ScriptMetricsManager {
         List<ScriptRunResultEntity> scriptRunResultEntities = new ArrayList<>();
         for (ScriptRunEvent event : scriptRunEvents) {
             ScriptRunResultEntity scriptRunResultEntity = new ScriptRunResultEntity(
-                    event.getFunctionId(),
+                    event.getScriptId(),
                     event.getStartTime(),
                     event.getExecutionTimeMs(),
                     event.getCpuTimeMs(),
                     event.getException(),
-                    event.getPayload()
+                    event.getPayload(),
+                    event.getLog()
             );
             scriptRunResultEntities.add(scriptRunResultEntity);
         }

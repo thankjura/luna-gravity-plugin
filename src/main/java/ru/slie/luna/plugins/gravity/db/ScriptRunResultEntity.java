@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "script_run_results", indexes = {
-        @Index(name = "idx_script_run_results_script_id_start", columnList = "function_id, start_at")
+        @Index(name = "idx_script_run_results_script_id_start", columnList = "script_id, start_at")
 })
 public class ScriptRunResultEntity extends ActiveDocEntity {
-    private String functionId;
+    private String scriptId;
     private LocalDateTime startAt;
     private Long executionTimeMs;
     private Long cpuTimeMs;
@@ -24,19 +24,23 @@ public class ScriptRunResultEntity extends ActiveDocEntity {
     @Column(columnDefinition = "TEXT")
     private String payload;
 
+    @Column(columnDefinition = "TEXT")
+    private String log;
+
     public ScriptRunResultEntity() {}
 
-    public ScriptRunResultEntity(String functionId, LocalDateTime startAt, long executionTimeMs, Long cpuTimeMs, String exception, String payload) {
-        this.functionId = functionId;
+    public ScriptRunResultEntity(String scriptId, LocalDateTime startAt, long executionTimeMs, Long cpuTimeMs, String exception, String payload, String log) {
+        this.scriptId = scriptId;
         this.startAt = startAt;
         this.executionTimeMs = executionTimeMs;
         this.cpuTimeMs = cpuTimeMs;
         this.exception = exception;
         this.payload = payload;
+        this.log = log;
     }
 
-    public String getFunctionId() {
-        return functionId;
+    public String getScriptId() {
+        return scriptId;
     }
 
     public LocalDateTime getStartAt() {
@@ -57,5 +61,9 @@ public class ScriptRunResultEntity extends ActiveDocEntity {
 
     public String getPayload() {
         return payload;
+    }
+
+    public String getLog() {
+        return log;
     }
 }

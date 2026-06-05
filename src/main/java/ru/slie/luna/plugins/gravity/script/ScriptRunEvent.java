@@ -3,24 +3,26 @@ package ru.slie.luna.plugins.gravity.script;
 import java.time.LocalDateTime;
 
 public class ScriptRunEvent {
-    private final String functionId;
+    private final String scriptId;
     private final LocalDateTime startTime;
     private final Long cpuTimeMs;
     private final Long executionTimeMs;
     private final String exception;
     private final String payload;
+    private final String log;
 
-    public ScriptRunEvent(String functionId, LocalDateTime startTime, Long cpuTimeMs, Long executionTimeMs, String exception, String payload) {
-        this.functionId = functionId;
+    public ScriptRunEvent(String scriptId, LocalDateTime startTime, Long cpuTimeMs, Long executionTimeMs, String exception, String payload, String log) {
+        this.scriptId = scriptId;
         this.startTime = startTime;
         this.cpuTimeMs = cpuTimeMs;
         this.executionTimeMs = executionTimeMs;
         this.exception = exception;
         this.payload = payload;
+        this.log = log;
     }
 
-    public String getFunctionId() {
-        return functionId;
+    public String getScriptId() {
+        return scriptId;
     }
     public LocalDateTime getStartTime() {
         return startTime;
@@ -40,5 +42,9 @@ public class ScriptRunEvent {
 
     public String getPayload() {
         return payload;
+    }
+
+    public String getLog() {
+        return log;
     }
 }

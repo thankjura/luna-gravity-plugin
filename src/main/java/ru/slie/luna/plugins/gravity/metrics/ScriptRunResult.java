@@ -7,7 +7,7 @@ import ru.slie.luna.plugins.gravity.utils.Constants;
 import java.time.LocalDateTime;
 
 public class ScriptRunResult {
-    private final String functionId;
+    private final String scriptId;
     private final LocalDateTime startAt;
     private final Long executionTimeMs;
     private final Long cpuTimeMs;
@@ -15,7 +15,7 @@ public class ScriptRunResult {
     private final String payload;
 
     public ScriptRunResult(ScriptRunResultEntity entity) {
-        this.functionId = entity.getFunctionId();
+        this.scriptId = entity.getScriptId();
         this.startAt = entity.getStartAt();
         this.executionTimeMs = entity.getExecutionTimeMs();
         this.cpuTimeMs = entity.getCpuTimeMs();
@@ -23,8 +23,8 @@ public class ScriptRunResult {
         this.payload = entity.getPayload();
     }
 
-    public String getFunctionId() {
-        return functionId;
+    public String getScriptId() {
+        return scriptId;
     }
 
     @JsonFormat(pattern = Constants.DATE_TIME_FORMAT)

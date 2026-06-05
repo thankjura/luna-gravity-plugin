@@ -10,7 +10,7 @@ export interface WorkflowScript {
   id: string,
   workflowId: string,
   workflowName: string,
-  originalId: number,
+  workflowOriginalId: number,
   actionId: string,
   actionName: string,
   script: string,

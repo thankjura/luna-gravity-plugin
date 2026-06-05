@@ -37,7 +37,7 @@ public class WorkflowScript {
         return workflow.getOriginalId() != null;
     }
 
-    public Long getOriginalId() {
+    public Long getWorkflowOriginalId() {
         return workflow.getOriginalId();
     }
 

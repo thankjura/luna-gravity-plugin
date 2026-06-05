@@ -3,7 +3,20 @@ import { $i18n } from "@/utils/i18n.ts";
 import { WorkflowScript } from "@/interfaces/workflow.ts";
 import { computed, onMounted, ref } from "vue";
 import { workflowService } from "@/services/workflowService.ts";
-import { LoadOverlayComponent, ProjectInfo, MultiSelect, StatusComponent, Status, WorkflowFunctionType } from 'luna';
+import {
+  LoadOverlayComponent,
+  ProjectInfo,
+  MultiSelect,
+  StatusComponent,
+  Status,
+  WorkflowFunctionType,
+  SearchResult,
+  BusyIconComponent,
+} from 'luna';
+import { ScriptRunResult } from "@/interfaces/metrics.ts";
+import { vLazyLoad } from "@/directives/LazyLoad.ts";
+import { metricService } from "@/services/metricService.ts";
+import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.vue";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
@@ -11,6 +24,8 @@ const projects = ref<Record<string, ProjectInfo>>({});
 const statuses = ref<Record<number, Status>>({});
 const term = ref<string>(null);
 const selectedProjects = ref<Array<string>>([]);
+const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
+const resultsBusy = ref<Record<string, boolean>>({});
 
 const projectOptions = computed<Array<ProjectInfo>>(() => {
   const out = [];
@@ -57,6 +72,18 @@ const functionTypeNames = computed<Record<WorkflowFunctionType, string>>(() => {
   }
 });
 
+const loadScriptResults = (scriptId: string) => {
+  if (resultsBusy.value[scriptId] || results.value[scriptId]) {
+    return;
+  }
+  resultsBusy.value[scriptId] = true;
+  metricService.getResults(scriptId, {page: 1, limit: 15}).then((data) => {
+    results.value[scriptId] = data.data;
+  }).finally(() => {
+    delete resultsBusy.value[scriptId];
+  })
+}
+
 const loadScripts = () => {
   busy.value = true;
   workflowService.getScripts().then((data) => {
@@ -66,6 +93,15 @@ const loadScripts = () => {
   }).finally(() => {
     busy.value = false;
   });
+}
+
+const getResultSummary = (result: SearchResult<ScriptRunResult>) => {
+  const fails = result.results.filter(sr => sr.exception).length;
+  const total = result.results.length;
+  return {
+    icon: fails > 0? 'icon-cancel-circle' : 'icon-ok-circle',
+    summary: fails > 0 ? $i18n.t("Has {0} failures in the last {0} executions", fails, total) : $i18n.t("No failures in the last {0} executions", total),
+  }
 }
 
 onMounted(() => {
@@ -120,7 +156,7 @@ onMounted(() => {
               </div>
             </td>
             <td>
-              {{ s.workflowName }} {{ s.originalId? `(${$i18n.t('Draft')})`: '' }}
+              {{ s.workflowName }} {{ s.workflowOriginalId? `(${$i18n.t('Draft')})`: '' }}
             </td>
             <td>
               <div class="transition">
@@ -141,11 +177,14 @@ onMounted(() => {
             <td>
               <button type="button" class="button-icon button-transparent icon-stats-bars" :title="$i18n.t('Show performance')"></button>
             </td>
-            <td>
-              <div class="iconed">
-                <span class="icon-clock"></span>
-                {{ $i18n.t('Has not run yet') }}
-              </div>
+            <td v-lazy-load="() => loadScriptResults(s.id)">
+              <template v-if="!s.workflowOriginalId">
+                <template v-if="results[s.id]">
+                  <HistoryButtonComponent :results="results[s.id].results"></HistoryButtonComponent>
+                </template>
+                <BusyIconComponent v-else></BusyIconComponent>
+              </template>
+              <HistoryButtonComponent v-else :results="[]"></HistoryButtonComponent>
             </td>
             <td>
               <button type="button" class="button-icon button-transparent icon-dots"></button>
