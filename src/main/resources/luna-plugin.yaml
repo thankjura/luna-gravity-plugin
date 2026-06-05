@@ -29,6 +29,8 @@ restPackages:
   - name: rest
     packages:
       - ru.slie.luna.plugins.gravity.rest
+activeDocs:
+  - ru.slie.luna.plugins.gravity.db.ScriptRunResultEntity
 webSections:
   - key: GravityAdminSideBarSection
     name: Gravity admin side bar section
@@ -64,3 +66,7 @@ workflowPostfunctions:
       path: frontend/BaseViewScriptComponent.js
     editComponent:
       path: frontend/BaseEditScriptComponent.js
+components:
+  - key: ScriptMetricsListener
+    name: Metrics listener
+    className: ru.slie.luna.plugins.gravity.metrics.ScriptMetricsListener

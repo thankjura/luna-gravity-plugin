@@ -59,6 +59,18 @@
             <version>2.25.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+            <version>3.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <scope>provided</scope>
+            <version>7.0.7</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -112,7 +124,7 @@
 
     <properties>
         <spring.version>7.0.7</spring.version>
-        <luna.version>3.0.1-SNAPSHOT</luna.version>
+        <luna.version>4.0.0-SNAPSHOT</luna.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

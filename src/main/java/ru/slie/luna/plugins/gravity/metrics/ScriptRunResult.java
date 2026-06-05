@@ -1,0 +1,50 @@
+package ru.slie.luna.plugins.gravity.metrics;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import ru.slie.luna.plugins.gravity.db.ScriptRunResultEntity;
+import ru.slie.luna.plugins.gravity.utils.Constants;
+
+import java.time.LocalDateTime;
+
+public class ScriptRunResult {
+    private final String functionId;
+    private final LocalDateTime startAt;
+    private final Long executionTimeMs;
+    private final Long cpuTimeMs;
+    private final String exception;
+    private final String payload;
+
+    public ScriptRunResult(ScriptRunResultEntity entity) {
+        this.functionId = entity.getFunctionId();
+        this.startAt = entity.getStartAt();
+        this.executionTimeMs = entity.getExecutionTimeMs();
+        this.cpuTimeMs = entity.getCpuTimeMs();
+        this.exception = entity.getException();
+        this.payload = entity.getPayload();
+    }
+
+    public String getFunctionId() {
+        return functionId;
+    }
+
+    @JsonFormat(pattern = Constants.DATE_TIME_FORMAT)
+    public LocalDateTime getStartAt() {
+        return startAt;
+    }
+
+    public Long getExecutionTimeMs() {
+        return executionTimeMs;
+    }
+
+    public Long getCpuTimeMs() {
+        return cpuTimeMs;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+}
