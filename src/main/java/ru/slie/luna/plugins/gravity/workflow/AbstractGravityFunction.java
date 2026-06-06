@@ -9,6 +9,8 @@ import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 import ru.slie.luna.plugins.gravity.utils.ExceptionHelper;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -21,7 +23,7 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
     protected final I18nResolver i18n;
     protected final ScriptRunnerService scriptRunnerService;
     private final ApplicationEventPublisher eventPublisher;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
     public static String SCRIPT_KEY = "script";
     public static String SCRIPT_NOTE = "note";
@@ -32,10 +34,6 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
         this.i18n = i18n;
         this.scriptRunnerService = scriptRunnerService;
         this.eventPublisher = eventPublisher;
-    }
-
-    protected void logConsumer(String msg) {
-
     }
 
     @Override

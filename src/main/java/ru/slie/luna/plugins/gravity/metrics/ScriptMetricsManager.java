@@ -2,7 +2,7 @@ package ru.slie.luna.plugins.gravity.metrics;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.slie.luna.db.SearchResultImpl;
+import ru.slie.luna.db.SearchResultList;
 import ru.slie.luna.db.filter.Filters;
 import ru.slie.luna.db.query.FindOptions;
 import ru.slie.luna.db.query.Query;
@@ -14,6 +14,7 @@ import ru.slie.luna.search.SearchResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -29,12 +30,15 @@ public class ScriptMetricsManager {
         return new ScriptRunResult(scriptRunResultEntity);
     }
 
-    public SearchResult<ScriptRunResult> searchResults(String scriptId, SearchParams searchParams) {
+    public SearchResult<ScriptRunResult> getLastResults(String scriptId, SearchParams searchParams) {
         Query<ScriptRunResultEntity> query = activeDocManager.query(ScriptRunResultEntity.class);
         query.filter(Filters.eq("scriptId", scriptId));
         FindOptions options = new FindOptions();
-        options.sort("startAt");
-        return new SearchResultImpl<>(query, searchParams, options, this::wrap);
+        options.sort("startAt", false).limit(searchParams.getLimit()).skip(searchParams.getSkip());
+        List<ScriptRunResultEntity> results = query.list(options);
+        results.sort(Comparator.comparing(ScriptRunResultEntity::getStartAt));
+        long total = query.count();
+        return new SearchResultList<>(total, results.stream().map(this::wrap).toList(), searchParams);
     }
 
     @Transactional
@@ -48,7 +52,7 @@ public class ScriptMetricsManager {
                     event.getCpuTimeMs(),
                     event.getException(),
                     event.getPayload(),
-                    event.getLog()
+                    event.getLogs()
             );
             scriptRunResultEntities.add(scriptRunResultEntity);
         }

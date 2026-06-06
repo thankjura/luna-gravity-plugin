@@ -9,16 +9,16 @@ public class ScriptRunEvent {
     private final Long executionTimeMs;
     private final String exception;
     private final String payload;
-    private final String log;
+    private final String logs;
 
-    public ScriptRunEvent(String scriptId, LocalDateTime startTime, Long cpuTimeMs, Long executionTimeMs, String exception, String payload, String log) {
+    public ScriptRunEvent(String scriptId, LocalDateTime startTime, Long cpuTimeMs, Long executionTimeMs, String exception, String payload, String logs) {
         this.scriptId = scriptId;
         this.startTime = startTime;
         this.cpuTimeMs = cpuTimeMs;
         this.executionTimeMs = executionTimeMs;
         this.exception = exception;
         this.payload = payload;
-        this.log = log;
+        this.logs = logs;
     }
 
     public String getScriptId() {
@@ -44,7 +44,7 @@ public class ScriptRunEvent {
         return payload;
     }
 
-    public String getLog() {
-        return log;
+    public String getLogs() {
+        return logs;
     }
 }

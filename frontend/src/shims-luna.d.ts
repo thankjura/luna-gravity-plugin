@@ -1,111 +1,106 @@
-// Luna exposes version: 3.0.1-SNAPSHOT
+// Luna exposes version: 4.0.0-SNAPSHOT
 declare module 'luna' {
-  import type { DefineComponent, AllowedComponentProps, ComponentCustomProps, VNodeProps } from 'vue'
-  import RouteLocationRaw from 'vue-router'
+  import type { DefineComponent, SlotsType } from 'vue';
+  import RouteLocationRaw from 'vue-router';
 
   export const BusyIconComponent: DefineComponent<
-    {}, {}, {}, {}, {}, {}, {}, {}>
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, SlotsType<{}>>;
   export const ButtonBusy: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       type?: "button" | "submit" | "reset"
       busy?: boolean
       disabled?: boolean
-    }, {}, {}, {}, {}, {}, {}, {}> & { $slots: {
-      'default'(props: {}): any
-    }
-  };
+    }, {}, {}, SlotsType<{
+      default: any,
+    }>>;
   export const LoadOverlayComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       absolute?: boolean
       dim?: boolean
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const PagePaginator: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'setPage': [_page: number]
+    }, {}, {
       busy?: boolean
       compact?: boolean
       page?: number
       maxItems?: number
       limit?: number
       total: number
-    }, {}, {}, {}, {}, {}, {}, {
-      'setPage': [_page: number]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const PopoverComponent: DefineComponent<
-    {
-      closeButton?: boolean
-      prefferedAlign?: ALIGN[]
-      group?: string
-    }, {
+    {},{
       toggle: (event: MouseEvent, target?: HTMLElement) => void
-    
       show: (event: MouseEvent, target?: HTMLElement) => void
-    
       hide: () => void
-    
       active: boolean
     }, {}, {}, {}, {}, {}, {
       'hide': []
-    }> & { $slots: {
-      'default'(props: {}): any
-    }
-  };
+    }, {}, {
+      closeButton?: boolean
+      prefferedAlign?: ALIGN[]
+      group?: string
+    }, {}, {}, SlotsType<{
+      default: any,
+    }>>;
   export const StatusComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       name?: string
       category?: string
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const TogglePanel: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'toggle': [_state: boolean]
+      'show': []
+    }, {}, {
       hideActions?: boolean
       initState?: boolean
       title?: string
       storeKey?: string
-    }, {}, {}, {}, {}, {}, {}, {
-      'toggle': [_state: boolean]
-    
-      'show': []
-    }> & { $slots: {
-      'actions'(props: {}): any
-      'default'(props: {}): any
-    }
-  };
+    }, {}, {}, SlotsType<{
+      actions: any,
+      default: any,
+    }>>;
   export const UserAvatarComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       size?: IconSize
       user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const UserLinkComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       user?: User
       label?: string
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const BaseDialog: DefineComponent<
-    {
-      busy?: boolean
-      showClose?: boolean
-    }, {
+    {},{
       show: () => void
-    
       hide: () => void
     }, {}, {}, {}, {}, {}, {
       'closed': []
-    }> & { $slots: {
-      'header'(props: {}): any
-      'default'(props: {}): any
-      'footer'(props: {}): any
-    }
-  };
+    }, {}, {
+      busy?: boolean
+      showClose?: boolean
+    }, {}, {}, SlotsType<{
+      header: any,
+      default: any,
+      footer: any,
+    }>>;
   export const ButtonsGroupComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       max?: number
       moreLabel?: string
       maxWidth?: number
       zIndex?: number
       group?: string
       options: DropDownOption[]
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const DropDownButton: DefineComponent<
-    {
+    {},{
+      show: () => Promise<void>
+      hide: () => void
+      active: boolean
+    }, {}, {}, {}, {}, {}, {}, {}, {
       fixed?: boolean
       busy?: boolean
       disabled?: boolean
@@ -118,18 +113,13 @@ declare module 'luna' {
       group?: string
       options: DropDownGroupOption[] | OptionsGetterSync | OptionsGetterAsync
       layerClass?: string
-    }, {
-      show: () => Promise<void>
-    
-      hide: () => void
-    
-      active: boolean
-    }, {}, {}, {}, {}, {}, {}> & { $slots: {
-      'default'(props: {}): any
-    }
-  };
+    }, {}, {}, SlotsType<{
+      default: any,
+    }>>;
   export const DropDownLayer: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'clicked': [_option: DropDownOption, _event: MouseEvent]
+    }, {}, {
       fixed?: boolean
       busy?: boolean
       prefferedAlign?: "left" | "right"
@@ -138,82 +128,82 @@ declare module 'luna' {
       align?: "left" | "right" | "auto"
       options?: DropDownGroupOption[]
       parentPosition?: ElemRect
-    }, {}, {}, {}, {}, {}, {}, {
-      'clicked': [_option: DropDownOption, _event: MouseEvent]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const DropDownLayerItem: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       option?: DropDownOption
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const CheckBoxesComponent: DefineComponent<
-    {
+    {},{
+      focusTerm: () => void
+      addValue: (opt: T) => void
+      delValue: (optId: string | number) => void
+    }, {}, {}, {}, {}, {}, {
+      'select': [value: T]
+      'remove': [value: string | number]
+      'update:modelValue': [value: (string | number)[]]
+    }, {}, {
       optionGroups: OptionsGroup<T>[]
       valueKey?: keyof T
       disabled?: boolean
       busyValue?: string | number
       emitsOnly?: boolean
       modelValue?: (string | number)[]
-    }, {
-      focusTerm: () => void
-    
-      addValue: (opt: T) => void
-    
-      delValue: (optId: string | number) => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-    
-      'remove': [value: string | number]
-    
-      'update:modelValue': [value: (string | number)[]]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const ColorPickerDialog: DefineComponent<
-    {}, {
+    {},{
       show: (colorValue: string, elementValue: HTMLElement) => void
     }, {}, {}, {}, {}, {}, {
       'update': [_color: string]
-    }>
+    }, {}, {}, {}, {}, SlotsType<{}>>;
   export const ColorPickerInput: DefineComponent<
-    {
-      modelValue?: string
-    }, {}, {}, {}, {}, {}, {}, {
+    {},{}, {}, {}, {}, {}, {}, {
       'update:modelValue': [value: string]
-    }> & { $slots: {
-      'default'(props: {}): any
-    }
-  };
+    }, {}, {
+      modelValue?: string
+    }, {}, {}, SlotsType<{
+      default: any,
+    }>>;
   export const ColorPickerLayer: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update:modelValue': [value: HSV]
+      'close': []
+      'updated': [_hsv: HSV]
+    }, {}, {
       modelValue?: HSV
       field?: HTMLElement
       origValue?: HSV
-    }, {}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: HSV]
-    
-      'close': []
-    
-      'updated': [_hsv: HSV]
-    }> & { $slots: {
-      'default'(props: {}): any
-      'footer'(props: {}): any
-    }
-  };
+    }, {}, {}, SlotsType<{
+      default: any,
+      footer: any,
+    }>>;
   export const DateTimePicker: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update:modelValue': [value: string]
+    }, {}, {
       disabled?: boolean
       withTime?: boolean
       modelValue?: string
-    }, {}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const IconSelector: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update:modelValue': [value: string]
+    }, {}, {
       type: IconType
       modelValue?: string
-    }, {}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const MultiSelect: DefineComponent<
-    {
+    {},{
+      addValue: (opt: T) => void
+      delValue: (optId: string | number) => void
+      showLayer: () => void
+      hideLayer: () => void
+    }, {}, {}, {}, {}, {}, {
+      'select': [value: T]
+      'remove': [value: string | number]
+      'create': [value: string]
+      'update:modelValue': [value: (string | number)[]]
+    }, {}, {
       options: T[] | OptionsFunc<T>
       modelData?: T[]
       showIcons?: boolean
@@ -226,43 +216,32 @@ declare module 'luna' {
       iconRadius?: string
       missingIconLiteralKey?: keyof T
       modelValue?: (string | number)[]
-    }, {
-      addValue: (opt: T) => void
-    
-      delValue: (optId: string | number) => void
-    
-      showLayer: () => void
-    
-      hideLayer: () => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-    
-      'remove': [value: string | number]
-    
-      'create': [value: string]
-    
-      'update:modelValue': [value: (string | number)[]]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const QsInput: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'submit': []
+      'update:modelValue': [value: string]
+      'update:error': [value: string]
+      'heightChanged': []
+    }, {}, {
       disabled?: boolean
       modelValue?: string
       error?: string
-    }, {}, {}, {}, {}, {}, {}, {
-      'submit': []
-    
-      'update:modelValue': [value: string]
-    
-      'update:error': [value: string]
-    
-      'heightChanged': []
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const QsViewer: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       qs?: string
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const SingleSelect: DefineComponent<
-    {
+    {},{
+      setValue: (opt: T) => void
+      showLayer: () => void
+      hideLayer: () => void
+    }, {}, {}, {}, {}, {}, {
+      'select': [value: T]
+      'create': [value: string]
+      'update:modelValue': [value: string | number]
+    }, {}, {
       options: T[] | OptionsFunc<T>
       modelData?: T
       showIcons?: boolean
@@ -281,62 +260,53 @@ declare module 'luna' {
       suggestionsWidth?: string
       id?: string
       modelValue?: string | number
-    }, {
-      setValue: (opt: T) => void
-    
-      showLayer: () => void
-    
-      hideLayer: () => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-    
-      'create': [value: string]
-    
-      'update:modelValue': [value: string | number]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const SliderTrack: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update:modelValue': [value: number]
+    }, {}, {
       max?: number
       min?: number
       step?: number
       modelValue?: number
-    }, {}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: number]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const SortableList: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update': [value: T[]]
+      'moved': [optionId: string | number, prevOptionId: string | number]
+      'deleted': [option: T]
+      'update:modelValue': [value: T[]]
+    }, {}, {
       modelValue: T[]
       showIcons?: boolean
       removable?: boolean
       emitsOnly?: boolean
       busy?: boolean
-    }, {}, {}, {}, {}, {}, {}, {
-      'update': [value: T[]]
-    
-      'moved': [optionId: string | number, prevOptionId: string | number]
-    
-      'deleted': [option: T]
-    
-      'update:modelValue': [value: T[]]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const SortableSelect: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {
+      'update': [_value: T[]]
+      'update:modelValue': [value: T[]]
+    }, {}, {
       modelValue: T[]
       showIcons?: boolean
       options: T[] | OptionsFunc<T>
-    }, {}, {}, {}, {}, {}, {}, {
-      'update': [_value: T[]]
-    
-      'update:modelValue': [value: T[]]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const SuggestionIconComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       option: T
       missingIconLiteralKey: keyof T
       iconRadius?: string
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const SuggestionsComponent: DefineComponent<
-    {
+    {},{
+      focusNext: (event?: KeyboardEvent) => void
+      updatePosition: () => void
+    }, {}, {}, {}, {}, {}, {
+      'hide': []
+      'select': [value: T]
+      'create': [value: string]
+    }, {}, {
       suggestions: T[]
       showIcons?: boolean
       term?: string
@@ -348,42 +318,36 @@ declare module 'luna' {
       iconRadius?: string
       missingIconLiteralKey?: keyof T
       width?: string
-    }, {
-      focusNext: (event?: KeyboardEvent) => void
-    
-      updatePosition: () => void
-    }, {}, {}, {}, {}, {}, {
-      'hide': []
-    
-      'select': [value: T]
-    
-      'create': [value: string]
-    }>
+    }, {}, {}, SlotsType<{}>>;
   export const MarkdownEditor: DefineComponent<
-    {
-      modelValue?: string
-    }, {}, {}, {}, {}, {}, {}, {
+    {},{}, {}, {}, {}, {}, {}, {
       'update:modelValue': [value: string]
-    }>
+    }, {}, {
+      modelValue?: string
+    }, {}, {}, SlotsType<{}>>;
   export const MarkdownViewer: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       value?: string
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const ProgressBar: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       busy?: boolean
       value?: number
       total?: number
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const ProgressComponent: DefineComponent<
-    {
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
       value: number
       total: number
-    }, {}, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, SlotsType<{}>>;
   export const ImageViewer: DefineComponent<
-    {}, {
+    {},{
       show: (imagesData: ImageItem[], idx?: number) => void
-    }, {}, {}, {}, {}, {}, {}>
+    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, SlotsType<{}>>;
+  export const CopyToBufferButton: DefineComponent<
+    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+      value?: string
+    }, {}, {}, SlotsType<{}>>;
 export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
   export interface NotifyComponentInterface {
       info: (title: string, body?: string, closable?: boolean) => void;

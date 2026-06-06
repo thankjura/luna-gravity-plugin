@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "script_run_results", indexes = {
-        @Index(name = "idx_script_run_results_script_id_start", columnList = "script_id, start_at")
+        @Index(name = "idx_script_run_results_script_id_start", columnList = "script_id, start_at desc")
 })
 public class ScriptRunResultEntity extends ActiveDocEntity {
     private String scriptId;
@@ -25,18 +25,18 @@ public class ScriptRunResultEntity extends ActiveDocEntity {
     private String payload;
 
     @Column(columnDefinition = "TEXT")
-    private String log;
+    private String logs;
 
     public ScriptRunResultEntity() {}
 
-    public ScriptRunResultEntity(String scriptId, LocalDateTime startAt, long executionTimeMs, Long cpuTimeMs, String exception, String payload, String log) {
+    public ScriptRunResultEntity(String scriptId, LocalDateTime startAt, long executionTimeMs, Long cpuTimeMs, String exception, String payload, String logs) {
         this.scriptId = scriptId;
         this.startAt = startAt;
         this.executionTimeMs = executionTimeMs;
         this.cpuTimeMs = cpuTimeMs;
         this.exception = exception;
         this.payload = payload;
-        this.log = log;
+        this.logs = logs;
     }
 
     public String getScriptId() {
@@ -63,7 +63,7 @@ public class ScriptRunResultEntity extends ActiveDocEntity {
         return payload;
     }
 
-    public String getLog() {
-        return log;
+    public String getLogs() {
+        return logs;
     }
 }

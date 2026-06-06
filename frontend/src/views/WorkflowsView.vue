@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { $i18n } from "@/utils/i18n.ts";
 import { WorkflowScript } from "@/interfaces/workflow.ts";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 import { workflowService } from "@/services/workflowService.ts";
 import {
   LoadOverlayComponent,
@@ -17,6 +17,8 @@ import { ScriptRunResult } from "@/interfaces/metrics.ts";
 import { vLazyLoad } from "@/directives/LazyLoad.ts";
 import { metricService } from "@/services/metricService.ts";
 import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.vue";
+import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.vue";
+import { ComponentExposed } from "vue-component-type-helpers";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
@@ -26,6 +28,7 @@ const term = ref<string>(null);
 const selectedProjects = ref<Array<string>>([]);
 const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
 const resultsBusy = ref<Record<string, boolean>>({});
+const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
 
 const projectOptions = computed<Array<ProjectInfo>>(() => {
   const out = [];
@@ -84,6 +87,13 @@ const loadScriptResults = (scriptId: string) => {
   })
 }
 
+
+const showExecutionDialog = (scriptId: string) => {
+  if (results.value[scriptId]?.results?.length > 0) {
+    historyExecutionDialog.value.show(results.value[scriptId].results);
+  }
+}
+
 const loadScripts = () => {
   busy.value = true;
   workflowService.getScripts().then((data) => {
@@ -93,15 +103,6 @@ const loadScripts = () => {
   }).finally(() => {
     busy.value = false;
   });
-}
-
-const getResultSummary = (result: SearchResult<ScriptRunResult>) => {
-  const fails = result.results.filter(sr => sr.exception).length;
-  const total = result.results.length;
-  return {
-    icon: fails > 0? 'icon-cancel-circle' : 'icon-ok-circle',
-    summary: fails > 0 ? $i18n.t("Has {0} failures in the last {0} executions", fails, total) : $i18n.t("No failures in the last {0} executions", total),
-  }
 }
 
 onMounted(() => {
@@ -180,7 +181,7 @@ onMounted(() => {
             <td v-lazy-load="() => loadScriptResults(s.id)">
               <template v-if="!s.workflowOriginalId">
                 <template v-if="results[s.id]">
-                  <HistoryButtonComponent :results="results[s.id].results"></HistoryButtonComponent>
+                  <HistoryButtonComponent @click="showExecutionDialog(s.id)" :results="results[s.id].results"></HistoryButtonComponent>
                 </template>
                 <BusyIconComponent v-else></BusyIconComponent>
               </template>
@@ -194,6 +195,8 @@ onMounted(() => {
       </table>
       <LoadOverlayComponent class="pad" v-if="busy" :absolute="true" :dim="true"></LoadOverlayComponent>
     </div>
+
+    <HistoryExecutionDialog ref="historyExecutionDialog"></HistoryExecutionDialog>
 
   </div>
 </template>

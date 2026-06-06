@@ -77,7 +77,7 @@ const runScript = () => {
           <button type="button" @click="activeTab='result'">{{ $i18n.t("Result") }}</button>
         </li>
         <li :class="{active: activeTab == 'log'}">
-          <button type="button" @click="activeTab='log'">{{ $i18n.t("Log") }}</button>
+          <button type="button" @click="activeTab='log'">{{ $i18n.t("Logs") }}</button>
         </li>
       </ul>
     </div>

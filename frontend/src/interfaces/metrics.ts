@@ -5,4 +5,5 @@ export interface ScriptRunResult {
   cpuTimeMs: number,
   exception: string,
   payload: string,
+  logs: string
 }

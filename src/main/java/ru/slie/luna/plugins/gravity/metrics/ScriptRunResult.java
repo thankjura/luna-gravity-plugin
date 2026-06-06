@@ -13,6 +13,7 @@ public class ScriptRunResult {
     private final Long cpuTimeMs;
     private final String exception;
     private final String payload;
+    private final String logs;
 
     public ScriptRunResult(ScriptRunResultEntity entity) {
         this.scriptId = entity.getScriptId();
@@ -21,6 +22,7 @@ public class ScriptRunResult {
         this.cpuTimeMs = entity.getCpuTimeMs();
         this.exception = entity.getException();
         this.payload = entity.getPayload();
+        this.logs = entity.getLogs();
     }
 
     public String getScriptId() {
@@ -46,5 +48,9 @@ public class ScriptRunResult {
 
     public String getPayload() {
         return payload;
+    }
+
+    public String getLogs() {
+        return logs;
     }
 }

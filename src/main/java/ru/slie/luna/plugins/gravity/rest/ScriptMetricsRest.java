@@ -19,6 +19,6 @@ public class ScriptMetricsRest {
     public SearchResult<ScriptRunResult> getResults(@PathVariable String scriptId,
                                                     @RequestParam(defaultValue = "1") Integer page,
                                                     @RequestParam(defaultValue = "15") Integer limit) {
-        return scriptMetricsManager.searchResults(scriptId, SearchParams.forPage(page, limit));
+        return scriptMetricsManager.getLastResults(scriptId, SearchParams.forPage(page, limit));
     }
 }
