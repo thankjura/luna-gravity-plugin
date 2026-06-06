@@ -11,7 +11,7 @@ const selectedTab = ref<number>(0);
 
 const show = (resultsValue: Array<ScriptRunResult>) => {
   results.value = resultsValue;
-  selectedTab.value = 0;
+  selectedTab.value = resultsValue.length-1;
   if (resultsValue.length > 0) {
     dialog.value.show();
   }
