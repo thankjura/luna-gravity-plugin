@@ -12,6 +12,8 @@ import {
   WorkflowFunctionType,
   SearchResult,
   BusyIconComponent,
+  DropDownGroupOption,
+  DropDownButton,
 } from 'luna';
 import { ScriptRunResult } from "@/interfaces/metrics.ts";
 import { vLazyLoad } from "@/directives/LazyLoad.ts";
@@ -19,6 +21,7 @@ import { metricService } from "@/services/metricService.ts";
 import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.vue";
 import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.vue";
 import { ComponentExposed } from "vue-component-type-helpers";
+import ProjectListComponent from "@/components/workflow/ProjectListComponent.vue";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
@@ -94,6 +97,10 @@ const showExecutionDialog = (scriptId: string) => {
   }
 }
 
+const showPerformanceDialog = (script: WorkflowScript) => {
+
+}
+
 const loadScripts = () => {
   busy.value = true;
   workflowService.getScripts().then((data) => {
@@ -103,6 +110,25 @@ const loadScripts = () => {
   }).finally(() => {
     busy.value = false;
   });
+}
+
+const dropDownOptions = (script: WorkflowScript): Array<DropDownGroupOption> => {
+  const options = [
+    {
+      id: 'perf',
+      label: $i18n.t('Show performance'),
+      cb() {
+        showPerformanceDialog(script)
+      }
+    }
+  ];
+
+  return [
+    {
+      id: script.id,
+      options,
+    }
+  ]
 }
 
 onMounted(() => {
@@ -142,19 +168,15 @@ onMounted(() => {
             <th>{{ $i18n.t("Workflow") }}</th>
             <th>{{ $i18n.t("Transition") }}</th>
             <th>{{ $i18n.t("Type") }}</th>
-            <th>{{ $i18n.t("Performance") }}</th>
             <th>{{ $i18n.t("History") }}</th>
-            <th>{{ $i18n.t("Actions") }}</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="s in filteredScripts" :key="s.id">
             <td>{{ s.scriptNote }}</td>
             <td>
-              <div class="project-list">
-                <span class="badget" v-for="p in s.projectKeys.slice(0, 3)">{{ p }}</span>
-                <button type="button" v-if="s.projectKeys.length > 3" class="button-icon icon-dots" :title="$i18n.t('More')"></button>
-              </div>
+              <ProjectListComponent :projects="projects" :keys="s.projectKeys"></ProjectListComponent>
             </td>
             <td>
               {{ s.workflowName }} {{ s.workflowOriginalId? `(${$i18n.t('Draft')})`: '' }}
@@ -175,9 +197,6 @@ onMounted(() => {
             <td>
               {{ functionTypeNames[s.functionType] }}
             </td>
-            <td>
-              <button type="button" class="button-icon button-transparent icon-stats-bars" :title="$i18n.t('Show performance')"></button>
-            </td>
             <td v-lazy-load="() => loadScriptResults(s.id)">
               <template v-if="!s.workflowOriginalId">
                 <template v-if="results[s.id]">
@@ -188,7 +207,7 @@ onMounted(() => {
               <HistoryButtonComponent v-else :results="[]"></HistoryButtonComponent>
             </td>
             <td>
-              <button type="button" class="button-icon button-transparent icon-dots"></button>
+              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-dots"></DropDownButton>
             </td>
           </tr>
         </tbody>
@@ -211,12 +230,6 @@ onMounted(() => {
   .workflow-scripts-table-container {
     position: relative;
     min-height: 200px;
-
-    .project-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
 
     .transition {
       display: flex;
