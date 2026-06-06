@@ -77,8 +77,12 @@ defineExpose({
             </div>
             <span class="description">{{ $i18n.t("Timing information related to this script execution. Elapsed measures the real world or «wall clock» duration of the execution whereas CPU time measures the amount of time the CPU was busy.") }}</span>
             <span class="code-block">
-              {{ $i18n.t("Elapsed: {0} ms", results[selectedTab].executionTimeMs) }}
+              <div>
+                {{ $i18n.t("Elapsed: {0} ms", results[selectedTab].executionTimeMs) }}
+              </div>
+              <div>
               {{ $i18n.t("CPU time: {0} ms", results[selectedTab].cpuTimeMs) }}
+              </div>
             </span>
           </div>
         </div>

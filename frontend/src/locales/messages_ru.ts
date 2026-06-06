@@ -51,7 +51,7 @@ export const messages = {
   "Elapsed: {0} ms": "Затрачено времени: {0} мс",
 
   // src/components/metrics/HistoryExecutionDialog.vue:81
-  "CPU time: {0} ms": "Процессорное время",
+  "CPU time: {0} ms": "Процессорное время: {0} мс",
 
   // src/components/workflow/BaseEditScriptComponent.vue:40
   "Note": "Примечание",
