@@ -26,7 +26,7 @@ const prepareChartData = (data: Array<MetricPoint>): ChartData<'line'> => {
     labels: data.map(m => formatXLabel(m.bucket)),
     datasets: [
       {
-        label: $i18n.t("Max time (ms)"),
+        label: $i18n.t("Max time"),
         data: data.map(m => m.maxExecutionTimeMs),
         borderColor: '#ff5630',
         backgroundColor: '#ff5630',
@@ -35,7 +35,16 @@ const prepareChartData = (data: Array<MetricPoint>): ChartData<'line'> => {
         pointRadius: 3
       },
       {
-        label: $i18n.t("Avg time (ms)"),
+        label: $i18n.t("Max CPU time"),
+        data: data.map(m => m.maxCpuTimeMs),
+        borderColor: '#ad0013',
+        backgroundColor: '#ad0013',
+        yAxisID: 'yTime',
+        tension: 0.1,
+        pointRadius: 3
+      },
+      {
+        label: $i18n.t("Avg time"),
         data: data.map(m => m.avgExecutionTimeMs),
         borderColor: '#0052cc',
         backgroundColor: '#0052cc',
@@ -44,7 +53,7 @@ const prepareChartData = (data: Array<MetricPoint>): ChartData<'line'> => {
         pointRadius: 2
       },
       {
-        label: $i18n.t("CPU time (ms)"),
+        label: $i18n.t("Avg CPU time"),
         data: data.map(m => m.avgCpuTimeMs),
         borderColor: '#00b8d9',
         backgroundColor: '#00b8d9',

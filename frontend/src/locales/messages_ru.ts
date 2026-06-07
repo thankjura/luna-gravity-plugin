@@ -18,6 +18,7 @@ export const messages = {
   "The time this was executed (server timezone).": "Время выполнения (часовой пояс сервера).",
 
   // src/components/metrics/HistoryExecutionDialog.vue:48
+  // src/views/ConsoleView.vue:80
   "Logs": "Логи",
 
   // src/components/metrics/HistoryExecutionDialog.vue:49
@@ -45,13 +46,74 @@ export const messages = {
   "Timing": "Тайминги",
 
   // src/components/metrics/HistoryExecutionDialog.vue:78
-  "Timing information related to this script execution. Elapsed measures the real world or «wall clock» duration of the execution whereas CPU time measures the amount of time the CPU was busy.": "Информация о времени выполнения этого скрипта. Показатель \"Затраченное время\" измеряет реальную продолжительность выполнения, а \"Процессорное время\" измеряет время, в течение которого процессор был занят.",
-
-  // src/components/metrics/HistoryExecutionDialog.vue:80
-  "Elapsed: {0} ms": "Затрачено времени: {0} мс",
+  "Timing information related to this script execution. Elapsed measures the real world or «wall clock» duration of the execution whereas CPU time measures the amount of time the CPU was busy.": "Информация о времени выполнения этого скрипта. Показатель «Затраченное время» измеряет реальную продолжительность выполнения, а «Процессорное время» измеряет время, в течение которого процессор был занят.",
 
   // src/components/metrics/HistoryExecutionDialog.vue:81
+  "Elapsed: {0} ms": "Затрачено времени: {0} мс",
+
+  // src/components/metrics/HistoryExecutionDialog.vue:84
   "CPU time: {0} ms": "Процессорное время: {0} мс",
+
+  // src/components/metrics/PerformanceChartComponent.vue:29
+  "Max time": "Макс. время",
+
+  // src/components/metrics/PerformanceChartComponent.vue:38
+  "Max CPU time": "Макс. ЦПУ время",
+
+  // src/components/metrics/PerformanceChartComponent.vue:47
+  "Avg time": "Среднее время",
+
+  // src/components/metrics/PerformanceChartComponent.vue:56
+  "Avg CPU time": "Среднее ЦПУ время",
+
+  // src/components/metrics/PerformanceChartComponent.vue:66
+  // src/components/metrics/PerformanceChartComponent.vue:97
+  "Number of executions": "Кол-во запусков",
+
+  // src/components/metrics/PerformanceChartComponent.vue:91
+  "Time (ms)": "Время (мс)",
+
+  // src/components/metrics/PerformanceDialog.vue:26
+  "Last hour": "Последний час",
+
+  // src/components/metrics/PerformanceDialog.vue:30
+  "Last 2 hours": "Последние 2 часа",
+
+  // src/components/metrics/PerformanceDialog.vue:34
+  "Last 4 hours": "Последние 4 часа",
+
+  // src/components/metrics/PerformanceDialog.vue:38
+  "Last 8 hours": "Последние 8 часов",
+
+  // src/components/metrics/PerformanceDialog.vue:42
+  "Last day": "Последний день",
+
+  // src/components/metrics/PerformanceDialog.vue:46
+  "Last 2 days": "Последние 2 дня",
+
+  // src/components/metrics/PerformanceDialog.vue:50
+  "Last week": "Последняя неделя",
+
+  // src/components/metrics/PerformanceDialog.vue:54
+  "Last 2 weeks": "Последние 2 недели",
+
+  // src/components/metrics/PerformanceDialog.vue:58
+  "Custom": "Другое",
+
+  // src/components/metrics/PerformanceDialog.vue:117
+  "Performance chart": "График производительности",
+
+  // src/components/metrics/PerformanceDialog.vue:121
+  "No data for selected period": "Нет данных за выбранный период",
+
+  // src/components/metrics/PerformanceDialog.vue:129
+  "empty for now": "пусто для сейчас",
+
+  // src/components/metrics/PerformanceDialog.vue:133
+  "Refresh": "Обновить",
+
+  // src/components/metrics/PerformanceDialog.vue:134
+  "Close": "Закрыть",
 
   // src/components/workflow/BaseEditScriptComponent.vue:40
   "Note": "Примечание",
@@ -59,11 +121,14 @@ export const messages = {
   // src/components/workflow/BaseEditScriptComponent.vue:41
   "optional script description...": "необязательное описание скрипта...",
 
+  // src/components/workflow/ProjectListComponent.vue:33
+  "More": "Больше",
+
   // src/views/ConsoleView.vue:34
   "Failed to execute script": "Не удалось выполнить скрипт.",
 
   // src/views/ConsoleView.vue:64
-  // src/views/WorkflowsView.vue:118
+  // src/views/WorkflowsView.vue:146
   "Gravity": "",
 
   // src/views/ConsoleView.vue:65
@@ -75,60 +140,51 @@ export const messages = {
   // src/views/ConsoleView.vue:77
   "Result": "Результат",
 
-  // src/views/WorkflowsView.vue:50
+  // src/views/WorkflowsView.vue:55
   "Custom script": "Пользовательский скрипт",
 
-  // src/views/WorkflowsView.vue:72
+  // src/views/WorkflowsView.vue:77
   "Condition": "Условие",
 
-  // src/views/WorkflowsView.vue:73
+  // src/views/WorkflowsView.vue:78
   "Validator": "Валидатор",
 
-  // src/views/WorkflowsView.vue:74
+  // src/views/WorkflowsView.vue:79
   "Postfunction": "Постфункция",
 
-  // src/views/WorkflowsView.vue:119
-  "Workflows": "Бизнес процессы",
-
-  // src/views/WorkflowsView.vue:126
-  "Filter": "Фильтр",
-
-  // src/views/WorkflowsView.vue:127
-  "note...": "примечание...",
-
-  // src/views/WorkflowsView.vue:130
-  "Projects": "Проекты",
-
-  // src/views/WorkflowsView.vue:140
-  "Name": "Название",
-
-  // src/views/WorkflowsView.vue:141
-  "Used in": "Используется в",
-
-  // src/views/WorkflowsView.vue:142
-  "Workflow": "Бизнес процесс",
-
-  // src/views/WorkflowsView.vue:143
-  "Transition": "Переход",
-
-  // src/views/WorkflowsView.vue:144
-  "Type": "Тип",
-
-  // src/views/WorkflowsView.vue:145
-  "Performance": "Производительность",
-
-  // src/views/WorkflowsView.vue:146
-  "History": "История",
+  // src/views/WorkflowsView.vue:121
+  "Show performance": "Показать производительность",
 
   // src/views/WorkflowsView.vue:147
-  "Actions": "Действия",
+  "Workflows": "Бизнес процессы",
 
-  // src/views/WorkflowsView.vue:156
-  "More": "Больше",
+  // src/views/WorkflowsView.vue:154
+  "Filter": "Фильтр",
 
-  // src/views/WorkflowsView.vue:160
+  // src/views/WorkflowsView.vue:155
+  "note...": "примечание...",
+
+  // src/views/WorkflowsView.vue:158
+  "Projects": "Проекты",
+
+  // src/views/WorkflowsView.vue:168
+  "Name": "Название",
+
+  // src/views/WorkflowsView.vue:169
+  "Used in": "Используется в",
+
+  // src/views/WorkflowsView.vue:170
+  "Workflow": "Бизнес процесс",
+
+  // src/views/WorkflowsView.vue:171
+  "Transition": "Переход",
+
+  // src/views/WorkflowsView.vue:172
+  "Type": "Тип",
+
+  // src/views/WorkflowsView.vue:173
+  "History": "История",
+
+  // src/views/WorkflowsView.vue:184
   "Draft": "Черновик",
-
-  // src/views/WorkflowsView.vue:179
-  "Show performance": "",
 }
