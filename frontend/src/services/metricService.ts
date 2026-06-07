@@ -1,6 +1,6 @@
 import { SearchQuery, SearchResult } from "luna";
 import { client } from "@/utils/client.ts";
-import { ScriptRunResult } from "@/interfaces/metrics.ts";
+import { MetricPoint, ScriptRunResult } from "@/interfaces/metrics.ts";
 
 class MetricService {
   getResults(scriptId: string, query: SearchQuery) {
@@ -8,6 +8,15 @@ class MetricService {
       params: {
         page: query.page,
         limit: query.limit,
+      }
+    });
+  }
+
+  getCharPoints(scriptId: string, from: string, to: string) {
+    return client.get<Array<MetricPoint>>(`/gravity/scipt/metrics/${scriptId}/points`, {
+      params: {
+        from,
+        to
       }
     });
   }

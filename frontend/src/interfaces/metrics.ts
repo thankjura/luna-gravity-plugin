@@ -7,3 +7,12 @@ export interface ScriptRunResult {
   payload: string,
   logs: string
 }
+
+export interface MetricPoint {
+  bucket: string,
+  totalCount: number,
+  avgExecutionTimeMs: number,
+  maxExecutionTimeMs: number,
+  avgCpuTimeMs: number,
+  maxCpuTimeMs: number,
+}

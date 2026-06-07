@@ -1,5 +1,7 @@
 package ru.slie.luna.plugins.gravity.metrics;
 
+import com.blazebit.persistence.CriteriaBuilder;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.slie.luna.db.SearchResultList;
@@ -7,11 +9,14 @@ import ru.slie.luna.db.filter.Filters;
 import ru.slie.luna.db.query.FindOptions;
 import ru.slie.luna.db.query.Query;
 import ru.slie.luna.plugins.gravity.db.ScriptRunResultEntity;
+import ru.slie.luna.plugins.gravity.metrics.dto.MetricPointDto;
 import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 import ru.slie.luna.regolith.ActiveDocManager;
 import ru.slie.luna.search.SearchParams;
 import ru.slie.luna.search.SearchResult;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -58,5 +63,42 @@ public class ScriptMetricsManager {
         }
 
         activeDocManager.saveAll(scriptRunResultEntities);
+    }
+
+    @NullMarked
+    public List<MetricPointDto> getMetricPoints(String scriptId, LocalDateTime from, LocalDateTime to) {
+        String bucketStep = resolveBucketStep(from, to);
+        CriteriaBuilder<ScriptRunResultEntity> cb = activeDocManager.getCriteriaBuilder(ScriptRunResultEntity.class);
+        return cb.from(ScriptRunResultEntity.class, "s")
+                .selectNew(MetricPointDto.class)
+                    .with("FUNCTION('date_trunc', :timeStep, s.startAt)", "bucket")
+                    .with("COUNT(s.id)", "totalCount")
+                    .with("AVG(s.executionTimeMs)", "avgExecutionTime")
+                    .with("MAX(s.executionTimeMs)", "maxExecutionTime")
+                    .with("AVG(s.cpuTimeMs)", "avgCpuTime")
+                    .with("MAX(s.cpuTimeMs)", "maxCpuTime")
+                .end()
+                .where("s.scriptId").eq(scriptId)
+                .where("s.startAt").between(from).and(to)
+                .groupBy("FUNCTION('date_trunc', :timeStep, s.startAt)")
+                .orderByAsc("FUNCTION('date_trunc', :timeStep, s.startAt)")
+                .setParameter("timeStep", bucketStep)
+                .getResultList();
+    }
+
+    @NullMarked
+    private static String resolveBucketStep(LocalDateTime start, LocalDateTime end) {
+        long hoursBetween = Duration.between(start, end).toHours();
+        if (hoursBetween <= 2) {
+            return "minute";
+        } else if (hoursBetween <= 24) {
+            return "hour";
+        } else if (hoursBetween <= 24 * 14) {
+            return "hour";
+        } else if (hoursBetween <= 24 * 30) {
+            return "day";
+        } else {
+            return "week";
+        }
     }
 }
