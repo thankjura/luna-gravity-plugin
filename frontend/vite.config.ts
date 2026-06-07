@@ -16,6 +16,7 @@ export default defineConfig({
         'sortablejs': 'Sortable',
         'monaco-editor': 'monaco',
         'chart.js': 'ChartJs',
+        'vue-router': 'vue-router',
       }
     }),
     vue()

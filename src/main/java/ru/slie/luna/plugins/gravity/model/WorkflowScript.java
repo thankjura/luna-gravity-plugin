@@ -80,4 +80,8 @@ public class WorkflowScript {
     public WorkflowTransition getTransition() {
         return transition;
     }
+
+    public boolean isDisabled() {
+        return AbstractGravityFunction.isDisabled(function.getParams());
+    }
 }

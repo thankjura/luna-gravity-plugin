@@ -22,6 +22,9 @@ public class GravityScriptValidator extends AbstractGravityFunction implements W
 
     @Override
     public void execute(WorkflowTransientVars transientVars, Map<String, String> funcParams) throws ValidateException {
+        if (isDisabled(funcParams)) {
+            return;
+        }
         String script = funcParams.get(SCRIPT_KEY);
         Map<String, Object> scriptEnv = new HashMap<>();
         scriptEnv.put("user", transientVars.getUser());

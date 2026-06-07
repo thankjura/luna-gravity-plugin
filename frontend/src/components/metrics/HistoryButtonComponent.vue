@@ -21,12 +21,9 @@ const fails = computed(() => {
     </template>
     <template v-else>
       <span :class="[fails > 0? 'icon-cancel-circle' : 'icon-ok-circle']"></span>
-      <template v-if="fails > 0">
-        {{ $i18n.t("Has {0} failures in the last {1} executions", fails, results.length) }}
-      </template>
-      <template v-else>
-        {{ $i18n.t("No failures in the last {0} executions", results.length) }}
-      </template>
+      <span :title="fails > 0 ? $i18n.t('Has {0} failures in the last {1} executions', fails, results.length): $i18n.t('No failures in the last {0} executions', results.length)">
+        {{ results.length - fails }}/{{ results.length }}
+      </span>
     </template>
   </button>
 </template>

@@ -27,6 +27,7 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
 
     public static String SCRIPT_KEY = "script";
     public static String SCRIPT_NOTE = "note";
+    public static String SCRIPT_DISABLED = "disabled";
 
     protected AbstractGravityFunction(I18nResolver i18n,
                                       ScriptRunnerService scriptRunnerService,
@@ -84,6 +85,18 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
         }
     }
 
+    public static boolean isDisabled(Map<String, String> params) {
+        return params != null && params.containsKey("disabled") && "yes".equals(params.get("disabled"));
+    }
+
+    public static void setDisabled(Map<String, String> params, boolean disabled) {
+        if (disabled) {
+            params.put(SCRIPT_DISABLED, "yes");
+        } else {
+            params.remove(SCRIPT_DISABLED);
+        }
+    }
+
     protected Object executeWithMetrics(String functionId, String script, Map<String, Object> scriptEnv) throws ValidateException {
         ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
         boolean isCpuTimeSupported = threadBean.isCurrentThreadCpuTimeSupported();
@@ -98,7 +111,9 @@ public abstract class AbstractGravityFunction implements WorkflowFunction  {
         try {
             return scriptRunnerService.execute(script, scriptEnv, builder::append);
         } catch (Exception e) {
-            stackTrace = ExceptionHelper.stackTraceToString(e);
+            if (!(e instanceof ValidateException)) {
+                stackTrace = ExceptionHelper.stackTraceToString(e);
+            }
             throw e;
         } finally {
             long endWallTimeNano = System.nanoTime();

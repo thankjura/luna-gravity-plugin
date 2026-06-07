@@ -2,10 +2,10 @@ export const messages = {
   // src/components/metrics/HistoryButtonComponent.vue:20
   "Has not run yet": "Еще не запускался",
 
-  // src/components/metrics/HistoryButtonComponent.vue:25
+  // src/components/metrics/HistoryButtonComponent.vue:24
   "Has {0} failures in the last {1} executions": "В последних {1} выполнениях зафиксировано {0} сбоев.",
 
-  // src/components/metrics/HistoryButtonComponent.vue:28
+  // src/components/metrics/HistoryButtonComponent.vue:24
   "No failures in the last {0} executions": "В последних {0} выполнениях ошибок не было.",
 
   // src/components/metrics/HistoryExecutionDialog.vue:28
@@ -101,6 +101,7 @@ export const messages = {
   "Custom": "Другое",
 
   // src/components/metrics/PerformanceDialog.vue:117
+  // src/views/WorkflowsView.vue:167
   "Performance chart": "График производительности",
 
   // src/components/metrics/PerformanceDialog.vue:121
@@ -115,11 +116,17 @@ export const messages = {
   // src/components/metrics/PerformanceDialog.vue:134
   "Close": "Закрыть",
 
-  // src/components/workflow/BaseEditScriptComponent.vue:40
+  // src/components/metrics/WorkflowScriptViewDialog.vue:25
+  "Workflow script": "Скрипт бизнес-процесса",
+
+  // src/components/workflow/BaseEditScriptComponent.vue:42
   "Note": "Примечание",
 
-  // src/components/workflow/BaseEditScriptComponent.vue:41
+  // src/components/workflow/BaseEditScriptComponent.vue:43
   "optional script description...": "необязательное описание скрипта...",
+
+  // src/components/workflow/BaseEditScriptComponent.vue:48
+  "Disabled": "Отключен",
 
   // src/components/workflow/ProjectListComponent.vue:33
   "More": "Больше",
@@ -128,7 +135,7 @@ export const messages = {
   "Failed to execute script": "Не удалось выполнить скрипт.",
 
   // src/views/ConsoleView.vue:64
-  // src/views/WorkflowsView.vue:146
+  // src/views/WorkflowsView.vue:206
   "Gravity": "",
 
   // src/views/ConsoleView.vue:65
@@ -140,51 +147,63 @@ export const messages = {
   // src/views/ConsoleView.vue:77
   "Result": "Результат",
 
-  // src/views/WorkflowsView.vue:55
+  // src/views/WorkflowsView.vue:70
   "Custom script": "Пользовательский скрипт",
 
-  // src/views/WorkflowsView.vue:77
+  // src/views/WorkflowsView.vue:92
   "Condition": "Условие",
 
-  // src/views/WorkflowsView.vue:78
+  // src/views/WorkflowsView.vue:93
   "Validator": "Валидатор",
 
-  // src/views/WorkflowsView.vue:79
+  // src/views/WorkflowsView.vue:94
   "Postfunction": "Постфункция",
 
-  // src/views/WorkflowsView.vue:121
-  "Show performance": "Показать производительность",
-
   // src/views/WorkflowsView.vue:147
+  "Function params updated": "Параметры функции обновлены",
+
+  // src/views/WorkflowsView.vue:149
+  "Failed update function params": "не удалось обновить параметры функции",
+
+  // src/views/WorkflowsView.vue:159
+  "Show script": "Показать скрипт",
+
+  // src/views/WorkflowsView.vue:179
+  "Enable": "Включить",
+
+  // src/views/WorkflowsView.vue:179
+  "Disable": "Выключить",
+
+  // src/views/WorkflowsView.vue:207
   "Workflows": "Бизнес процессы",
 
-  // src/views/WorkflowsView.vue:154
+  // src/views/WorkflowsView.vue:214
   "Filter": "Фильтр",
 
-  // src/views/WorkflowsView.vue:155
+  // src/views/WorkflowsView.vue:215
   "note...": "примечание...",
 
-  // src/views/WorkflowsView.vue:158
+  // src/views/WorkflowsView.vue:218
   "Projects": "Проекты",
 
-  // src/views/WorkflowsView.vue:168
+  // src/views/WorkflowsView.vue:228
   "Name": "Название",
 
-  // src/views/WorkflowsView.vue:169
+  // src/views/WorkflowsView.vue:229
   "Used in": "Используется в",
 
-  // src/views/WorkflowsView.vue:170
+  // src/views/WorkflowsView.vue:230
   "Workflow": "Бизнес процесс",
 
-  // src/views/WorkflowsView.vue:171
+  // src/views/WorkflowsView.vue:231
   "Transition": "Переход",
 
-  // src/views/WorkflowsView.vue:172
+  // src/views/WorkflowsView.vue:232
   "Type": "Тип",
 
-  // src/views/WorkflowsView.vue:173
+  // src/views/WorkflowsView.vue:233
   "History": "История",
 
-  // src/views/WorkflowsView.vue:184
+  // src/views/WorkflowsView.vue:244
   "Draft": "Черновик",
 }

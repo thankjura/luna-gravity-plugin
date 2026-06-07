@@ -21,6 +21,9 @@ public class GravityScriptPostfunction extends AbstractGravityFunction implement
 
     @Override
     public void execute(WorkflowTransientVars transientVars, Map<String, String> funcParams) {
+        if (isDisabled(funcParams)) {
+            return;
+        }
         String script = funcParams.get(SCRIPT_KEY);
         Map<String, Object> scriptEnv = new HashMap<>();
         scriptEnv.put("user", transientVars.getUser());

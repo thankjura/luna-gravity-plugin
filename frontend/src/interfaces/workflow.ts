@@ -8,16 +8,17 @@ export interface WorkflowTransition {
 
 export interface WorkflowScript {
   id: string,
-  workflowId: string,
+  workflowId: number,
   workflowName: string,
   workflowOriginalId: number,
-  actionId: string,
+  actionId: number,
   actionName: string,
   script: string,
   scriptNote: string,
   projectKeys: Array<string>,
   functionType: WorkflowFunctionType,
   transition: WorkflowTransition,
+  disabled: boolean,
 }
 
 export interface WorkflowScriptsResponse {

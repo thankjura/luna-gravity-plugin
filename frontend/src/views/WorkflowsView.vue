@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { $i18n } from "@/utils/i18n.ts";
 import { WorkflowScript } from "@/interfaces/workflow.ts";
-import { computed, onMounted, ref, useTemplateRef } from "vue";
+import { computed, inject, onMounted, ref, useTemplateRef } from "vue";
 import { workflowService } from "@/services/workflowService.ts";
 import {
   LoadOverlayComponent,
@@ -13,7 +13,7 @@ import {
   SearchResult,
   BusyIconComponent,
   DropDownGroupOption,
-  DropDownButton,
+  DropDownButton, DropDownOption, RouteNames, NotifyComponentInterface,
 } from 'luna';
 import { ScriptRunResult } from "@/interfaces/metrics.ts";
 import { vLazyLoad } from "@/directives/LazyLoad.ts";
@@ -23,6 +23,7 @@ import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.
 import { ComponentExposed } from "vue-component-type-helpers";
 import ProjectListComponent from "@/components/workflow/ProjectListComponent.vue";
 import PerformanceDialog from "@/components/metrics/PerformanceDialog.vue";
+import WorkflowScriptViewDialog from "@/components/metrics/WorkflowScriptViewDialog.vue";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
@@ -34,6 +35,20 @@ const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
 const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
 const performanceDialog = useTemplateRef<ComponentExposed<typeof PerformanceDialog>>('performanceDialog');
+const workflowScriptViewDialog = useTemplateRef<ComponentExposed<typeof WorkflowScriptViewDialog>>('workflowScriptViewDialog');
+const $notify = inject<NotifyComponentInterface>("$notify");
+
+const orig2draftMap = computed<Record<string, string>>(() => {
+  const out = {};
+  if (scripts.value) {
+    for (const s of scripts.value) {
+      if (s.workflowOriginalId) {
+        out[s.workflowOriginalId] = s.workflowId;
+      }
+    }
+  }
+  return out;
+})
 
 const projectOptions = computed<Array<ProjectInfo>>(() => {
   const out = [];
@@ -103,6 +118,10 @@ const showPerformanceDialog = (script: WorkflowScript) => {
   performanceDialog.value.show(script.id);
 }
 
+const showScriptDialog = (script: WorkflowScript) => {
+  workflowScriptViewDialog.value.show(script);
+}
+
 const loadScripts = () => {
   busy.value = true;
   workflowService.getScripts().then((data) => {
@@ -114,16 +133,57 @@ const loadScripts = () => {
   });
 }
 
+const toggleScriptState = (script: WorkflowScript) => {
+  if (busy.value) {
+    return
+  }
+
+  busy.value = true;
+  workflowService.setDisabled(script.workflowId, script.actionId, script.functionType, script.id, !script.disabled).then((data) => {
+    const idx = scripts.value.findIndex(item => item.id === data.data.id);
+    if (idx != -1) {
+      scripts.value.splice(idx, 1, data.data);
+    }
+    $notify.ok($i18n.t('Function params updated'));
+  }).catch(() => {
+    $notify.error($i18n.t('Failed update function params'));
+  }).finally(() => {
+    busy.value = false;
+  });
+}
+
 const dropDownOptions = (script: WorkflowScript): Array<DropDownGroupOption> => {
-  const options = [
+  const options: Array<DropDownOption> = [
+    {
+      id: 'show',
+      label: $i18n.t('Show script'),
+      cb() {
+        showScriptDialog(script)
+      },
+      iconName: 'icon-eye'
+    },
     {
       id: 'perf',
-      label: $i18n.t('Show performance'),
+      label: $i18n.t('Performance chart'),
       cb() {
         showPerformanceDialog(script)
-      }
+      },
+      iconName: 'icon-stats-bars'
     }
   ];
+
+  if (script.workflowOriginalId || !orig2draftMap.value[script.workflowId]) {
+    options.push(
+        {
+          id: 'state',
+          label: script.disabled ? $i18n.t('Enable') : $i18n.t('Disable'),
+          cb() {
+            toggleScriptState(script);
+          },
+          iconName: script.disabled ? 'icon-ok-circle' : 'icon-blocked'
+        }
+    )
+  }
 
   return [
     {
@@ -175,7 +235,7 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="s in filteredScripts" :key="s.id">
+          <tr v-for="s in filteredScripts" :key="s.id" :class="{disabled: s.disabled}">
             <td>{{ s.scriptNote }}</td>
             <td>
               <ProjectListComponent :projects="projects" :keys="s.projectKeys"></ProjectListComponent>
@@ -190,7 +250,7 @@ onMounted(() => {
                     <StatusComponent v-if="statuses[status]" :name="statuses[status].name" :category="statuses[status].categoryKey"></StatusComponent>
                   </template>
                 </div>
-                <div class="transition-name">-> {{ s.transition.transitionName }} -></div>
+                <div class="transition-name">-> <router-link :to="{name: RouteNames.admin.workflows, params: {id: s.workflowId}, query: {hl: s.actionId}}">{{ s.transition.transitionName }}</router-link> -></div>
                 <div class="transition-target">
                   <StatusComponent v-if="statuses[s.transition.targetStatus]" :name="statuses[s.transition.targetStatus].name" :category="statuses[s.transition.targetStatus].categoryKey"></StatusComponent>
                 </div>
@@ -209,7 +269,7 @@ onMounted(() => {
               <HistoryButtonComponent v-else :results="[]"></HistoryButtonComponent>
             </td>
             <td>
-              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-dots"></DropDownButton>
+              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-dots" :cache-options="false"></DropDownButton>
             </td>
           </tr>
         </tbody>
@@ -219,6 +279,7 @@ onMounted(() => {
 
     <HistoryExecutionDialog ref="historyExecutionDialog"></HistoryExecutionDialog>
     <PerformanceDialog ref="performanceDialog"></PerformanceDialog>
+    <WorkflowScriptViewDialog ref="workflowScriptViewDialog"></WorkflowScriptViewDialog>
   </div>
 </template>
 
@@ -237,6 +298,12 @@ onMounted(() => {
       display: flex;
       align-items: stretch;
       gap: 10px;
+
+      .transition-name {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+      }
 
       & > * {
         display: flex;

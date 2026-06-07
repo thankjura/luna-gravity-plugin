@@ -42,6 +42,7 @@ onMounted(async () => {
     automaticLayout: true,
     suggestOnTriggerCharacters: true,
     scrollBeyondLastLine: false,
+    readOnly: props.disabled,
     scrollbar: {
       vertical: 'auto',
       handleMouseWheel: true

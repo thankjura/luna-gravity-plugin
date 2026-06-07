@@ -1,5 +1,6 @@
 package ru.slie.luna.plugins.gravity.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import ru.slie.luna.plugins.gravity.workflow.GravityScriptCondition;
 import ru.slie.luna.plugins.gravity.workflow.GravityScriptPostfunction;
@@ -25,5 +26,16 @@ public enum WorkflowFunctionType {
     @JsonValue
     public String getKey() {
         return key;
+    }
+
+    @JsonCreator
+    public static WorkflowFunctionType fromString(String key) {
+        for (WorkflowFunctionType functionType: WorkflowFunctionType.values()) {
+            if (functionType.key.equals(key)) {
+                return functionType;
+            }
+        }
+
+        return null;
     }
 }

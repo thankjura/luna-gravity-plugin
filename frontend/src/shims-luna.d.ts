@@ -184,6 +184,7 @@ declare module 'luna' {
       disabled?: boolean
       withTime?: boolean
       modelValue?: string
+      placeholder?: string
     }, {}, {}, SlotsType<{}>>;
   export const IconSelector: DefineComponent<
     {},{}, {}, {}, {}, {}, {}, {
@@ -349,6 +350,89 @@ declare module 'luna' {
       value?: string
     }, {}, {}, SlotsType<{}>>;
 export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
+export const RouteNames: {
+        home: "home",
+        dashboard: "dashboard",
+        navigator: "navigator",
+        bulkAction: "bulkAction",
+        bulkActionProgress: "bulkActionProgress",
+        projects: "projects",
+        project: {
+            project: "project",
+            summary: "projectSummary",
+            issues: "projectIssues",
+            activity: "projectActivity",
+            reports: "projectReports",
+            settings: {
+                settings: "projectSettings",
+                summary: "projectSettingsSummary",
+                details: "projectSettingsDetails",
+                issueTypes: "projectSettingsIssueTypes",
+                users: "projectSettingsUsers",
+                schemas: "projectSettingsSchemas",
+                delete: "projectSettingsDelete",
+            },
+        },
+        login: "login",
+        logout: "logout",
+        profile: "profile",
+        searchFilters: "searchFilters",
+        issue: "issue",
+        agile: {
+            boards: "agileBoards",
+            view: "agileBoardView",
+            backlog: "agileBoardBacklog",
+            reports: "agileBoardReports",
+            settings: "agileBoardSettings",
+        },
+        admin: {
+            admin: "admin",
+            users: {
+                users: "adminUsers",
+                list: "adminUserList",
+                user: "adminUser",
+                roles: "adminUserRoles",
+            },
+            groups: "adminGroups",
+            issueTypes: "adminIssueTypes",
+            issueTypeSchemas: "adminIssueTypeSchemas",
+            priorities: "adminPriorities",
+            prioritySchemas: "adminPrioritySchemas",
+            statuses: "adminStatuses",
+            workflows: "adminWorkflows",
+            workflowSchemas: "adminWorkflowSchemas",
+            projects: "adminProjects",
+            projectRoles: "adminProjectRoles",
+            customFields: "adminCustomFields",
+            screens: "adminScreens",
+            screenSchemas: "adminScreenSchemas",
+            issueTypeScreenSchemas: "adminIssueTypeScreenSchemas",
+            permissionSchemas: "adminPermissionSchemas",
+            outgoingMailServers: "adminOutgoingMailServers",
+            outgoingMailQueue: "adminOutgoingMailQueue",
+            incomingMailServers: "adminIncomingMailServers",
+            messageHandlers: "adminMessageHandlers",
+            notificationSchemas: "adminNotificationSchemas",
+            fieldLayouts: "adminFieldLayouts",
+            fieldLayoutSchemas: "adminFieldLayoutSchemas",
+            globalPermissions: "adminGlobalPermissions",
+            properties: "adminProperties",
+            systemInfo: "adminSystemInfo",
+            plugins: "adminPlugins",
+            scheduler: "adminScheduler",
+            issueLinkTypes: "adminIssueLinkTypes",
+            directories: "adminDirectories",
+            indexing: "adminIndexing",
+            backup: "adminBackup",
+            projectImport: "adminProjectImport",
+            logging: "adminLogging",
+            ranking: "adminRanking",
+            docs: "adminDocs",
+            license: "adminLicense",
+            icons: "adminIcons",
+        },
+        maintenance: "maintenance",
+    }
   export interface NotifyComponentInterface {
       info: (title: string, body?: string, closable?: boolean) => void;
       warn: (title: string, body?: string, closable?: boolean) => void;

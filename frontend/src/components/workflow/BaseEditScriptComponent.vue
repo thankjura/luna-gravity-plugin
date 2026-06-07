@@ -11,6 +11,7 @@ defineProps({
 type Params = {
   script: string,
   note: string,
+  disabled: 'yes' | null,
 }
 
 const context = computed(() => {
@@ -36,9 +37,17 @@ const funcType = inject<Ref<WorkflowFunctionType>>('funcType')
 
 <template>
   <div class="gravity-edit-function">
-    <div class="gravity-field-group">
-      <label for="note">{{ $i18n.t('Note') }}</label>
-      <input type="text" v-model="value.note" :placeholder="$i18n.t('optional script description...')">
+    <div class="gravity-edit-form">
+      <div class="gravity-field-group">
+        <label for="note">{{ $i18n.t('Note') }}</label>
+        <input type="text" v-model="value.note" :placeholder="$i18n.t('optional script description...')">
+      </div>
+      <div class="gravity-field-group">
+        <label>
+          <input type="checkbox" v-model="value.disabled" true-value="yes" false-value="" >
+          {{ $i18n.t('Disabled') }}
+        </label>
+      </div>
     </div>
     <CodeEditor class="function-code-editor" v-model="value.script" :context="context"></CodeEditor>
   </div>
@@ -51,10 +60,16 @@ const funcType = inject<Ref<WorkflowFunctionType>>('funcType')
     gap: 20px;
     flex-direction: column;
 
-    .gravity-field-group {
+    .gravity-edit-form {
       display: flex;
-      gap: 20px;
       align-items: center;
+      gap: 20px;
+
+      .gravity-field-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
     }
 
     .function-code-editor {

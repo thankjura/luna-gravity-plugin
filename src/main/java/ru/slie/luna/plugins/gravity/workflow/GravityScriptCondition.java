@@ -21,6 +21,9 @@ public class GravityScriptCondition extends AbstractGravityFunction implements W
 
     @Override
     public boolean execute(WorkflowTransientVars transientVars, Map<String, String> params) {
+        if (isDisabled(params)) {
+            return true;
+        }
         String script = params.get(SCRIPT_KEY);
         Map<String, Object> scriptEnv = new HashMap<>();
         scriptEnv.put("user", transientVars.getUser());
