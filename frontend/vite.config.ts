@@ -15,7 +15,7 @@ export default defineConfig({
         'I18N': 'I18N',
         'sortablejs': 'Sortable',
         'monaco-editor': 'monaco',
-        'chart.js': 'chart.js',
+        'chart.js': 'ChartJs',
       }
     }),
     vue()

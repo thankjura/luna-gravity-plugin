@@ -79,7 +79,7 @@ onMounted(async () => {
   </div>
 </template>
 
-<style>
+<style scoped>
   .code-viewer-wrapper {
     max-height: v-bind(currentMaxHeight);
     position: relative;

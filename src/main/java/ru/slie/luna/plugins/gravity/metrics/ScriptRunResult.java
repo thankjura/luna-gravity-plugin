@@ -29,7 +29,7 @@ public class ScriptRunResult {
         return scriptId;
     }
 
-    @JsonFormat(pattern = Constants.DATE_TIME_FORMAT)
+    @JsonFormat(pattern = Constants.DATE_TIME_SEC_FORMAT)
     public LocalDateTime getStartAt() {
         return startAt;
     }

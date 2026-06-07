@@ -22,6 +22,7 @@ import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.
 import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.vue";
 import { ComponentExposed } from "vue-component-type-helpers";
 import ProjectListComponent from "@/components/workflow/ProjectListComponent.vue";
+import PerformanceDialog from "@/components/metrics/PerformanceDialog.vue";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
@@ -32,6 +33,7 @@ const selectedProjects = ref<Array<string>>([]);
 const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
 const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
+const performanceDialog = useTemplateRef<ComponentExposed<typeof PerformanceDialog>>('performanceDialog');
 
 const projectOptions = computed<Array<ProjectInfo>>(() => {
   const out = [];
@@ -98,7 +100,7 @@ const showExecutionDialog = (scriptId: string) => {
 }
 
 const showPerformanceDialog = (script: WorkflowScript) => {
-
+  performanceDialog.value.show(script.id);
 }
 
 const loadScripts = () => {
@@ -216,7 +218,7 @@ onMounted(() => {
     </div>
 
     <HistoryExecutionDialog ref="historyExecutionDialog"></HistoryExecutionDialog>
-
+    <PerformanceDialog ref="performanceDialog"></PerformanceDialog>
   </div>
 </template>
 

@@ -31,7 +31,7 @@ const fails = computed(() => {
   </button>
 </template>
 
-<style>
+<style scoped>
   .history-button-component {
     display: flex;
     gap: 10px;
