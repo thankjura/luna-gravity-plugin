@@ -1,7 +1,7 @@
 // Luna exposes version: 4.0.0-SNAPSHOT
 declare module 'luna' {
-  import type { DefineComponent, SlotsType } from 'vue';
-  import RouteLocationRaw from 'vue-router';
+  import type { DefineComponent, SlotsType, InjectionKey, Ref } from 'vue';
+  import type RouteLocationRaw from 'vue-router';
 
   export const BusyIconComponent: DefineComponent<
     {},{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, SlotsType<{}>>;
@@ -148,6 +148,7 @@ declare module 'luna' {
       disabled?: boolean
       busyValue?: string | number
       emitsOnly?: boolean
+      maxHeight?: string
       modelValue?: (string | number)[]
     }, {}, {}, SlotsType<{}>>;
   export const ColorPickerDialog: DefineComponent<
@@ -430,9 +431,20 @@ export const RouteNames: {
             docs: "adminDocs",
             license: "adminLicense",
             icons: "adminIcons",
+            eventTypes: "adminEventTypes",
+            mailTester: "adminMailTester",
         },
         maintenance: "maintenance",
     }
+export const Injections: {
+    $notify: InjectionKey<NotifyComponentInterface>,
+    project: InjectionKey<Ref<Project>>,
+    board: InjectionKey<Ref<Board>>,
+    workflowAction: InjectionKey<Ref<WorkflowAction>>,
+    workflowFuncType: InjectionKey<Ref<WorkflowFunctionType>>,
+    workflowActionFunc: InjectionKey<Ref<WorkflowFunctionDescriptor>>,
+    metaIssue: InjectionKey<Ref<MetaIssue>>,
+  }
   export interface NotifyComponentInterface {
       info: (title: string, body?: string, closable?: boolean) => void;
       warn: (title: string, body?: string, closable?: boolean) => void;
@@ -440,7 +452,7 @@ export const RouteNames: {
       error: (title: string, body?: string, closable?: boolean) => void;
   }
   export interface I18N {
-      loadMessages(locale: string): void,
+      loadMessages(locale: string): Promise<void>,
       supportedLocales: Array<string>,
       t(text: string, ...args: Array<string|number>): string,
       p(text: string, params: Record<string, any>, ...args: Array<string|number>): string,
@@ -890,9 +902,11 @@ export const RouteNames: {
       warningMessages: Array<string>
   }
   export interface IssueEventType {
-      id: string,
+      id: number,
       name: string,
-      description: string | null
+      description: string | null,
+      baseEventTypeId: number,
+      systemEvent: boolean,
   }
   export interface IconKey {
       key: string,
@@ -1181,89 +1195,19 @@ export const RouteNames: {
       id: number,
       name: string,
       description: string|null,
-      defaultWorkflow: Workflow,
+      defaultWorkflow: WorkflowSimple,
       defaultWorkflowId: number,
       entries: Array<WorkflowSchemaEntry>,
   }
-  export interface Workflow {
+  export interface WorkflowSimple {
       id: number,
       name: string,
-      description: string | null,
-      statuses: Array<Status>,
-      display: {
-          statusPositionMap: {
-              [kay: number]: Position
-          },
-          canvasPosition: Position,
-          actionPorts: {
-              [key: number]: {
-                  left: NodePort,
-                  right: NodePort,
-              }
-          },
-      },
-      createAction: WorkflowAction,
-      actions: Array<WorkflowAction>,
-      originalId: number | null,
-      author: User | null,
-      updater: User | null,
-      created: string | null,
-      updated: string | null,
+      description: string|null,
+      originalId: number|null,
   }
-  export interface Position {
-      x: number,
-      y: number,
-  }
-  export interface NodePort {
-      nodeId: number,
-      direction: Direction|null,
-      index: number,
-  }
-  export type Direction = 'left' | 'right' | 'top' | 'bottom';
-  export interface WorkflowAction {
-      id: number,
-      name: string,
-      sourceStatusIds: Array<number>,
-      targetStatusId: number,
-      screenId: number|null,
-      screen: Screen|null,
-      validators: Array<WorkflowActionFunction>,
-      conditions: WorkflowActionConditionGroup,
-      postfunctions: Array<WorkflowActionFunction>,
-  }
-  export interface Screen {
-      id: number,
-      name: string,
-      description: string,
-      tabs: Array<ScreenTab>
-  }
-  export interface ScreenTab {
-      id: number,
-      name: string,
-      fieldIds: Array<string>,
-      fields: Array<IssueField>,
-  }
-  export interface WorkflowActionFunction extends WorkflowFunctionDescriptor {
-      id: string,
-      params: null | WorkflowFunctionParams,
-      viewParams: null | WorkflowFunctionViewParams,
-  }
-  export interface WorkflowFunctionParams {
-      [key: string]: string
-  }
-  export interface WorkflowFunctionViewParams {
-      [key: string]: any
-  }
-  export interface WorkflowActionConditionGroup {
-      id: string,
-      condition: WorkflowActionFunction | null,
-      items: Array<WorkflowActionConditionGroup> | null,
-      operator: ConditionOperator,
-  }
-  export type ConditionOperator = "and" | "or";
   export interface WorkflowSchemaEntry {
       issueType: IssueType,
-      workflow: Workflow,
+      workflow: WorkflowSimple,
   }
   export interface IssueTypeScreenSchema {
       id: number,
@@ -1288,6 +1232,18 @@ export const RouteNames: {
       editScreenId?: number,
       viewScreen?: Screen,
       viewScreenId?: number,
+  }
+  export interface Screen {
+      id: number,
+      name: string,
+      description: string,
+      tabs: Array<ScreenTab>
+  }
+  export interface ScreenTab {
+      id: number,
+      name: string,
+      fieldIds: Array<string>,
+      fields: Array<IssueField>,
   }
   export interface ScreenSchemaAffectedSchemas {
       screenSchema: ScreenSchema,
@@ -1320,14 +1276,74 @@ export const RouteNames: {
       editComponent: string | null,
   }
   export type WorkflowFunctionType = 'postfunction' | 'validator' | 'condition';
+  export interface WorkflowFunctionParams {
+      [key: string]: string
+  }
+  export interface WorkflowFunctionViewParams {
+      [key: string]: any
+  }
+  export interface WorkflowActionFunction extends WorkflowFunctionDescriptor {
+      id: string,
+      params: null | WorkflowFunctionParams,
+      viewParams: null | WorkflowFunctionViewParams,
+  }
+  export type ConditionOperator = "and" | "or";
+  export interface WorkflowActionConditionGroup {
+      id: string,
+      condition: WorkflowActionFunction | null,
+      items: Array<WorkflowActionConditionGroup> | null,
+      operator: ConditionOperator,
+  }
+  export interface WorkflowAction {
+      id: number,
+      name: string,
+      sourceStatusIds: Array<number>,
+      targetStatusId: number,
+      screenId: number|null,
+      screen: Screen|null,
+      validators: Array<WorkflowActionFunction>,
+      conditions: WorkflowActionConditionGroup,
+      postfunctions: Array<WorkflowActionFunction>,
+  }
+  export interface Workflow extends WorkflowSimple {
+      statuses: Array<Status>,
+      display: {
+          statusPositionMap: {
+              [kay: number]: Position
+          },
+          canvasPosition: Position,
+          actionPorts: {
+              [key: number]: {
+                  left: NodePort,
+                  right: NodePort,
+              }
+          },
+      },
+      createAction: WorkflowAction,
+      actions: Array<WorkflowAction>,
+      author: User | null,
+      updater: User | null,
+      created: string | null,
+      updated: string | null,
+  }
+  export interface Position {
+      x: number,
+      y: number,
+  }
+  export interface NodePort {
+      nodeId: number,
+      direction: Direction|null,
+      index: number,
+  }
+  export type Direction = 'left' | 'right' | 'top' | 'bottom';
   export interface WorkflowSchemaSimple {
       id: number,
       name: string,
       description: string|null,
       workflowIds: Array<number>,
   }
-  export interface WorkflowSearchResult extends SearchResult<Workflow>{
-      drafts: Array<Workflow>,
+  export interface WorkflowSearchResult extends SearchResult<WorkflowSimple> {
+      drafts: Array<WorkflowSimple>,
       schemas: Array<WorkflowSchemaSimple>,
   }
   export interface Directory {
@@ -1752,6 +1768,12 @@ export const RouteNames: {
       projectRoles: Array<ProjectRole>,
       userFields: Array<IssueField>,
   }
+  export interface MailPreviewResponse {
+      duration: number,
+      eventTypeId: number,
+      subject: string,
+      html: string,
+  }
   export interface Permission {
       id: string,
       name: string,
@@ -1930,6 +1952,10 @@ export const RouteNames: {
       state: string,
       progress?: number,
       plannedCompleteDate?: string,
+  }
+  export interface NamedResponse {
+    id: number,
+    name: string,
   }
   export interface WebNode {
       id: number,

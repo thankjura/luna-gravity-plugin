@@ -11,7 +11,6 @@ import ru.slie.luna.plugins.gravity.model.WorkflowScript;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class ScriptManager {
@@ -47,22 +46,20 @@ public class ScriptManager {
     public List<WorkflowScript> getWorkflowScripts() {
         List<WorkflowScript> workflowScripts = new ArrayList<>();
 
-        try (Stream<Workflow> workflowStream = workflowManager.getAll()) {
-            workflowStream.forEach(workflow -> {
-                for (WorkflowAction action : workflow.getActions()) {
-                    if (action.getConditions() != null) {
-                        extractScriptFromCondition(workflow, action, action.getConditions(), workflowScripts);
-                    }
-
-                    for (WorkflowActionFunction validator: action.getValidators()) {
-                        extractFunction(workflow, action, validator, WorkflowFunctionType.VALIDATOR, workflowScripts);
-                    }
-
-                    for (WorkflowActionFunction postfunction: action.getPostfunctions()) {
-                        extractFunction(workflow, action, postfunction, WorkflowFunctionType.POSTFUNCTION, workflowScripts);
-                    }
+        for (Workflow workflow: workflowManager.getAll()) {
+            for (WorkflowAction action : workflow.getActions()) {
+                if (action.getConditions() != null) {
+                    extractScriptFromCondition(workflow, action, action.getConditions(), workflowScripts);
                 }
-            });
+
+                for (WorkflowActionFunction validator: action.getValidators()) {
+                    extractFunction(workflow, action, validator, WorkflowFunctionType.VALIDATOR, workflowScripts);
+                }
+
+                for (WorkflowActionFunction postfunction: action.getPostfunctions()) {
+                    extractFunction(workflow, action, postfunction, WorkflowFunctionType.POSTFUNCTION, workflowScripts);
+                }
+            }
         }
 
         return workflowScripts;

@@ -13,7 +13,7 @@ import {
   SearchResult,
   BusyIconComponent,
   DropDownGroupOption,
-  DropDownButton, DropDownOption, RouteNames, NotifyComponentInterface,
+  DropDownButton, DropDownOption, RouteNames, Injections,
 } from 'luna';
 import { ScriptRunResult } from "@/interfaces/metrics.ts";
 import { vLazyLoad } from "@/directives/LazyLoad.ts";
@@ -36,7 +36,7 @@ const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
 const performanceDialog = useTemplateRef<ComponentExposed<typeof PerformanceDialog>>('performanceDialog');
 const workflowScriptViewDialog = useTemplateRef<ComponentExposed<typeof WorkflowScriptViewDialog>>('workflowScriptViewDialog');
-const $notify = inject<NotifyComponentInterface>("$notify");
+const $notify = inject(Injections.$notify);
 
 const orig2draftMap = computed<Record<string, string>>(() => {
   const out = {};

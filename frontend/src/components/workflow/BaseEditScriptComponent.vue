@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CodeEditor from "@/components/CodeEditor.vue";
-import { computed, inject, PropType, Ref } from "vue";
-import { Errors, WorkflowFunctionType } from "luna";
+import { computed, inject, PropType } from "vue";
+import { Errors, Injections } from "luna";
 import { $i18n } from "@/utils/i18n.ts";
 
 defineProps({
@@ -31,7 +31,7 @@ const context = computed(() => {
 });
 
 const value = defineModel<Params>();
-const funcType = inject<Ref<WorkflowFunctionType>>('funcType')
+const funcType = inject(Injections.workflowFuncType);
 
 </script>
 
