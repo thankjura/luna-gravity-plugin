@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
 import { onBeforeUnmount, onMounted, PropType, useTemplateRef, watch } from "vue";
-import { MetricPoint } from "@/interfaces/metrics.ts";
-import { Chart, ChartData, ChartOptions } from "chart.js";
+import { MetricPointCollection } from "@/interfaces/metrics.ts";
+import { Chart, ChartData, ChartDataset, ChartOptions } from "chart.js";
 import { DateTime } from "luxon";
 import { $i18n } from "@/utils/i18n.ts";
 
 const props = defineProps({
-  metrics: Array as PropType<Array<MetricPoint>>
+  metrics: Object as PropType<MetricPointCollection>
 });
 
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas');
@@ -21,58 +21,64 @@ const formatXLabel = (isoString: string): string => {
   return dt.toFormat('dd.MM HH:mm');
 };
 
-const prepareChartData = (data: Array<MetricPoint>): ChartData<'line'> => {
+const prepareChartData = (data: MetricPointCollection): ChartData<'line'> => {
+  const datasets: Array<ChartDataset<'line'>> = [
+    {
+      label: data.bucket? $i18n.t("Max time") : $i18n.t("Execution time"),
+      data: data.points.map(m => m.maxExecutionTimeMs),
+      borderColor: '#ff5630',
+      backgroundColor: '#ff5630',
+      yAxisID: 'yTime',
+      tension: 0.1,
+      pointRadius: 3
+    },
+    {
+      label: data.bucket? $i18n.t("Max CPU time") : $i18n.t("CPU time"),
+      data: data.points.map(m => m.maxCpuTimeMs),
+      borderColor: '#ad0013',
+      backgroundColor: '#ad0013',
+      yAxisID: 'yTime',
+      tension: 0.1,
+      pointRadius: 3
+    },
+  ];
+  if (data.bucket) {
+    datasets.push(
+        {
+          label: $i18n.t("Avg time"),
+          data: data.points.map(m => m.avgExecutionTimeMs),
+          borderColor: '#0052cc',
+          backgroundColor: '#0052cc',
+          yAxisID: 'yTime',
+          tension: 0.1,
+          pointRadius: 2
+        },
+        {
+          label: $i18n.t("Avg CPU time"),
+          data: data.points.map(m => m.avgCpuTimeMs),
+          borderColor: '#00b8d9',
+          backgroundColor: '#00b8d9',
+          yAxisID: 'yTime',
+          borderDash: [5, 5],
+          tension: 0.1,
+          pointRadius: 0
+        },
+        {
+          label: $i18n.t("Number of executions"),
+          data: data.points.map(m => m.totalCount),
+          borderColor: '#ffab00',
+          backgroundColor: 'rgba(255, 171, 0, 0.08)',
+          yAxisID: 'yCount',
+          tension: 0.1,
+          fill: true,
+          pointRadius: 2
+        }
+    )
+  }
+
   return {
-    labels: data.map(m => formatXLabel(m.bucket)),
-    datasets: [
-      {
-        label: $i18n.t("Max time"),
-        data: data.map(m => m.maxExecutionTimeMs),
-        borderColor: '#ff5630',
-        backgroundColor: '#ff5630',
-        yAxisID: 'yTime',
-        tension: 0.1,
-        pointRadius: 3
-      },
-      {
-        label: $i18n.t("Max CPU time"),
-        data: data.map(m => m.maxCpuTimeMs),
-        borderColor: '#ad0013',
-        backgroundColor: '#ad0013',
-        yAxisID: 'yTime',
-        tension: 0.1,
-        pointRadius: 3
-      },
-      {
-        label: $i18n.t("Avg time"),
-        data: data.map(m => m.avgExecutionTimeMs),
-        borderColor: '#0052cc',
-        backgroundColor: '#0052cc',
-        yAxisID: 'yTime',
-        tension: 0.1,
-        pointRadius: 2
-      },
-      {
-        label: $i18n.t("Avg CPU time"),
-        data: data.map(m => m.avgCpuTimeMs),
-        borderColor: '#00b8d9',
-        backgroundColor: '#00b8d9',
-        yAxisID: 'yTime',
-        borderDash: [5, 5],
-        tension: 0.1,
-        pointRadius: 0
-      },
-      {
-        label: $i18n.t("Number of executions"),
-        data: data.map(m => m.totalCount),
-        borderColor: '#ffab00',
-        backgroundColor: 'rgba(255, 171, 0, 0.08)',
-        yAxisID: 'yCount',
-        tension: 0.1,
-        fill: true,
-        pointRadius: 2
-      }
-    ]
+    labels: data.points.map(m => formatXLabel(m.bucket)),
+    datasets
   };
 };
 
@@ -102,7 +108,7 @@ const chartOptions: ChartOptions<'line'> = {
 };
 
 watch(() => props.metrics, (newMetrics) => {
-  if (chartInstance) {
+  if (chartInstance && newMetrics) {
     chartInstance.data = prepareChartData(newMetrics);
     chartInstance.update();
   }

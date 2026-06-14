@@ -54,23 +54,29 @@ export const messages = {
   // src/components/metrics/HistoryExecutionDialog.vue:84
   "CPU time: {0} ms": "Процессорное время: {0} мс",
 
-  // src/components/metrics/PerformanceChartComponent.vue:29
+  // src/components/metrics/PerformanceChartComponent.vue:27
   "Max time": "Макс. время",
 
-  // src/components/metrics/PerformanceChartComponent.vue:38
+  // src/components/metrics/PerformanceChartComponent.vue:27
+  "Execution time": "Время выполнения",
+
+  // src/components/metrics/PerformanceChartComponent.vue:36
   "Max CPU time": "Макс. ЦПУ время",
 
-  // src/components/metrics/PerformanceChartComponent.vue:47
+  // src/components/metrics/PerformanceChartComponent.vue:36
+  "CPU time": "Время ЦПУ",
+
+  // src/components/metrics/PerformanceChartComponent.vue:48
   "Avg time": "Среднее время",
 
-  // src/components/metrics/PerformanceChartComponent.vue:56
+  // src/components/metrics/PerformanceChartComponent.vue:57
   "Avg CPU time": "Среднее ЦПУ время",
 
-  // src/components/metrics/PerformanceChartComponent.vue:66
-  // src/components/metrics/PerformanceChartComponent.vue:97
+  // src/components/metrics/PerformanceChartComponent.vue:67
+  // src/components/metrics/PerformanceChartComponent.vue:103
   "Number of executions": "Кол-во запусков",
 
-  // src/components/metrics/PerformanceChartComponent.vue:91
+  // src/components/metrics/PerformanceChartComponent.vue:97
   "Time (ms)": "Время (мс)",
 
   // src/components/metrics/PerformanceDialog.vue:26
@@ -136,7 +142,7 @@ export const messages = {
 
   // src/views/ConsoleView.vue:64
   // src/views/WorkflowsView.vue:206
-  "Gravity": "",
+  "Gravity": "Gravity",
 
   // src/views/ConsoleView.vue:65
   "Console": "Консоль",

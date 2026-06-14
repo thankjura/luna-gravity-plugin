@@ -168,8 +168,6 @@ declare module 'luna' {
   export const ColorPickerLayer: DefineComponent<
     {},{}, {}, {}, {}, {}, {}, {
       'update:modelValue': [value: HSV]
-      'close': []
-      'updated': [_hsv: HSV]
     }, {}, {
       modelValue?: HSV
       field?: HTMLElement
@@ -221,10 +219,8 @@ declare module 'luna' {
     }, {}, {}, SlotsType<{}>>;
   export const QsInput: DefineComponent<
     {},{}, {}, {}, {}, {}, {}, {
-      'submit': []
       'update:modelValue': [value: string]
       'update:error': [value: string]
-      'heightChanged': []
     }, {}, {
       disabled?: boolean
       modelValue?: string
@@ -1198,6 +1194,7 @@ export const Injections: {
       defaultWorkflow: WorkflowSimple,
       defaultWorkflowId: number,
       entries: Array<WorkflowSchemaEntry>,
+      active: boolean,
   }
   export interface WorkflowSimple {
       id: number,

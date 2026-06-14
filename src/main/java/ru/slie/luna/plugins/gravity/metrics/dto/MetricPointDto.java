@@ -17,6 +17,15 @@ public class MetricPointDto {
         this.maxCpuTimeMs = maxCpuTimeMs;
     }
 
+    public MetricPointDto(Object bucket, Long totalCount, Long avgExecutionTimeMs, Long maxExecutionTimeMs, Long avgCpuTimeMs, Long maxCpuTimeMs) {
+        this.bucket = bucket != null ? bucket.toString() : null;
+        this.totalCount = totalCount;
+        this.avgExecutionTimeMs = avgExecutionTimeMs.doubleValue();
+        this.maxExecutionTimeMs = maxExecutionTimeMs;
+        this.avgCpuTimeMs = avgCpuTimeMs.doubleValue();
+        this.maxCpuTimeMs = maxCpuTimeMs;
+    }
+
     public String getBucket() {
         return bucket;
     }

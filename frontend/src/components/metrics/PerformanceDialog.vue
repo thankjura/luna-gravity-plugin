@@ -2,7 +2,7 @@
 import { BaseDialog, Option, SingleSelect, DateTimePicker, ButtonBusy } from "luna";
 import { $i18n } from "@/utils/i18n.ts";
 import { computed, ref, useTemplateRef } from "vue";
-import { MetricPoint } from "@/interfaces/metrics.ts";
+import { MetricPointCollection } from "@/interfaces/metrics.ts";
 import { DateTime, DurationLike } from "luxon";
 import { metricService } from "@/services/metricService.ts";
 import { ComponentExposed } from "vue-component-type-helpers";
@@ -12,7 +12,7 @@ const DATE_FORMAT = 'yyyy-LL-dd HH:mm';
 type Period = '1h' | '2h' | '4h' | '8h' | '1d' | '2d' | '7d' | '14d' | 'custom';
 
 const busy = ref<boolean>(false);
-const metrics = ref<Array<MetricPoint>>([]);
+const metrics = ref<MetricPointCollection>(null);
 const fromDate = ref<string>(null);
 const toDate = ref<string>(null);
 const selectedPeriod = ref<Period>('1h');
@@ -117,8 +117,8 @@ defineExpose({
     <template v-slot:header>{{ $i18n.t("Performance chart") }}</template>
     <template v-slot:default>
       <div class="performance-chart-wrapper">
-        <PerformanceChartComponent :metrics="metrics"></PerformanceChartComponent>
-        <div class="no-metrics-overlay" v-if="!busy && metrics.length == 0">{{ $i18n.t("No data for selected period") }}</div>
+        <PerformanceChartComponent :metrics="metrics" v-if="metrics"></PerformanceChartComponent>
+        <div class="no-metrics-overlay" v-if="!busy && metrics?.points.length == 0">{{ $i18n.t("No data for selected period") }}</div>
       </div>
     </template>
     <template v-slot:footer>

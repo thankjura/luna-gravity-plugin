@@ -3,14 +3,13 @@ package ru.slie.luna.plugins.gravity.rest;
 import org.springframework.web.bind.annotation.*;
 import ru.slie.luna.plugins.gravity.metrics.ScriptMetricsManager;
 import ru.slie.luna.plugins.gravity.metrics.ScriptRunResult;
-import ru.slie.luna.plugins.gravity.metrics.dto.MetricPointDto;
+import ru.slie.luna.plugins.gravity.metrics.dto.MetricPointCollection;
 import ru.slie.luna.plugins.gravity.utils.Constants;
 import ru.slie.luna.search.SearchParams;
 import ru.slie.luna.search.SearchResult;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @RestController
 @RequestMapping("/gravity/scipt/metrics")
@@ -29,7 +28,7 @@ public class ScriptMetricsRest {
     }
 
     @GetMapping("/{scriptId}/points")
-    public List<MetricPointDto> getChartPoints(@PathVariable String scriptId, @RequestParam("from") String from, @RequestParam(value = "to", required = false) String to) {
+    public MetricPointCollection getChartPoints(@PathVariable String scriptId, @RequestParam("from") String from, @RequestParam(value = "to", required = false) String to) {
         LocalDateTime fromDate = LocalDateTime.parse(from, DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT));
         LocalDateTime toDate;
         if (to != null && !to.isEmpty()) {

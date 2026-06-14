@@ -15,6 +15,8 @@ import ru.slie.luna.issue.workflow.action.WorkflowAction;
 import ru.slie.luna.issue.workflow.action.WorkflowActionConditionGroup;
 import ru.slie.luna.issue.workflow.action.WorkflowActionFunction;
 import ru.slie.luna.issue.workflow.action.WorkflowActionValidator;
+import ru.slie.luna.issue.workflow.draft.WorkflowActionBuilder;
+import ru.slie.luna.issue.workflow.draft.WorkflowBuilder;
 import ru.slie.luna.permission.GlobalPermissionManager;
 import ru.slie.luna.plugins.gravity.model.WorkflowFunctionType;
 import ru.slie.luna.plugins.gravity.model.WorkflowScript;
@@ -204,11 +206,14 @@ public class WorkflowRest {
             params = new HashMap<>();
         }
         AbstractGravityFunction.setDisabled(params, disabled);
+        WorkflowBuilder builder =  workflowManager.getBuilder(workflow);
+        WorkflowActionBuilder actionBuilder = builder.getActionById(action.getId());
 
         switch (functionType) {
-            case CONDITION -> workflowManager.updateCondition(workflow, action.getId(), function.getId(), params);
-            case VALIDATOR -> workflowManager.updateValidator(workflow, action.getId(), function.getId(), params);
-            case POSTFUNCTION -> workflowManager.updatePostfunction(workflow, action.getId(), function.getId(), params);
+            case CONDITION -> actionBuilder.setConditionParams(function.getId(), params);
+            case VALIDATOR -> actionBuilder.setValidatorParams(function.getId(), params);
+            case POSTFUNCTION -> actionBuilder.setPostfunctionParams(function.getId(), params);
         }
+        workflowManager.save(authenticationContext.getCurrentUser(), builder);
     }
 }

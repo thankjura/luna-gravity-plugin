@@ -16,3 +16,8 @@ export interface MetricPoint {
   avgCpuTimeMs: number,
   maxCpuTimeMs: number,
 }
+
+export interface MetricPointCollection {
+  points: Array<MetricPoint>;
+  bucket: string,
+}

@@ -9,6 +9,7 @@ import ru.slie.luna.db.filter.Filters;
 import ru.slie.luna.db.query.FindOptions;
 import ru.slie.luna.db.query.Query;
 import ru.slie.luna.plugins.gravity.db.ScriptRunResultEntity;
+import ru.slie.luna.plugins.gravity.metrics.dto.MetricPointCollection;
 import ru.slie.luna.plugins.gravity.metrics.dto.MetricPointDto;
 import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 import ru.slie.luna.regolith.ActiveDocManager;
@@ -66,10 +67,31 @@ public class ScriptMetricsManager {
     }
 
     @NullMarked
-    public List<MetricPointDto> getMetricPoints(String scriptId, LocalDateTime from, LocalDateTime to) {
+    public MetricPointCollection getMetricPoints(String scriptId, LocalDateTime from, LocalDateTime to) {
+        int maxRawRows = 100;
+
+        List<MetricPointDto> points = activeDocManager.getCriteriaBuilder(ScriptRunResultEntity.class)
+                                                 .from(ScriptRunResultEntity.class, "s")
+                                                 .selectNew(MetricPointDto.class)
+                                                 .with("s.startAt", "bucket")
+                                                 .with("1L", "totalCount")
+                                                 .with("s.executionTimeMs", "avgExecutionTime")
+                                                 .with("s.executionTimeMs", "maxExecutionTime")
+                                                 .with("s.cpuTimeMs", "avgCpuTime")
+                                                 .with("s.cpuTimeMs", "maxCpuTime")
+                                                 .end()
+                                                 .where("s.scriptId").eq(scriptId)
+                                                 .where("s.startAt").between(from).and(to)
+                                                 .orderByAsc("s.startAt")
+                                                 .setMaxResults(maxRawRows + 1)
+                                                 .getResultList();
+        if (points.size() <= maxRawRows) {
+            return new MetricPointCollection(points, null);
+        }
+
         String bucketStep = resolveBucketStep(from, to);
         CriteriaBuilder<ScriptRunResultEntity> cb = activeDocManager.getCriteriaBuilder(ScriptRunResultEntity.class);
-        return cb.from(ScriptRunResultEntity.class, "s")
+        points = cb.from(ScriptRunResultEntity.class, "s")
                 .selectNew(MetricPointDto.class)
                     .with("FUNCTION('date_trunc', :timeStep, s.startAt)", "bucket")
                     .with("COUNT(s.id)", "totalCount")
@@ -84,6 +106,8 @@ public class ScriptMetricsManager {
                 .orderByAsc("FUNCTION('date_trunc', :timeStep, s.startAt)")
                 .setParameter("timeStep", bucketStep)
                 .getResultList();
+
+        return new MetricPointCollection(points, bucketStep);
     }
 
     @NullMarked
