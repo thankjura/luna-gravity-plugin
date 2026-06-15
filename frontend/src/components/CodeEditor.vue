@@ -10,7 +10,7 @@ import { loadMonacoInstance } from "@/utils/monaco.ts";
 
 const props = defineProps({
   disabled: Boolean,
-  context: Object as PropType<Record<string, string>>,
+  context: Object as PropType<Record<string, string>>
 });
 
 const value = defineModel<string>();
@@ -83,7 +83,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="container" class="gravity-code-editor"></div>
+  <div ref="container" class="gravity-code-editor" @click.stop @mousedown.stop></div>
 </template>
 
 <style>

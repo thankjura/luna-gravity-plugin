@@ -33,6 +33,6 @@ public class SetUtils {
             return null;
         }
 
-        return StringUtils.join(DELIMITER);
+        return StringUtils.join(set, DELIMITER);
     }
 }

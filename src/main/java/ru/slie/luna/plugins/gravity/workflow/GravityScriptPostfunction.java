@@ -30,7 +30,7 @@ public class GravityScriptPostfunction extends AbstractGravityFunction implement
         scriptEnv.put("issue", transientVars.getIssue());
         scriptEnv.put("transientVars", transientVars);
         try {
-            executeWithMetrics(transientVars.getActionFunction().getId(), script, scriptEnv);
+            scriptRunnerService.executeWithMetrics(transientVars.getActionFunction().getId(), script, scriptEnv, true);
         } catch (ValidateException e) {
             log.error(e.getMessage(), e);
         }

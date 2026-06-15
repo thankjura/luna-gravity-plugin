@@ -6,7 +6,9 @@ import {
   IssueEventType,
   Errors,
   MultiSelect,
-  ButtonBusy, Injections
+  ButtonBusy,
+  Injections,
+  ToggleComponent,
 } from 'luna';
 import { ListenerScript } from "@/interfaces/listener.ts";
 import { listenerService } from "@/services/listenerService.ts";
@@ -54,6 +56,7 @@ const submit = () => {
       projects.value = data.data.projects;
       scriptName.value = $i18n.t("Edit listener script");
       errors.value = {};
+      $notify.ok($i18n.t("Listener updated successfully."));
     }).catch((e) => {
       if (e.data?.errors) {
         errors.value = e.data?.errors;
@@ -69,6 +72,7 @@ const submit = () => {
       scriptName.value = $i18n.t("Edit listener script");
       errors.value = {};
       router.replace({name: "gravityListeners", params: {id: data.data.id}});
+      $notify.ok($i18n.t("Listener created successfully."));
     }).catch((e) => {
       if (e.data?.errors) {
         errors.value = e.data?.errors;
@@ -78,6 +82,10 @@ const submit = () => {
       busy.value = false;
     });
   }
+}
+
+const projectOptions = (term: string|null, excludes?: Array<number>) => {
+  return systemService.projectSuggestions(term, excludes);
 }
 
 onMounted(() => {
@@ -100,7 +108,7 @@ onMounted(() => {
     </nav>
 
     <div class="panel pad">
-      <form class="ui pad compact" @submit.prevent="submit">
+      <form class="ui pad compact">
         <div class="field-group">
           <label for="script-name">{{ $i18n.t("Name") }}</label>
           <input :disabled="busy" type="text" id="script-name" v-model="script.name" />
@@ -112,17 +120,22 @@ onMounted(() => {
         </div>
         <div class="field-group">
           <label for="script-projects">{{ $i18n.t("Projects") }}</label>
-          <MultiSelect :disabled="busy" :model-data="projects" class="textarea" id="script-projects" v-model="script.projectIds" :options="systemService.projectSuggestions" :show-icons="true"></MultiSelect>
+          <MultiSelect :disabled="busy" :model-data="projects" id="script-projects" v-model="script.projectIds" :options="projectOptions" :show-icons="true"></MultiSelect>
+          <div class="description">{{ $i18n.t("Leave blank for all projects") }}</div>
           <div class="error" v-if="errors['projectIds']">{{ errors['projectIds'] }}</div>
         </div>
         <div class="field-group">
           <label for="script-event-types">{{ $i18n.t("EventTypes") }}</label>
-          <MultiSelect :disabled="busy" class="textarea" id="script-event-types" v-model="script.eventTypeIds" :options="eventTypes"></MultiSelect>
+          <MultiSelect :disabled="busy" id="script-event-types" v-model="script.eventTypeIds" :options="eventTypes"></MultiSelect>
           <div class="error" v-if="errors['eventTypeIds']">{{ errors['eventTypeIds'] }}</div>
         </div>
         <div class="field-group">
-          <label for="script-script">{{ $i18n.t("Script") }}</label>
-          <CodeEditor v-model="script.script" :context="{__context__: 'listener'}" :disabled="busy" :style="{maxWidth: '100%'}"></CodeEditor>
+          <label for="script-async">{{ $i18n.t("Async") }}</label>
+          <ToggleComponent :disabled="busy" id="script-async" v-model="script.async"></ToggleComponent>
+        </div>
+        <div class="field-group">
+          <strong class="label">{{ $i18n.t("Script") }}</strong>
+          <CodeEditor v-model="script.script" :context="{__context__: 'listener'}" :style="{maxWidth: '100%'}"></CodeEditor>
         </div>
 
         <div>

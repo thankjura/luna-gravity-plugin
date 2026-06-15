@@ -107,8 +107,8 @@ export const messages = {
   "Custom": "Другое",
 
   // src/components/metrics/PerformanceDialog.vue:117
-  // src/views/ListenerScriptsView.vue:148
   // src/views/WorkflowScriptsView.vue:167
+  // src/views/listeners/ListenerScriptsList.vue:156
   "Performance chart": "График производительности",
 
   // src/components/metrics/PerformanceDialog.vue:121
@@ -133,7 +133,23 @@ export const messages = {
   "optional script description...": "необязательное описание скрипта...",
 
   // src/components/workflow/BaseEditScriptComponent.vue:48
+  // src/views/WorkflowScriptsView.vue:241
+  // src/views/listeners/ListenerScriptsList.vue:253
   "Disabled": "Отключен",
+
+  // src/components/workflow/DeleteListenerScriptDialog.vue:43
+  "Delete listener": "Удалить слушателя",
+
+  // src/components/workflow/DeleteListenerScriptDialog.vue:46
+  "Are you sure remove listener?": "Вы действительно хотите удалить слушателя?",
+
+  // src/components/workflow/DeleteListenerScriptDialog.vue:53
+  // src/views/listeners/ListenerScriptsEditor.vue:142
+  "Cancel": "Отмена",
+
+  // src/components/workflow/DeleteListenerScriptDialog.vue:54
+  // src/views/listeners/ListenerScriptsList.vue:178
+  "Delete": "Удалить",
 
   // src/components/workflow/ProjectListComponent.vue:44
   "More": "Больше",
@@ -142,8 +158,9 @@ export const messages = {
   "Failed to execute script": "Не удалось выполнить скрипт.",
 
   // src/views/ConsoleView.vue:64
-  // src/views/ListenerScriptsView.vue:182
   // src/views/WorkflowScriptsView.vue:206
+  // src/views/listeners/ListenerScriptsEditor.vue:104
+  // src/views/listeners/ListenerScriptsList.vue:208
   "Gravity": "Gravity",
 
   // src/views/ConsoleView.vue:65
@@ -155,61 +172,8 @@ export const messages = {
   // src/views/ConsoleView.vue:77
   "Result": "Результат",
 
-  // src/views/ListenerScriptsView.vue:125
-  "Listener script enabled successfully": "Скрипт включен",
-
-  // src/views/ListenerScriptsView.vue:127
-  "Listener script disabled successfully": "Скрипт выключен",
-
-  // src/views/ListenerScriptsView.vue:130
-  "Failed update script params": "Ошибка обновления параметров скрипта",
-
-  // src/views/ListenerScriptsView.vue:140
-  // src/views/WorkflowScriptsView.vue:159
-  "Show script": "Показать скрипт",
-
-  // src/views/ListenerScriptsView.vue:156
-  // src/views/WorkflowScriptsView.vue:179
-  "Disable": "Выключить",
-
-  // src/views/ListenerScriptsView.vue:156
-  // src/views/WorkflowScriptsView.vue:179
-  "Enable": "Включить",
-
-  // src/views/ListenerScriptsView.vue:183
-  "Listeners": "Слушатели",
-
-  // src/views/ListenerScriptsView.vue:190
-  // src/views/WorkflowScriptsView.vue:214
-  "Filter": "Фильтр",
-
-  // src/views/ListenerScriptsView.vue:191
-  // src/views/WorkflowScriptsView.vue:215
-  "note...": "примечание...",
-
-  // src/views/ListenerScriptsView.vue:194
-  // src/views/WorkflowScriptsView.vue:218
-  "Projects": "Проекты",
-
-  // src/views/ListenerScriptsView.vue:198
-  "Event types": "Типы событий",
-
-  // src/views/ListenerScriptsView.vue:208
-  // src/views/WorkflowScriptsView.vue:228
-  "Name": "Название",
-
-  // src/views/ListenerScriptsView.vue:209
-  // src/views/WorkflowScriptsView.vue:229
-  "Used in": "Используется в",
-
-  // src/views/ListenerScriptsView.vue:210
-  "Event type": "Тип события",
-
-  // src/views/ListenerScriptsView.vue:211
-  // src/views/WorkflowScriptsView.vue:233
-  "History": "История",
-
   // src/views/WorkflowScriptsView.vue:70
+  // src/views/WorkflowScriptsView.vue:242
   "Custom script": "Пользовательский скрипт",
 
   // src/views/WorkflowScriptsView.vue:92
@@ -227,8 +191,41 @@ export const messages = {
   // src/views/WorkflowScriptsView.vue:149
   "Failed update function params": "не удалось обновить параметры функции",
 
+  // src/views/WorkflowScriptsView.vue:159
+  "Show script": "Показать скрипт",
+
+  // src/views/WorkflowScriptsView.vue:179
+  // src/views/listeners/ListenerScriptsList.vue:170
+  "Enable": "Включить",
+
+  // src/views/WorkflowScriptsView.vue:179
+  // src/views/listeners/ListenerScriptsList.vue:170
+  "Disable": "Выключить",
+
   // src/views/WorkflowScriptsView.vue:207
   "Workflows": "Бизнес процессы",
+
+  // src/views/WorkflowScriptsView.vue:214
+  // src/views/listeners/ListenerScriptsList.vue:223
+  "Filter": "Фильтр",
+
+  // src/views/WorkflowScriptsView.vue:215
+  // src/views/listeners/ListenerScriptsList.vue:224
+  "note...": "примечание...",
+
+  // src/views/WorkflowScriptsView.vue:218
+  // src/views/listeners/ListenerScriptsEditor.vue:122
+  // src/views/listeners/ListenerScriptsList.vue:227
+  "Projects": "Проекты",
+
+  // src/views/WorkflowScriptsView.vue:228
+  // src/views/listeners/ListenerScriptsEditor.vue:113
+  // src/views/listeners/ListenerScriptsList.vue:241
+  "Name": "Название",
+
+  // src/views/WorkflowScriptsView.vue:229
+  // src/views/listeners/ListenerScriptsList.vue:242
+  "Used in": "Используется в",
 
   // src/views/WorkflowScriptsView.vue:230
   "Workflow": "Бизнес процесс",
@@ -239,6 +236,87 @@ export const messages = {
   // src/views/WorkflowScriptsView.vue:232
   "Type": "Тип",
 
-  // src/views/WorkflowScriptsView.vue:244
+  // src/views/WorkflowScriptsView.vue:233
+  // src/views/listeners/ListenerScriptsList.vue:245
+  "History": "История",
+
+  // src/views/WorkflowScriptsView.vue:241
+  // src/views/listeners/ListenerScriptsList.vue:253
+  "Enabled": "Включен",
+
+  // src/views/WorkflowScriptsView.vue:249
   "Draft": "Черновик",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:32
+  "New listener script": "Новый скрипт слушателя",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:45
+  // src/views/listeners/ListenerScriptsEditor.vue:57
+  // src/views/listeners/ListenerScriptsEditor.vue:72
+  "Edit listener script": "Редактировать скрипт слушателя",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:59
+  "Listener updated successfully.": "Слушатель успешно обновлен.",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:64
+  "Failed to update listener script": "Ошибка обновления слушателя",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:75
+  "Listener created successfully.": "Слушатель успешно создан.",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:80
+  "Failed to create listener script": "Ошибка создания слушателя",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:105
+  // src/views/listeners/ListenerScriptsList.vue:209
+  "Listeners": "Слушатели",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:118
+  "Description": "Описание",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:124
+  "Leave blank for all projects": "Оставьте пустым для всех проектов",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:128
+  "EventTypes": "Типы событий",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:133
+  // src/views/listeners/ListenerScriptsList.vue:244
+  "Async": "Асинхронный",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:137
+  "Script": "Скрипт",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:145
+  "Save": "Сохранить",
+
+  // src/views/listeners/ListenerScriptsEditor.vue:148
+  "Create": "Создать",
+
+  // src/views/listeners/ListenerScriptsList.vue:134
+  "Listener script enabled successfully": "Скрипт включен",
+
+  // src/views/listeners/ListenerScriptsList.vue:136
+  "Listener script disabled successfully": "Скрипт выключен",
+
+  // src/views/listeners/ListenerScriptsList.vue:139
+  "Failed update script params": "Ошибка обновления параметров скрипта",
+
+  // src/views/listeners/ListenerScriptsList.vue:164
+  "Edit": "Редактировать",
+
+  // src/views/listeners/ListenerScriptsList.vue:211
+  "Automatically execute actions in response to an event. ": "Автоматически выполняет действия в ответ на события.",
+
+  // src/views/listeners/ListenerScriptsList.vue:215
+  "Create listener": "Создать слушателя",
+
+  // src/views/listeners/ListenerScriptsList.vue:231
+  "Event types": "Типы событий",
+
+  // src/views/listeners/ListenerScriptsList.vue:243
+  "Event type": "Тип события",
+
+  // src/views/listeners/ListenerScriptsList.vue:261
+  "All projects": "Все проекты",
 }

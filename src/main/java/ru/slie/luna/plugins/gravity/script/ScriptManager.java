@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.slie.luna.db.query.DeleteResult;
 import ru.slie.luna.db.query.Query;
+import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.issue.workflow.Workflow;
 import ru.slie.luna.issue.workflow.WorkflowManager;
 import ru.slie.luna.issue.workflow.action.WorkflowAction;
 import ru.slie.luna.issue.workflow.action.WorkflowActionConditionGroup;
 import ru.slie.luna.issue.workflow.action.WorkflowActionFunction;
+import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.db.ScriptListenerEntity;
 import ru.slie.luna.plugins.gravity.model.ListenerScript;
 import ru.slie.luna.plugins.gravity.model.WorkflowFunctionType;
@@ -19,6 +21,7 @@ import ru.slie.luna.plugins.gravity.model.WorkflowScript;
 import ru.slie.luna.plugins.gravity.utils.SetUtils;
 import ru.slie.luna.regolith.ActiveDocManager;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,13 +32,16 @@ public class ScriptManager implements InitializingBean {
     private final WorkflowManager workflowManager;
     private final Map<Long, ListenerScript> listenerScriptMap = new ConcurrentHashMap<>();
     private final PlatformTransactionManager transactionManager;
+    private final I18nResolver i18n;
 
     public ScriptManager(ActiveDocManager activeDocManager,
                          WorkflowManager workflowManager,
-                         PlatformTransactionManager transactionManager) {
+                         PlatformTransactionManager transactionManager,
+                         I18nResolver i18n) {
         this.activeDocManager = activeDocManager;
         this.workflowManager = workflowManager;
         this.transactionManager = transactionManager;
+        this.i18n = i18n;
     }
 
     private void extractFunction(Workflow workflow, WorkflowAction action, WorkflowActionFunction workflowFunction, WorkflowFunctionType functionType, List<WorkflowScript> scripts) {
@@ -58,6 +64,20 @@ public class ScriptManager implements InitializingBean {
         for (WorkflowActionConditionGroup group : conditionGroup.getItems()) {
             extractScriptFromCondition(workflow, action, group, scripts);
         }
+    }
+
+    private void validateListenerScript(ListenerScript script) throws ValidateException {
+        ValidateException exception = new ValidateException();
+
+        if (script.getName() == null || script.getName().trim().isEmpty()) {
+            exception.addError("name", i18n.getText("gravity.script.name.required"));
+        }
+
+        if (script.getEventTypeIds().isEmpty()) {
+            exception.addError("eventTypeIds", i18n.getText("gravity.script.event_types.required"));
+        }
+
+        exception.raise();
     }
 
     // TODO: cache manager
@@ -102,7 +122,9 @@ public class ScriptManager implements InitializingBean {
     }
 
     @Transactional
-    public void save(ListenerScript script) {
+    public void save(ListenerScript script) throws ValidateException {
+        validateListenerScript(script);
+
         ScriptListenerEntity entity = null;
         if (script.getId() != null) {
             entity = activeDocManager.getById(ScriptListenerEntity.class, script.getId()).orElse(null);
@@ -114,8 +136,18 @@ public class ScriptManager implements InitializingBean {
                     script.getDescription(),
                     SetUtils.setToString(script.getProjectIds()),
                     SetUtils.setToString(script.getEventTypeIds()),
-                    script.getScript()
+                    script.getScript(),
+                    script.isAsync()
             );
+        } else {
+            entity.setName(script.getName());
+            entity.setDescription(script.getDescription());
+            entity.setProjectIds(SetUtils.setToString(script.getProjectIds()));
+            entity.setEventTypeIds(SetUtils.setToString(script.getEventTypeIds()));
+            entity.setScript(script.getScript());
+            entity.setAsync(script.isAsync());
+            entity.setEnabled(script.isEnabled());
+            entity.setUpdated(LocalDateTime.now());
         }
 
         activeDocManager.save(entity);

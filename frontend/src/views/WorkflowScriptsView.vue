@@ -236,7 +236,12 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-for="s in filteredScripts" :key="s.id" :class="{disabled: s.disabled}">
-            <td>{{ s.scriptNote }}</td>
+            <td>
+              <span class="iconed">
+                <span :class="[s.disabled ? 'icon-blocked' : 'icon-ok-circle']" :title="s.disabled? $i18n.t('Disabled') : $i18n.t('Enabled')"></span>
+                {{ s.scriptNote ?? $i18n.t("Custom script") }}
+              </span>
+            </td>
             <td>
               <ProjectListComponent :projects="projects" :keys="s.projectKeys"></ProjectListComponent>
             </td>

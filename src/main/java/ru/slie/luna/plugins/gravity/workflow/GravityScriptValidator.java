@@ -31,7 +31,7 @@ public class GravityScriptValidator extends AbstractGravityFunction implements W
         scriptEnv.put("issue", transientVars.getIssue());
         scriptEnv.put("transientVars", transientVars);
         try {
-            executeWithMetrics(transientVars.getActionFunction().getName(), script, scriptEnv);
+            scriptRunnerService.executeWithMetrics(transientVars.getActionFunction().getName(), script, scriptEnv, false);
         } catch (Exception e) {
             if (e instanceof ValidateException) {
                 throw (ValidateException) e;

@@ -78,3 +78,6 @@ components:
   - key: ScriptMetricsListener
     name: Metrics listener
     className: ru.slie.luna.plugins.gravity.metrics.ScriptMetricsListener
+  - key: ScriptGlobalListener
+    name: Run custom listeners
+    className: ru.slie.luna.plugins.gravity.listener.GravityGlobalListener

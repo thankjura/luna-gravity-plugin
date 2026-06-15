@@ -22,6 +22,7 @@ public class ListenerScript implements WithId, WithName {
     private String script;
     private LocalDateTime created;
     private LocalDateTime updated;
+    private Boolean async;
     private Boolean enabled;
 
     public ListenerScript(ScriptListenerEntity entity) {
@@ -32,8 +33,9 @@ public class ListenerScript implements WithId, WithName {
         this.name = request.getName();
         this.description = request.getDescription();
         setProjectIds(request.getProjectIds());
-        setEventTypeIds(request.getEventTypesIds());
+        setEventTypeIds(request.getEventTypeIds());
         this.script = request.getScript();
+        this.async = request.getAsync();
         this.enabled = request.getEnabled();
     }
 
@@ -46,6 +48,7 @@ public class ListenerScript implements WithId, WithName {
         this.script = script.getScript();
         this.created = script.getCreated();
         this.updated = script.getUpdated();
+        this.async = script.isAsync();
         this.enabled = script.isEnabled();
     }
 
@@ -58,6 +61,7 @@ public class ListenerScript implements WithId, WithName {
         this.script = entity.getScript();
         this.created = entity.getCreated();
         this.updated = entity.getUpdated();
+        this.async = entity.isAsync();
         this.enabled = entity.isEnabled();
     }
 
@@ -125,5 +129,13 @@ public class ListenerScript implements WithId, WithName {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(Boolean async) {
+        this.async = async;
     }
 }

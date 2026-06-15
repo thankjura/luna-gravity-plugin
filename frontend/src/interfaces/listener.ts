@@ -7,6 +7,7 @@ export interface ListenerScript {
   projectIds: Array<number>,
   eventTypeIds: Array<number>,
   script: string,
+  async: boolean,
   enabled: boolean,
 }
 

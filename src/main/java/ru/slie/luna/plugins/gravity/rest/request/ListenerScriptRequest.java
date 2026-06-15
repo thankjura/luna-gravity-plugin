@@ -6,8 +6,9 @@ public class ListenerScriptRequest {
     private String name;
     private String description;
     private Set<Long> projectIds;
-    private Set<Long> eventTypesIds;
+    private Set<Long> eventTypeIds;
     private String script;
+    private Boolean async;
     private Boolean enabled;
 
     public String getName() {
@@ -22,8 +23,8 @@ public class ListenerScriptRequest {
         return projectIds;
     }
 
-    public Set<Long> getEventTypesIds() {
-        return eventTypesIds;
+    public Set<Long> getEventTypeIds() {
+        return eventTypeIds;
     }
 
     public String getScript() {
@@ -32,5 +33,9 @@ public class ListenerScriptRequest {
 
     public Boolean getEnabled() {
         return enabled;
+    }
+
+    public Boolean getAsync() {
+        return async;
     }
 }

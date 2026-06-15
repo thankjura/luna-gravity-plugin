@@ -31,7 +31,7 @@ public class GravityScriptCondition extends AbstractGravityFunction implements W
         scriptEnv.put("action", transientVars.getAction());
         scriptEnv.put("transientVars", transientVars);
         try {
-            Object val = executeWithMetrics(transientVars.getActionFunction().getId(), script, scriptEnv);
+            Object val = scriptRunnerService.executeWithMetrics(transientVars.getActionFunction().getId(), script, scriptEnv, true);
             return switch (val) {
                 case null -> false;
                 case String string -> !string.isBlank();

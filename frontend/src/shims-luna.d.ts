@@ -346,6 +346,16 @@ declare module 'luna' {
     {},{}, {}, {}, {}, {}, {}, {}, {}, {
       value?: string
     }, {}, {}, SlotsType<{}>>;
+  export const ToggleComponent: DefineComponent<
+    {},{}, {}, {}, {}, {}, {}, {
+      'update:modelValue': [value: boolean]
+    }, {}, {
+      busy?: boolean
+      disabled?: boolean
+      manual?: boolean
+      id?: string
+      modelValue?: boolean
+    }, {}, {}, SlotsType<{}>>;
 export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
 export const RouteNames: {
         home: "home",
@@ -481,25 +491,25 @@ export const Injections: {
       active: boolean,
   }
   export interface DropDownOption {
-    id: string|number,
-    label: string;
-    iconUrl?: string;
-    iconTitle?: string;
-    iconName?: string;
-    route?: RouteLocationRaw,
-    href?: string;
-    cb?: (option: DropDownOption, event: MouseEvent) => boolean|undefined|void;
-    children?: Array<DropDownGroupOption>;
-    childrenLayerClass?: string;
-    className?: string,
-    title?: string,
-    selected?: boolean,
+      id: string|number,
+      label: string;
+      iconUrl?: string;
+      iconTitle?: string;
+      iconName?: string;
+      route?: RouteLocationRaw,
+      href?: string;
+      cb?: (option: DropDownOption, event: MouseEvent) => boolean|undefined|void;
+      children?: Array<DropDownGroupOption>;
+      childrenLayerClass?: string;
+      className?: string,
+      title?: string,
+      selected?: boolean,
   }
   export interface DropDownGroupOption {
-    id: string|number,
-    label?: string;
-    options: Array<DropDownOption>;
-    className?: string,
+      id: string|number,
+      label?: string;
+      options: Array<DropDownOption>;
+      className?: string,
   }
   export type OptionsGetterSync = () => DropDownGroupOption[]
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>

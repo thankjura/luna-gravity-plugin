@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.slie.luna.db.query.DeleteResult;
 import ru.slie.luna.event.type.IssueEventTypeManager;
+import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.plugins.gravity.model.ListenerScript;
 import ru.slie.luna.plugins.gravity.rest.request.ListenerScriptRequest;
 import ru.slie.luna.plugins.gravity.rest.response.ListenerScriptWithProjects;
@@ -51,14 +52,14 @@ public class ListenerScriptRest {
     }
 
     @PostMapping("/scripts")
-    public ListenerScriptWithProjects create(@RequestBody ListenerScriptRequest request) {
+    public ListenerScriptWithProjects create(@RequestBody ListenerScriptRequest request) throws ValidateException {
         ListenerScript script = new ListenerScript(request);
         scriptManager.save(script);
         return new ListenerScriptWithProjects(script, projectManager.getByIds(script.getProjectIds()));
     }
 
     @PatchMapping("/scripts/{id}")
-    public ListenerScriptWithProjects patchScript(@PathVariable Long id, Map<String, Object> request) {
+    public ListenerScriptWithProjects patchScript(@PathVariable Long id, @RequestBody Map<String, Object> request) throws ValidateException {
         ListenerScript script = scriptManager.getListenerScript(id).orElse(null);
         if (script == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -73,6 +74,7 @@ public class ListenerScriptRest {
                 case "eventTypeIds" -> script.setEventTypeIds(mapper.convertValue(entry.getValue(), new TypeReference<>() {}));
                 case "script" -> script.setScript(mapper.convertValue(entry.getValue(), String.class));
                 case "enabled" -> script.setEnabled(mapper.convertValue(entry.getValue(), Boolean.class));
+                case "async" -> script.setAsync(mapper.convertValue(entry.getValue(), Boolean.class));
             }
         }
         scriptManager.save(script);

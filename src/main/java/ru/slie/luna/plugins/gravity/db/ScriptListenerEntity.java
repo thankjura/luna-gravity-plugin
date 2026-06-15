@@ -18,10 +18,11 @@ public class ScriptListenerEntity extends ActiveDocEntity {
     private String script;
     private LocalDateTime created;
     private LocalDateTime updated;
+    private Boolean async;
     private Boolean enabled;
 
     public ScriptListenerEntity() {}
-    public ScriptListenerEntity(String name, String description, String projectIds, String eventTypeIds, String script) {
+    public ScriptListenerEntity(String name, String description, String projectIds, String eventTypeIds, String script, Boolean async) {
         this.name = name;
         this.description = description;
         this.projectIds = projectIds;
@@ -29,6 +30,7 @@ public class ScriptListenerEntity extends ActiveDocEntity {
         this.script = script;
         this.created = LocalDateTime.now();
         this.updated = created;
+        this.async = async;
         this.enabled = false;
     }
 
@@ -86,5 +88,17 @@ public class ScriptListenerEntity extends ActiveDocEntity {
 
     public LocalDateTime getUpdated() {
         return updated;
+    }
+
+    public Boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(Boolean async) {
+        this.async = async;
+    }
+
+    public void setUpdated(LocalDateTime localDateTime) {
+        this.updated = localDateTime;
     }
 }

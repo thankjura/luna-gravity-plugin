@@ -2,6 +2,24 @@ import { client } from "@/utils/client.ts";
 import { ListenerScript, ListenerScriptsResponse, ListenerScriptWithProjects } from "@/interfaces/listener.ts";
 import { DeleteResult } from "luna";
 
+const ALLOWED_SCRIPT_KEYS: Array<keyof ListenerScript> = [
+  'name',
+  'description',
+  'script',
+  'enabled',
+  'eventTypeIds',
+  'projectIds',
+  'async',
+];
+
+const filterAllowedFields = (data: Partial<ListenerScript>): Partial<ListenerScript> => {
+  const filteredEntries = Object.entries(data).filter(([key]) =>
+      ALLOWED_SCRIPT_KEYS.includes(key as keyof ListenerScript)
+  );
+
+  return Object.fromEntries(filteredEntries) as Partial<ListenerScript>;
+};
+
 class ListenerService {
   getAll() {
     return client.get<ListenerScriptsResponse>('/gravity/listener/scripts');
@@ -12,6 +30,7 @@ class ListenerService {
   }
 
   patch(id: number, script: Partial<ListenerScript>) {
+    script = filterAllowedFields(script);
     return client.patch<ListenerScriptWithProjects>(`/gravity/listener/scripts/${id}`, script);
   }
 
@@ -20,6 +39,7 @@ class ListenerService {
   }
 
   create(script: Partial<ListenerScript>) {
+    script = filterAllowedFields(script);
     return client.post<ListenerScriptWithProjects>(`/gravity/listener/scripts`, script);
   }
 }

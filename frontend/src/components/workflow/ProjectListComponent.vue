@@ -37,7 +37,7 @@ const showMoreProjects = (event: MouseEvent) => {
   <ul class="project-list">
     <li v-for="key in keys.slice(0, 3)" :key="key">
       <span class="item" :title="projectsMap[key]?.name">
-        {{ key }}
+        {{ projectsMap[key]?.key ?? key }}
       </span>
     </li>
     <li v-if="keys.length > 3">
@@ -47,7 +47,7 @@ const showMoreProjects = (event: MouseEvent) => {
           <ul class="project-list">
             <li v-for="key in keys" :key="key">
               <span class="item" :title="projectsMap[key]?.name">
-                {{ key }}
+                {{ projectsMap[key]?.key ?? key }}
               </span>
             </li>
           </ul>

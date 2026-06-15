@@ -21,6 +21,7 @@ import PerformanceDialog from "@/components/metrics/PerformanceDialog.vue";
 import { ListenerScript } from "@/interfaces/listener.ts";
 import { listenerService } from "@/services/listenerService.ts";
 import DeleteListenerScriptDialog from "@/components/workflow/DeleteListenerScriptDialog.vue";
+import { systemService } from "@/services/systemService.ts";
 
 const busy = ref(false);
 const scripts = ref<Array<ListenerScript>>([]);
@@ -47,21 +48,23 @@ const eventTypesMap = computed<Record<number, IssueEventType>>(() => {
 });
 
 const filteredScripts = computed<Array<ListenerScript>>(() => {
-  if (!term.value && selectedProjects.value.length == 0) {
+  if (!term.value && selectedProjects.value.length == 0 && selectedEventTypes.value.length == 0) {
     return scripts.value;
   }
-
   const out: Array<ListenerScript> = [];
 
+  const searchTerm = term.value?.toLowerCase();
+
   for (const s of scripts.value) {
-    if (term.value && (
-        (s.name != null && !s.name.toLowerCase().includes(term.value.toLowerCase())) &&
-        (s.description != null && !s.description.toLowerCase().includes(term.value.toLowerCase()))
-    )) {
-      continue;
+    if (searchTerm) {
+      const matchesName = s.name?.toLowerCase().includes(searchTerm);
+      const matchesDescription = s.description?.toLowerCase().includes(searchTerm);
+      if (!(matchesName || matchesDescription)) {
+        continue;
+      }
     }
 
-    if (selectedProjects.value.length > 0 && !s.projectIds.some(item => selectedProjects.value.includes(item))) {
+    if (selectedProjects.value.length > 0 && s.projectIds.length && !s.projectIds.some(item => selectedProjects.value.includes(item))) {
       continue;
     }
 
@@ -108,10 +111,6 @@ const loadScripts = () => {
   });
 }
 
-const showScriptDialog = (script: ListenerScript) => {
-  console.log(script);
-}
-
 const showDeleteDialog = (script: ListenerScript) => {
   deleteDialog.value.show(script);
 }
@@ -149,20 +148,18 @@ const onDeleteScript = (scriptId: number) => {
 const dropDownOptions = (script: ListenerScript): Array<DropDownGroupOption> => {
   const options: Array<DropDownOption> = [
     {
-      id: 'show',
-      label: $i18n.t('Show script'),
-      cb() {
-        showScriptDialog(script)
-      },
-      iconName: 'icon-eye'
-    },
-    {
       id: 'perf',
       label: $i18n.t('Performance chart'),
       cb() {
         showPerformanceDialog(script)
       },
       iconName: 'icon-stats-bars'
+    },
+    {
+      id: 'edit',
+      label: $i18n.t('Edit'),
+      route: {name: 'gravityListeners', params: {id: script.id}},
+      iconName: 'icon-pencil'
     },
     {
       id: 'state',
@@ -190,6 +187,10 @@ const dropDownOptions = (script: ListenerScript): Array<DropDownGroupOption> => 
   ]
 }
 
+const projectOptions = (termValue: string|null, excludes?: Array<number>) => {
+  return systemService.projectSuggestions(termValue, excludes);
+}
+
 onMounted(() => {
   loadScripts();
 });
@@ -202,11 +203,15 @@ onMounted(() => {
       <ol role="list">
         <li>{{ $i18n.t("Gravity") }}</li>
         <li>{{ $i18n.t("Listeners") }}</li>
+        <li class="title" style="font-size: 100%; font-weight: normal;">
+          {{ $i18n.t("Automatically execute actions in response to an event. ") }}
+        </li>
       </ol>
       <div class="actions">
         <router-link :to="{name: 'gravityListeners', params: {id: 'create'}}" class="button">{{ $i18n.t("Create listener") }}</router-link>
       </div>
     </nav>
+
 
     <div class="pad panel">
       <form class="ui horizontal" @submit.prevent>
@@ -216,11 +221,11 @@ onMounted(() => {
         </div>
         <div class="field-group">
           <label for="gravity-listener-project">{{ $i18n.t("Projects") }}</label>
-          <MultiSelect v-model="selectedProjects" type="text" id="gravity-listener-project" :options="projects"></MultiSelect>
+          <MultiSelect v-model="selectedProjects" id="gravity-listener-project" :options="projectOptions" :show-icons="true"></MultiSelect>
         </div>
         <div class="field-group">
           <label for="gravity-listener-event-type">{{ $i18n.t("Event types") }}</label>
-          <MultiSelect v-model="selectedEventTypes" type="text" id="gravity-listener-event-type" :options="eventTypes"></MultiSelect>
+          <MultiSelect v-model="selectedEventTypes" id="gravity-listener-event-type" :options="eventTypes"></MultiSelect>
         </div>
       </form>
     </div>
@@ -232,6 +237,7 @@ onMounted(() => {
             <th>{{ $i18n.t("Name") }}</th>
             <th>{{ $i18n.t("Used in") }}</th>
             <th>{{ $i18n.t("Event type") }}</th>
+            <th>{{ $i18n.t("Async") }}</th>
             <th>{{ $i18n.t("History") }}</th>
             <th></th>
           </tr>
@@ -239,10 +245,16 @@ onMounted(() => {
         <tbody>
           <tr v-for="s in filteredScripts" :key="s.id" :class="{disabled: !s.enabled}">
             <td>
-              <div :title="s.description">{{ s.name }}</div>
+              <div class="iconed">
+                <span :class="[s.enabled ? 'icon-ok-circle': 'icon-blocked']" :title="s.enabled? $i18n.t('Enabled'): $i18n.t('Disabled')"></span>
+                <div :title="s.description">{{ s.name }}</div>
+              </div>
             </td>
             <td>
-              <ProjectListComponent :projects="projects" :keys="s.projectIds"></ProjectListComponent>
+              <template v-if="s.projectIds?.length > 0">
+                <ProjectListComponent :projects="projects" :keys="s.projectIds"></ProjectListComponent>
+              </template>
+              <div v-else>{{ $i18n.t("All projects") }}</div>
             </td>
             <td>
               <template v-for="eventTypeId in s.eventTypeIds">
@@ -250,6 +262,9 @@ onMounted(() => {
                   {{ eventTypesMap[eventTypeId].name }}
                 </div>
               </template>
+            </td>
+            <td>
+              <span v-if="s.async" class="icon-ok-circle"></span>
             </td>
             <td v-lazy-load="() => loadScriptResults(s.id)">
               <template v-if="results[s.id]">
