@@ -23,7 +23,11 @@ routes:
     parent: admin
   - routeName: gravityWorkflows
     routePath: gravity/workflows
-    component: frontend/WorkflowsView.js
+    component: frontend/WorkflowScriptsView.js
+    parent: admin
+  - routeName: gravityListeners
+    routePath: gravity/listeners/:id?
+    component: frontend/ListenerScriptsView.js
     parent: admin
 restPackages:
   - name: rest
@@ -31,6 +35,7 @@ restPackages:
       - ru.slie.luna.plugins.gravity.rest
 activeDocs:
   - ru.slie.luna.plugins.gravity.db.ScriptRunResultEntity
+  - ru.slie.luna.plugins.gravity.db.ScriptListenerEntity
 webSections:
   - key: GravityAdminSideBarSection
     name: Gravity admin side bar section
@@ -42,6 +47,9 @@ webItems:
   - key: GravityAdminWorkflowsWebItem
     name: Gravity workflows web item
     className: ru.slie.luna.plugins.gravity.web.GravityAdminWorkflowsWebItem
+  - key: GravityAdminListenersWebItem
+    name: Gravity listeners web item
+    className: ru.slie.luna.plugins.gravity.web.GravityAdminListenersWebItem
 workflowConditions:
   - key: GravityCondition
     name: Gravity script condition

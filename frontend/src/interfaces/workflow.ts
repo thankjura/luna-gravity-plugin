@@ -23,7 +23,7 @@ export interface WorkflowScript {
 
 export interface WorkflowScriptsResponse {
   scripts: Array<WorkflowScript>,
-  projects: Record<string, ProjectInfo>,
-  statuses: Record<number, Status>,
+  projects: Array<ProjectInfo>,
+  statuses: Array<Status>,
 }
 

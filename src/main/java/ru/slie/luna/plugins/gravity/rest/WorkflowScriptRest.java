@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.slie.luna.exception.DeleteException;
 import ru.slie.luna.exception.ValidateException;
-import ru.slie.luna.issue.status.Status;
 import ru.slie.luna.issue.status.StatusManager;
 import ru.slie.luna.issue.workflow.Workflow;
 import ru.slie.luna.issue.workflow.WorkflowManager;
@@ -35,7 +34,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/gravity/workflow")
-public class WorkflowRest {
+public class WorkflowScriptRest {
     private final ScriptManager scriptManager;
     private final ProjectManager projectManager;
     private final WorkflowManager workflowManager;
@@ -43,12 +42,12 @@ public class WorkflowRest {
     private final AuthenticationContext authenticationContext;
     private final GlobalPermissionManager globalPermissionManager;
 
-    public WorkflowRest(ScriptManager scriptManager,
-                        ProjectManager projectManager,
-                        WorkflowManager workflowManager,
-                        StatusManager statusManager,
-                        AuthenticationContext authenticationContext,
-                        GlobalPermissionManager globalPermissionManager) {
+    public WorkflowScriptRest(ScriptManager scriptManager,
+                              ProjectManager projectManager,
+                              WorkflowManager workflowManager,
+                              StatusManager statusManager,
+                              AuthenticationContext authenticationContext,
+                              GlobalPermissionManager globalPermissionManager) {
         this.scriptManager = scriptManager;
         this.projectManager = projectManager;
         this.workflowManager = workflowManager;
@@ -100,13 +99,7 @@ public class WorkflowRest {
             }
         }
 
-        Map<Long, Status> statusesMap = new HashMap<>();
-        for (Status status: statusManager.getByIds(statuses)) {
-            statusesMap.put(status.getId(), status);
-        }
-
-
-        return new WorkflowScriptsResponse(scripts, affectedProject, statusesMap);
+        return new WorkflowScriptsResponse(scripts, affectedProject.values(), statusManager.getByIds(statuses));
     }
 
     @PostMapping("/scripts")

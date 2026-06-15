@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.plugins.gravity.script.ScriptRunEvent;
 
@@ -34,6 +35,7 @@ public class ScriptMetricsListener implements InitializingBean, DisposableBean {
         scriptMetricsExecutor.scheduleWithFixedDelay(this::flushBatch, 5, 5, TimeUnit.SECONDS);
     }
 
+    @Async
     @EventListener
     public void handleScriptRunEvent(ScriptRunEvent event) {
         scriptMetricsExecutor.submit(() -> {

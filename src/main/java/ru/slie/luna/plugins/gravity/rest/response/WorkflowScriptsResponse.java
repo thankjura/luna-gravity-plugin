@@ -4,7 +4,7 @@ import ru.slie.luna.issue.status.Status;
 import ru.slie.luna.plugins.gravity.model.WorkflowScript;
 import ru.slie.luna.project.ProjectInfo;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-public record WorkflowScriptsResponse(List<WorkflowScript> scripts, Map<String, ProjectInfo> projects, Map<Long, Status> statuses) {}
+public record WorkflowScriptsResponse(List<WorkflowScript> scripts, Collection<ProjectInfo> projects, List<Status> statuses) {}

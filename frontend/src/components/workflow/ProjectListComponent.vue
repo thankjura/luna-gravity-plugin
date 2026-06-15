@@ -1,18 +1,29 @@
 <script setup lang="ts">
 
-import { PropType, useTemplateRef } from "vue";
+import { computed, PropType, useTemplateRef } from "vue";
 import { ProjectInfo } from "luna";
 import { $i18n } from "@/utils/i18n.ts";
 import { PopoverComponent } from "luna";
 import { ComponentExposed } from "vue-component-type-helpers";
 
-defineProps({
-  projects: Object as PropType<Record<string, ProjectInfo>>,
-  keys: Array as PropType<Array<string>>,
+const props = defineProps({
+  projects: Array as PropType<Array<ProjectInfo>>,
+  keys: Array as PropType<Array<string|number>>,
 });
 
 const popover = useTemplateRef<ComponentExposed<typeof PopoverComponent>>('popover');
 const button = useTemplateRef<HTMLButtonElement>('button');
+
+const projectsMap = computed(() => {
+  const out = {};
+  if (props.projects) {
+    for (const project of props.projects) {
+      out[project.id] = project;
+      out[project.key] = project;
+    }
+  }
+  return out;
+});
 
 const showMoreProjects = (event: MouseEvent) => {
   if (button.value) {
@@ -25,7 +36,7 @@ const showMoreProjects = (event: MouseEvent) => {
 <template>
   <ul class="project-list">
     <li v-for="key in keys.slice(0, 3)" :key="key">
-      <span class="item" :title="projects[key]?.name">
+      <span class="item" :title="projectsMap[key]?.name">
         {{ key }}
       </span>
     </li>
@@ -35,7 +46,7 @@ const showMoreProjects = (event: MouseEvent) => {
         <div class="popover-body">
           <ul class="project-list">
             <li v-for="key in keys" :key="key">
-              <span class="item" :title="projects[key]?.name">
+              <span class="item" :title="projectsMap[key]?.name">
                 {{ key }}
               </span>
             </li>

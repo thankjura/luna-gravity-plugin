@@ -27,8 +27,8 @@ import WorkflowScriptViewDialog from "@/components/metrics/WorkflowScriptViewDia
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
-const projects = ref<Record<string, ProjectInfo>>({});
-const statuses = ref<Record<number, Status>>({});
+const projects = ref<Array<ProjectInfo>>([]);
+const statuses = ref<Array<Status>>([]);
 const term = ref<string>(null);
 const selectedProjects = ref<Array<string>>([]);
 const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
@@ -48,13 +48,13 @@ const orig2draftMap = computed<Record<string, string>>(() => {
     }
   }
   return out;
-})
+});
 
-const projectOptions = computed<Array<ProjectInfo>>(() => {
-  const out = [];
-  if (projects.value) {
-    for (const project of Object.values(projects.value)) {
-      out.push(project);
+const statusesMap = computed<Record<number, Status>>(() => {
+  const out = {};
+  if (statuses.value) {
+    for (const status of statuses.value) {
+      out[status.id] = status;
     }
   }
   return out;
@@ -216,7 +216,7 @@ onMounted(() => {
         </div>
         <div class="field-group">
           <label for="gravity-workflow-project">{{ $i18n.t("Projects") }}</label>
-          <MultiSelect v-model="selectedProjects" type="text" id="gravity-workflow-project" value-key="key" :options="projectOptions"></MultiSelect>
+          <MultiSelect v-model="selectedProjects" type="text" id="gravity-workflow-project" value-key="key" :options="projects"></MultiSelect>
         </div>
       </form>
     </div>
@@ -247,12 +247,12 @@ onMounted(() => {
               <div class="transition">
                 <div class="transition-source">
                   <template v-for="status in s.transition.sourceStatuses" :key="status">
-                    <StatusComponent v-if="statuses[status]" :name="statuses[status].name" :category="statuses[status].categoryKey"></StatusComponent>
+                    <StatusComponent v-if="statusesMap[status]" :name="statusesMap[status].name" :category="statusesMap[status].categoryKey"></StatusComponent>
                   </template>
                 </div>
                 <div class="transition-name">-> <router-link :to="{name: RouteNames.admin.workflows, params: {id: s.workflowId}, query: {hl: s.actionId}}">{{ s.transition.transitionName }}</router-link> -></div>
                 <div class="transition-target">
-                  <StatusComponent v-if="statuses[s.transition.targetStatus]" :name="statuses[s.transition.targetStatus].name" :category="statuses[s.transition.targetStatus].categoryKey"></StatusComponent>
+                  <StatusComponent v-if="statusesMap[s.transition.targetStatus]" :name="statusesMap[s.transition.targetStatus].name" :category="statusesMap[s.transition.targetStatus].categoryKey"></StatusComponent>
                 </div>
               </div>
             </td>

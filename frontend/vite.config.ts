@@ -16,7 +16,7 @@ export default defineConfig({
         'sortablejs': 'Sortable',
         'monaco-editor': 'monaco',
         'chart.js': 'ChartJs',
-        'vue-router': 'vue-router',
+        'vue-router': 'VueRouter',
       }
     }),
     vue()
@@ -32,7 +32,8 @@ export default defineConfig({
     lib: {
       entry: [
         resolve(__dirname, 'src/views/ConsoleView.vue'),
-        resolve(__dirname, 'src/views/WorkflowsView.vue'),
+        resolve(__dirname, 'src/views/WorkflowScriptsView.vue'),
+        resolve(__dirname, 'src/views/ListenerScriptsView.vue'),
         resolve(__dirname, 'src/components/workflow/BaseViewScriptComponent.vue'),
         resolve(__dirname, 'src/components/workflow/BaseEditScriptComponent.vue'),
       ],

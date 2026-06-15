@@ -107,7 +107,8 @@ export const messages = {
   "Custom": "Другое",
 
   // src/components/metrics/PerformanceDialog.vue:117
-  // src/views/WorkflowsView.vue:167
+  // src/views/ListenerScriptsView.vue:148
+  // src/views/WorkflowScriptsView.vue:167
   "Performance chart": "График производительности",
 
   // src/components/metrics/PerformanceDialog.vue:121
@@ -134,14 +135,15 @@ export const messages = {
   // src/components/workflow/BaseEditScriptComponent.vue:48
   "Disabled": "Отключен",
 
-  // src/components/workflow/ProjectListComponent.vue:33
+  // src/components/workflow/ProjectListComponent.vue:44
   "More": "Больше",
 
   // src/views/ConsoleView.vue:34
   "Failed to execute script": "Не удалось выполнить скрипт.",
 
   // src/views/ConsoleView.vue:64
-  // src/views/WorkflowsView.vue:206
+  // src/views/ListenerScriptsView.vue:182
+  // src/views/WorkflowScriptsView.vue:206
   "Gravity": "Gravity",
 
   // src/views/ConsoleView.vue:65
@@ -153,63 +155,90 @@ export const messages = {
   // src/views/ConsoleView.vue:77
   "Result": "Результат",
 
-  // src/views/WorkflowsView.vue:70
-  "Custom script": "Пользовательский скрипт",
+  // src/views/ListenerScriptsView.vue:125
+  "Listener script enabled successfully": "Скрипт включен",
 
-  // src/views/WorkflowsView.vue:92
-  "Condition": "Условие",
+  // src/views/ListenerScriptsView.vue:127
+  "Listener script disabled successfully": "Скрипт выключен",
 
-  // src/views/WorkflowsView.vue:93
-  "Validator": "Валидатор",
+  // src/views/ListenerScriptsView.vue:130
+  "Failed update script params": "Ошибка обновления параметров скрипта",
 
-  // src/views/WorkflowsView.vue:94
-  "Postfunction": "Постфункция",
-
-  // src/views/WorkflowsView.vue:147
-  "Function params updated": "Параметры функции обновлены",
-
-  // src/views/WorkflowsView.vue:149
-  "Failed update function params": "не удалось обновить параметры функции",
-
-  // src/views/WorkflowsView.vue:159
+  // src/views/ListenerScriptsView.vue:140
+  // src/views/WorkflowScriptsView.vue:159
   "Show script": "Показать скрипт",
 
-  // src/views/WorkflowsView.vue:179
-  "Enable": "Включить",
-
-  // src/views/WorkflowsView.vue:179
+  // src/views/ListenerScriptsView.vue:156
+  // src/views/WorkflowScriptsView.vue:179
   "Disable": "Выключить",
 
-  // src/views/WorkflowsView.vue:207
-  "Workflows": "Бизнес процессы",
+  // src/views/ListenerScriptsView.vue:156
+  // src/views/WorkflowScriptsView.vue:179
+  "Enable": "Включить",
 
-  // src/views/WorkflowsView.vue:214
+  // src/views/ListenerScriptsView.vue:183
+  "Listeners": "Слушатели",
+
+  // src/views/ListenerScriptsView.vue:190
+  // src/views/WorkflowScriptsView.vue:214
   "Filter": "Фильтр",
 
-  // src/views/WorkflowsView.vue:215
+  // src/views/ListenerScriptsView.vue:191
+  // src/views/WorkflowScriptsView.vue:215
   "note...": "примечание...",
 
-  // src/views/WorkflowsView.vue:218
+  // src/views/ListenerScriptsView.vue:194
+  // src/views/WorkflowScriptsView.vue:218
   "Projects": "Проекты",
 
-  // src/views/WorkflowsView.vue:228
+  // src/views/ListenerScriptsView.vue:198
+  "Event types": "Типы событий",
+
+  // src/views/ListenerScriptsView.vue:208
+  // src/views/WorkflowScriptsView.vue:228
   "Name": "Название",
 
-  // src/views/WorkflowsView.vue:229
+  // src/views/ListenerScriptsView.vue:209
+  // src/views/WorkflowScriptsView.vue:229
   "Used in": "Используется в",
 
-  // src/views/WorkflowsView.vue:230
-  "Workflow": "Бизнес процесс",
+  // src/views/ListenerScriptsView.vue:210
+  "Event type": "Тип события",
 
-  // src/views/WorkflowsView.vue:231
-  "Transition": "Переход",
-
-  // src/views/WorkflowsView.vue:232
-  "Type": "Тип",
-
-  // src/views/WorkflowsView.vue:233
+  // src/views/ListenerScriptsView.vue:211
+  // src/views/WorkflowScriptsView.vue:233
   "History": "История",
 
-  // src/views/WorkflowsView.vue:244
+  // src/views/WorkflowScriptsView.vue:70
+  "Custom script": "Пользовательский скрипт",
+
+  // src/views/WorkflowScriptsView.vue:92
+  "Condition": "Условие",
+
+  // src/views/WorkflowScriptsView.vue:93
+  "Validator": "Валидатор",
+
+  // src/views/WorkflowScriptsView.vue:94
+  "Postfunction": "Постфункция",
+
+  // src/views/WorkflowScriptsView.vue:147
+  "Function params updated": "Параметры функции обновлены",
+
+  // src/views/WorkflowScriptsView.vue:149
+  "Failed update function params": "не удалось обновить параметры функции",
+
+  // src/views/WorkflowScriptsView.vue:207
+  "Workflows": "Бизнес процессы",
+
+  // src/views/WorkflowScriptsView.vue:230
+  "Workflow": "Бизнес процесс",
+
+  // src/views/WorkflowScriptsView.vue:231
+  "Transition": "Переход",
+
+  // src/views/WorkflowScriptsView.vue:232
+  "Type": "Тип",
+
+  // src/views/WorkflowScriptsView.vue:244
   "Draft": "Черновик",
 }
