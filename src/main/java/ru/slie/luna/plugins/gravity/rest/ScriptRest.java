@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import ru.slie.luna.event.IssueEvent;
 import ru.slie.luna.issue.Issue;
 import ru.slie.luna.issue.MutableIssue;
 import ru.slie.luna.issue.workflow.WorkflowTransientVars;
@@ -97,6 +98,7 @@ public class ScriptRest {
 
     Map<String, Class<?>> getContextVariables(Map<String, String> context) {
         Map<String, Class<?>> map = new HashMap<>();
+        map.put("log", Logger.class);
         if (context == null) {
             return map;
         }
@@ -113,6 +115,11 @@ public class ScriptRest {
                     map.put("user", User.class);
                     map.put("transientVars", WorkflowTransientVars.class);
                 }
+                case "listener" -> {
+                    map.put("issue", Issue.class);
+                    map.put("user", User.class);
+                    map.put("event", IssueEvent.class);
+                }
             }
         }
 
@@ -120,6 +127,7 @@ public class ScriptRest {
             switch (entry.getValue()) {
                 case "issue" -> map.put(entry.getKey(), Issue.class);
                 case "user" -> map.put(entry.getKey(), User.class);
+                case "event" -> map.put(entry.getKey(), IssueEvent.class);
             }
         }
 

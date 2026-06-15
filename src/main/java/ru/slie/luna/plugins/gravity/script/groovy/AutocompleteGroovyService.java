@@ -42,9 +42,11 @@ public class AutocompleteGroovyService {
 
         ImportCustomizer importCustomizer = new ImportCustomizer();
         contextVariables.values().forEach(clazz -> importCustomizer.addImports(clazz.getName()));
+        importCustomizer.addImports(Logger.class.getName());
         config.addCompilationCustomizers(importCustomizer);
 
         CompilationUnit cu = new CompilationUnit(config);
+
 
         DynamicBindingCustomizer dynamicFields = new DynamicBindingCustomizer(contextVariables);
         cu.addPhaseOperation((source, context, classNode) -> {
