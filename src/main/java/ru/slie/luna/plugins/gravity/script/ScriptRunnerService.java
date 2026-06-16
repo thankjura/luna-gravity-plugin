@@ -52,7 +52,7 @@ public class ScriptRunnerService {
         try {
             return execute(script, scriptEnv, builder::append);
         } catch (Exception e) {
-            if (!scripValidators && !(e instanceof ValidateException)) {
+            if (!scripValidators || !(e instanceof ValidateException)) {
                 stackTrace = MetricsHelper.stackTraceToString(e);
             }
             throw e;

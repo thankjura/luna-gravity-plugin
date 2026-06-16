@@ -216,7 +216,7 @@ onMounted(() => {
         </div>
         <div class="field-group">
           <label for="gravity-workflow-project">{{ $i18n.t("Projects") }}</label>
-          <MultiSelect v-model="selectedProjects" type="text" id="gravity-workflow-project" value-key="key" :options="projects"></MultiSelect>
+          <MultiSelect v-model="selectedProjects" type="text" id="gravity-workflow-project" value-key="key" :options="projects" :show-icons="true"></MultiSelect>
         </div>
       </form>
     </div>
