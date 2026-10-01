@@ -56,7 +56,7 @@ workflowConditions:
     className: ru.slie.luna.plugins.gravity.workflow.GravityScriptCondition
     viewComponent:
       path: frontend/BaseViewScriptComponent.js
-    editComponent:
+    formComponent:
       path: frontend/BaseEditScriptComponent.js
 workflowValidators:
   - key: GravityValidator
@@ -64,7 +64,7 @@ workflowValidators:
     className: ru.slie.luna.plugins.gravity.workflow.GravityScriptValidator
     viewComponent:
       path: frontend/BaseViewScriptComponent.js
-    editComponent:
+    formComponent:
       path: frontend/BaseEditScriptComponent.js
 workflowPostfunctions:
   - key: GravityPostfunction
@@ -72,7 +72,7 @@ workflowPostfunctions:
     className: ru.slie.luna.plugins.gravity.workflow.GravityScriptPostfunction
     viewComponent:
       path: frontend/BaseViewScriptComponent.js
-    editComponent:
+    formComponent:
       path: frontend/BaseEditScriptComponent.js
 components:
   - key: ScriptMetricsListener

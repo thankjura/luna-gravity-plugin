@@ -6,10 +6,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.slie.luna.exception.DeleteException;
 import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.issue.status.StatusManager;
-import ru.slie.luna.issue.workflow.Workflow;
-import ru.slie.luna.issue.workflow.WorkflowManager;
-import ru.slie.luna.issue.workflow.WorkflowSchema;
-import ru.slie.luna.issue.workflow.WorkflowSchemaEntry;
+import ru.slie.luna.issue.workflow.*;
 import ru.slie.luna.issue.workflow.action.WorkflowAction;
 import ru.slie.luna.issue.workflow.action.WorkflowActionConditionGroup;
 import ru.slie.luna.issue.workflow.action.WorkflowActionFunction;
@@ -38,6 +35,7 @@ public class WorkflowScriptRest {
     private final ScriptManager scriptManager;
     private final ProjectManager projectManager;
     private final WorkflowManager workflowManager;
+    private final WorkflowSchemaManager workflowSchemaManager;
     private final StatusManager statusManager;
     private final AuthenticationContext authenticationContext;
     private final GlobalPermissionManager globalPermissionManager;
@@ -45,12 +43,14 @@ public class WorkflowScriptRest {
     public WorkflowScriptRest(ScriptManager scriptManager,
                               ProjectManager projectManager,
                               WorkflowManager workflowManager,
+                              WorkflowSchemaManager workflowSchemaManager,
                               StatusManager statusManager,
                               AuthenticationContext authenticationContext,
                               GlobalPermissionManager globalPermissionManager) {
         this.scriptManager = scriptManager;
         this.projectManager = projectManager;
         this.workflowManager = workflowManager;
+        this.workflowSchemaManager = workflowSchemaManager;
         this.statusManager = statusManager;
         this.authenticationContext = authenticationContext;
         this.globalPermissionManager = globalPermissionManager;
@@ -71,7 +71,7 @@ public class WorkflowScriptRest {
         }
 
         for (Map.Entry<Long, Set<String>> entry : schemaProjectMap.entrySet()) {
-            Optional<WorkflowSchema> schema = workflowManager.getSchemaById(entry.getKey());
+            Optional<WorkflowSchema> schema = workflowSchemaManager.getById(entry.getKey());
             if (schema.isEmpty()) {
                 continue;
             }

@@ -93,7 +93,7 @@ declare module 'luna' {
       maxWidth?: number
       zIndex?: number
       group?: string
-      options: DropDownOption[]
+      options: DropDownGroupOption[]
     }, {}, {}, SlotsType<{}>>;
   export const DropDownButton: DefineComponent<
     {},{
@@ -356,8 +356,19 @@ declare module 'luna' {
       id?: string
       modelValue?: boolean
     }, {}, {}, SlotsType<{}>>;
-export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
-export const RouteNames: {
+  export const SortableTable: DefineComponent<
+    {},{}, {}, {}, {}, {}, {}, {
+      'updated': [_event: SortableEvent]
+      'changed': [_event: SortableEvent]
+    }, {}, {
+      group?: string
+    }, {}, {}, SlotsType<{
+      header: any,
+      default: any,
+      footer: any,
+    }>>;
+  export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
+  export const RouteNames: {
         home: "home",
         dashboard: "dashboard",
         navigator: "navigator",
@@ -442,7 +453,7 @@ export const RouteNames: {
         },
         maintenance: "maintenance",
     }
-export const Injections: {
+  export const Injections: {
     $notify: InjectionKey<NotifyComponentInterface>,
     project: InjectionKey<Ref<Project>>,
     board: InjectionKey<Ref<Board>>,
@@ -451,6 +462,7 @@ export const Injections: {
     workflowActionFunc: InjectionKey<Ref<WorkflowFunctionDescriptor>>,
     metaIssue: InjectionKey<Ref<MetaIssue>>,
   }
+  export const $bus: Emitter<BusEvents>
   export interface NotifyComponentInterface {
       info: (title: string, body?: string, closable?: boolean) => void;
       warn: (title: string, body?: string, closable?: boolean) => void;
@@ -466,13 +478,129 @@ export const Injections: {
   export interface Errors {
       [key: string]: string
   }
-  export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
-  export enum IconSize {
-      ORIGINAL = "original",
-      SMALL = "32x32",
-      MEDIUM = "64x64",
-      LARGE = "128x128",
-      X_LARGE = "256x256",
+  export interface Emitter<Events extends Record<EventType, unknown>> {
+      all: EventHandlerMap<Events>;
+      on<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void;
+      on(type: '*', handler: WildcardHandler<Events>): void;
+      off<Key extends keyof Events>(type: Key, handler?: Handler<Events[Key]>): void;
+      off(type: '*', handler: WildcardHandler<Events>): void;
+      emit<Key extends keyof Events>(type: Key, event: Events[Key]): void;
+      emit<Key extends keyof Events>(type: undefined extends Events[Key] ? Key : never): void;
+  }
+  export declare type EventType = string | symbol;
+  export declare type EventHandlerMap<Events extends Record<EventType, unknown>> = Map<keyof Events | '*', EventHandlerList<Events[keyof Events]> | WildCardEventHandlerList<Events>>;
+  export declare type EventHandlerList<T = unknown> = Array<Handler<T>>;
+  export declare type Handler<T = unknown> = (event: T) => void;
+  T = any
+  export declare type WildCardEventHandlerList<T = Record<string, unknown>> = Array<WildcardHandler<T>>;
+  export declare type WildcardHandler<T = Record<string, unknown>> = (type: keyof T, event: T[keyof T]) => void;
+  export type BusEvents = {
+      'issue.updated': {issue: Issue, fields?: Array<string>, initiator?: string},
+      'issue.created': {issue: Issue, initiator?: string},
+      'issue.deleted': {issue: Issue},
+      'issue.worklog.created': {worklog: Worklog},
+      'issue.worklog.updated': {worklog: Worklog},
+      'issue.attachment.added': {issueKey: string, attachments: Array<Attachment>, initiator: string},
+      'action.create_comment': {issue: Issue},
+      'action.create_link': {issueKey: string, initiator?: string},
+      'action.move_issue': {issue: Issue, initiator?: string},
+      'action.edit_issue': {issueKey: string, fields?: Array<string>, initiator?: string},
+      'action.assign_issue': {issue: Issue, fields?: Array<string>, initiator?: string},
+      'action.delete_issue': {issue: Issue, initiator?: string},
+      'action.transit_issue': {issueKey: string, actionId: number, showDialog: boolean, fields?: Array<string>, initiator?: string},
+      'action.edit_worklog': {issueKey: string, worklog: Worklog},
+      'action.create_worklog': {issueKey: string},
+      'action.edit_field': {issueKey: string, fieldId: string},
+      'action.custom': {name: string, issue?: Issue, initiator?: string, params: Record<string, string>},
+      // workflow
+      'workflow.edit_condition': {condGroup: WorkflowActionConditionGroup},
+      'workflow.remove_condition': {condGroup: WorkflowActionConditionGroup},
+      'workflow.add_condition': {condGroup: WorkflowActionConditionGroup},
+      // user
+      'user.login.required': {resolve?: (user: UserProfile) => void, reject?: () => void},
+      'user.self.updated': {user: UserProfile},
+      // size
+      'site.theme.switched': {theme: 'dark'|'light'}
+  
+      // project
+      'project.updated': {project: ProjectWithSchemas},
+  
+      // filters
+      'search_filter.deleted': {searchFilterId: number}
+  
+      // popovers
+      'popover.show': {event: MouseEvent, group: string, target?: Element, id: string},
+  }
+  export interface Issue extends IssueInfo {
+      parent?: IssueInfo,
+      projectId: number,
+      assignee?: User,
+      author?: User,
+      project: Project,
+      priority?: Priority,
+      estimate?: string,
+      timeLeft?: string,
+      timeSpent?: string,
+      estimateValue?: number,
+      timeLeftValue?: number,
+      timeSpentValue?: number,
+      priorityId?: number,
+      status: Status,
+      statusId: number,
+      summary: string,
+      description: string,
+      created: string,
+      updated: string,
+      color?: string,
+      sprint?: Sprint,
+      rank?: string,
+      labels?: Array<Label>,
+      watchers?: WatchersInfo,
+      fields?: {
+          [key: string]: FieldValue
+      },
+      issuePerms: IssuePerms,
+      [key: string]: any
+  }
+  export interface IssueInfo extends IssueKey {
+      id: number,
+      summary: string,
+      issueType: IssueType,
+      issueTypeId: number,
+      status: Status,
+      priority?: Priority,
+  }
+  export interface IssueType {
+      id: number,
+      name: string,
+      subtask?: boolean,
+      description?: string,
+      iconPath: string,
+      iconUrl: string,
+  }
+  export interface Status {
+      id: number,
+      name: string,
+      description: string|null,
+      category: StatusCategory,
+      categoryKey: string,
+  }
+  export interface StatusCategory {
+      key: StatusCategoryEnum,
+      name: string,
+  }
+  export enum StatusCategoryEnum {
+      TODO = "todo",
+      IN_PROGRESS = "in_progress",
+      DONE = "done",
+  }
+  export interface Priority {
+      id: number,
+      name: string,
+      description?: string,
+      iconPath?: string,
+      iconUrl?: string,
+      position: number
   }
   export interface User {
       id: number
@@ -490,6 +618,356 @@ export const Injections: {
       gender: 'male'|'female',
       active: boolean,
   }
+  export interface Project {
+      id: number,
+      key: string,
+      name: string,
+      description?: string,
+      iconPath?: string,
+      iconUrl?: string,
+      canAdminProject: boolean,
+      created: string,
+      lead: User,
+      leadId?: number,
+      assignStrategy: AssignStrategy,
+  }
+  export enum AssignStrategy {
+      LEAD = "lead",
+      AUTHOR = "author",
+  }
+  export interface Sprint {
+      id: number;
+      name: string;
+      author: User,
+      authorId: number;
+      goal: string;
+      boardId: number,
+      displayName: string,
+      state: SprintState,
+      active: boolean,
+      complete: boolean,
+      startDate: string,
+      finishDate: string,
+      activatedDate: string,
+      completedDate: string,
+      auditEntries: Array<SprintAuditEntry>
+  }
+  export enum SprintState {
+      NEW = 'new',
+      ACTIVE = 'active',
+      COMPLETE = 'complete',
+  }
+  export interface SprintAuditEntry {
+      id: number,
+      author: User,
+      authorId: number,
+      state: SprintState,
+      created: string,
+  }
+  export interface Label {
+      id: number,
+      name: string,
+  }
+  export interface WatchersInfo {
+      count: number,
+      watching: boolean,
+  }
+  export type FieldValue = string | null | undefined | object | Array<string>
+  export interface IssuePerms {
+      canEditIssue: boolean,
+      canAssignIssue: boolean,
+      canTransitIssue: boolean,
+      canMoveIssue: boolean,
+      canDeleteIssue: boolean,
+      canCreateComments: boolean,
+      canEditOwnComments: boolean,
+      canEditAllComments: boolean,
+      canDeleteAllComments: boolean,
+      canDeleteOwnComments: boolean,
+      canCreateAttachments: boolean,
+      canDeleteAllAttachments: boolean,
+      canDeleteOwnAttachments: boolean,
+      canCreateWorklogs: boolean,
+      canEditAllWorklogs: boolean,
+      canEditOwnWorklogs: boolean,
+      canDeleteAllWorklogs: boolean,
+      canDeleteOwnWorklogs: boolean,
+      canViewWatchers: boolean,
+      canManageWatchers: boolean,
+      canCreateIssues: boolean,
+  }
+  export interface Worklog {
+      id: number,
+      author: User,
+      authorId: number,
+      created: string
+      updater: User|null,
+      updaterId: number|null,
+      updated: string|null,
+      startDate: string,
+      timeSpent: string,
+      comment: string|null,
+  }
+  export interface Attachment {
+      id: number,
+      authorId: number,
+      author: User,
+      created: string,
+      fileName: string,
+      fileUrl: string,
+      fileSize: number,
+      mimeType: string,
+      thumbName: string,
+      thumbUrl: string,
+  }
+  export interface WorkflowActionConditionGroup {
+      id: string,
+      condition: WorkflowActionFunction | null,
+      items: Array<WorkflowActionConditionGroup> | null,
+      operator: ConditionOperator,
+  }
+  export interface WorkflowActionFunction extends WorkflowFunctionDescriptor {
+      id: string,
+      params: null | WorkflowFunctionParams,
+      viewParams: null | WorkflowFunctionViewParams,
+  }
+  export interface WorkflowFunctionParams {
+      [key: string]: string
+  }
+  export interface WorkflowFunctionViewParams {
+      [key: string]: any
+  }
+  export type ConditionOperator = "and" | "or";
+  export interface UserProfile extends User {
+      activity: UserActivity,
+      admin: boolean,
+      viewUsers: boolean,
+  }
+  export interface UserActivity {
+      dashboardId: number|null,
+      navigatorQs: string | null,
+      navigatorFilterId: number | null,
+      navigatorColumnIds: Array<string>,
+      lastVisitedIssuesIds: Array<number>,
+      lastVisitedProjectIds: Array<number>,
+      navigatorColumns: Array<IssueField>,
+      lastVisitedFilterIds: Array<number>,
+      lastVisitedFilters: Array<SearchFilter>,
+      lastVisitedBoardIds: Array<number>,
+      favoriteFilterIds: Array<number>,
+      favoriteBoardIds: Array<number>,
+  }
+  export interface IssueField {
+      id: string,
+      name: string,
+      description?: string
+      fieldTypeKey: string
+      fieldTypeName: string,
+      editComponent?: string,
+      editComponents?: Array<string>,
+      viewComponent?: string,
+      viewComponents?: Array<string>,
+      navigatorComponent?: string,
+      navigatorComponents?: Array<string>,
+      optionsComponent?: string,
+      searcherKey: string
+      searcherName: string,
+      valid: boolean,
+      systemField: boolean,
+      contexts?: Array<IssueFieldContext>,
+      options?: Array<Option<number>>,
+  }
+  export interface IssueFieldContext {
+      id: number,
+      name: string,
+      description?: string,
+      projectIds?: Array<number>,
+      issueTypeIds?: Array<number>,
+      projects?: Array<Project>,
+      issueTypes?: Array<IssueType>,
+      defaultValue?: FieldValue,
+      options?: Array<Option<number>>,
+  }
+  export interface Option<T> {
+      id: T,
+      name: string,
+      iconUrl?: string,
+      altName?: string,
+  }
+  export interface SearchFilter extends SharedObject {
+      id: number,
+      name: string,
+      description: string,
+      queryString: string,
+      author: User,
+      authorId: number,
+      updateAuthorId?: number,
+      created: string,
+      updated?: string,
+  
+  }
+  export interface ProjectWithSchemas extends Project {
+      issueTypeSchemaId: number | null,
+      resolutionSchemaId: number | null,
+      issueTypeScreenSchemaId: number | null,
+      fieldLayoutSchemaId: number | null,
+      fieldLayoutSchema: FieldLayoutSchema | null,
+      prioritySchemaId: number | null,
+      issueTypeSchema: IssueTypeSchema | null,
+      resolutionSchema: ResolutionSchema | null,
+      issueTypeScreenSchema: IssueTypeScreenSchema | null,
+      prioritySchema: PrioritySchema | null,
+      workflowSchemaId: number|null,
+      workflowSchema: WorkflowSchema|null,
+      permissionSchemaId: number|null,
+      permissionSchema: PermissionSchema|null,
+      notificationSchemaId: number|null,
+      notificationSchema: NotificationSchema|null,
+  }
+  export interface FieldLayoutSchema {
+      id: number,
+      name: string,
+      description: string,
+      defaultLayout: FieldLayout,
+      defaultLayoutId: number,
+      entries: Array<FieldLayoutSchemaEntry>
+  }
+  export interface FieldLayout {
+      id: number,
+      name: string,
+      description: string,
+      fieldLayoutItems: Array<FieldLayoutItem>
+  }
+  export interface FieldLayoutItem {
+      fieldId: string,
+      field: IssueField,
+      required: boolean,
+  }
+  export interface FieldLayoutSchemaEntry {
+      issueType: IssueType,
+      fieldLayout: FieldLayout,
+  }
+  export interface IssueTypeSchema {
+      id: number,
+      name: string,
+      description?: string,
+      issueTypes: Array<IssueType>,
+      issueTypeIds: Array<number>,
+  }
+  export interface ResolutionSchema {
+      id: number,
+      name: string,
+      description?: string,
+      resolutions: Array<Resolution>,
+  }
+  export interface Resolution {
+      id: number,
+      name: string,
+      description?: string,
+  }
+  export interface IssueTypeScreenSchema {
+      id: number,
+      name: string,
+      description?: string | null,
+      defaultScreenSchema: ScreenSchema,
+      defaultScreenSchemaId: number,
+      entries: {
+          [key: number]: ScreenSchema
+      },
+      assignedIssueTypesMap: {[key: number]: IssueType}
+  }
+  export interface ScreenSchema {
+      id: number,
+      name: string,
+      description?: string | null,
+      defaultScreen: Screen,
+      defaultScreenId: number,
+      createScreen?: Screen,
+      createScreenId?: number,
+      editScreen?: Screen,
+      editScreenId?: number,
+      viewScreen?: Screen,
+      viewScreenId?: number,
+  }
+  export interface Screen {
+      id: number,
+      name: string,
+      description: string,
+      tabs: Array<ScreenTab>
+  }
+  export interface ScreenTab {
+      id: number,
+      name: string,
+      fieldIds: Array<string>,
+      fields: Array<IssueField>,
+  }
+  export interface PrioritySchema {
+      id: number,
+      name: string,
+      description?: string,
+      priorities: Array<Priority>,
+  }
+  export interface WorkflowSchema {
+      id: number,
+      name: string,
+      description: string|null,
+      defaultWorkflow: WorkflowSimple,
+      defaultWorkflowId: number,
+      entries: Array<WorkflowSchemaEntry>,
+      active: boolean,
+  }
+  export interface WorkflowSimple {
+      id: number,
+      name: string,
+      description: string|null,
+      originalId: number|null,
+  }
+  export interface WorkflowSchemaEntry {
+      issueType: IssueType,
+      workflow: WorkflowSimple,
+  }
+  export interface PermissionSchema {
+      id: number,
+      name: string,
+      description: string|null,
+      permissionsMap: {
+          [key: string]: PermissionSchemaEntry
+      }
+  }
+  export interface PermissionSchemaEntry {
+      userIds: Array<number>,
+      groupNames: Array<string>,
+      projectRoleIds: Array<number>,
+      userFieldIds: Array<string>,
+  }
+  export interface NotificationSchema {
+      id: number,
+      name: string,
+      description: string|null,
+      notificationsMap: {
+          [key: string]: NotificationSchemaEntry
+      }
+  }
+  export interface NotificationSchemaEntry {
+      userIds: Array<number>,
+      groupNames: Array<string>,
+      projectRoleIds: Array<string>,
+      userFieldIds: Array<string>,
+  }
+  export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
+  export enum IconSize {
+      ORIGINAL = "original",
+      SMALL = "32x32",
+      MEDIUM = "64x64",
+      LARGE = "128x128",
+      X_LARGE = "256x256",
+  }
+  export interface DropDownGroupOption {
+      id: string|number,
+      label?: string;
+      options: Array<DropDownOption>;
+      className?: string,
+  }
   export interface DropDownOption {
       id: string|number,
       label: string;
@@ -505,12 +983,6 @@ export const Injections: {
       title?: string,
       selected?: boolean,
   }
-  export interface DropDownGroupOption {
-      id: string|number,
-      label?: string;
-      options: Array<DropDownOption>;
-      className?: string,
-  }
   export type OptionsGetterSync = () => DropDownGroupOption[]
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
   export interface ElemRect {
@@ -519,7 +991,6 @@ export const Injections: {
     width: number,
     height: number
   }
-  T = any
   export type HSV = { h: number, s: number, v: number, a?: number };
   export enum IconType {
       ISSUE_TYPE = "issuetypes",
@@ -550,45 +1021,6 @@ export const Injections: {
       attachments?: Array<Attachment>
       date: string
   }
-  export interface IssueInfo extends IssueKey {
-      id: number,
-      summary: string,
-      issueType: IssueType,
-      issueTypeId: number,
-      status: Status,
-      priority?: Priority,
-  }
-  export interface IssueType {
-      id: number,
-      name: string,
-      description?: string,
-      iconPath: string,
-      iconUrl: string,
-  }
-  export interface Status {
-      id: number,
-      name: string,
-      description: string|null,
-      category: StatusCategory,
-      categoryKey: string,
-  }
-  export interface StatusCategory {
-      key: StatusCategoryEnum,
-      name: string,
-  }
-  export enum StatusCategoryEnum {
-      TODO = "todo",
-      IN_PROGRESS = "in_progress",
-      DONE = "done",
-  }
-  export interface Priority {
-      id: number,
-      name: string,
-      description?: string,
-      iconPath?: string,
-      iconUrl?: string,
-      position: number
-  }
   export interface Comment {
       id: number,
       author: User,
@@ -597,36 +1029,12 @@ export const Injections: {
       updater?: User,
       text: string
   }
-  export interface Worklog {
-      id: number,
-      author: User,
-      authorId: number,
-      created: string
-      updater: User|null,
-      updaterId: number|null,
-      updated: string|null,
-      startDate: string,
-      timeSpent: string,
-      comment: string|null,
-  }
   export interface ChangeItem {
       id: number,
       fieldId: string,
       fieldName: string,
       oldStringValue: string,
       newStringValue: string,
-  }
-  export interface Attachment {
-      id: number,
-      authorId: number,
-      author: User,
-      created: string,
-      fileName: string,
-      fileUrl: string,
-      fileSize: number,
-      mimeType: string,
-      thumbName: string,
-      thumbUrl: string,
   }
   export interface ActivityStreamItemGrouped {
       groupedUser: User
@@ -669,61 +1077,6 @@ export const Injections: {
       description: string,
       queryString: string,
   }
-  export interface IssueField {
-      id: string,
-      name: string,
-      description?: string
-      fieldTypeKey: string
-      fieldTypeName: string,
-      editComponent?: string,
-      editComponents?: Array<string>,
-      viewComponent?: string,
-      viewComponents?: Array<string>,
-      navigatorComponent?: string,
-      navigatorComponents?: Array<string>,
-      optionsComponent?: string,
-      searcherKey: string
-      searcherName: string,
-      valid: boolean,
-      systemField: boolean,
-      contexts?: Array<IssueFieldContext>,
-      options?: Array<Option<number>>,
-  }
-  export interface IssueFieldContext {
-      id: number,
-      name: string,
-      description?: string,
-      projectIds?: Array<number>,
-      issueTypeIds?: Array<number>,
-      projects?: Array<Project>,
-      issueTypes?: Array<IssueType>,
-      defaultValue?: FieldValue,
-      options?: Array<Option<number>>,
-  }
-  export interface Project {
-      id: number,
-      key: string,
-      name: string,
-      description?: string,
-      iconPath?: string,
-      iconUrl?: string,
-      canAdminProject: boolean,
-      created: string,
-      lead: User,
-      leadId?: number,
-      assignStrategy: AssignStrategy,
-  }
-  export enum AssignStrategy {
-      LEAD = "lead",
-      AUTHOR = "author",
-  }
-  export type FieldValue = string | null | undefined | object | Array<string>
-  export interface Option<T> {
-      id: T,
-      name: string,
-      iconUrl?: string,
-      altName?: string,
-  }
   export interface CardColorPreset {
       strategy: ColorStrategy,
       colors: Array<CardColor>,
@@ -732,35 +1085,6 @@ export const Injections: {
       id: number,
       value: string,
       color: string,
-  }
-  export interface Sprint {
-      id: number;
-      name: string;
-      author: User,
-      authorId: number;
-      goal: string;
-      boardId: number,
-      displayName: string,
-      state: SprintState,
-      active: boolean,
-      complete: boolean,
-      startDate: string,
-      finishDate: string,
-      activatedDate: string,
-      completedDate: string,
-      auditEntries: Array<SprintAuditEntry>
-  }
-  export enum SprintState {
-      NEW = 'new',
-      ACTIVE = 'active',
-      COMPLETE = 'complete',
-  }
-  export interface SprintAuditEntry {
-      id: number,
-      author: User,
-      authorId: number,
-      state: SprintState,
-      created: string,
   }
   export interface KanbanBoard extends Board {
   
@@ -777,66 +1101,6 @@ export const Injections: {
       results: Array<T>,
       page: number,
       limit: number,
-  }
-  export interface Issue extends IssueInfo {
-      projectId: number,
-      assignee?: User,
-      author?: User,
-      project: Project,
-      priority?: Priority,
-      estimate?: string,
-      timeLeft?: string,
-      timeSpent?: string,
-      estimateValue?: number,
-      timeLeftValue?: number,
-      timeSpentValue?: number,
-      priorityId?: number,
-      status: Status,
-      statusId: number,
-      summary: string,
-      description: string,
-      created: string,
-      updated: string,
-      color?: string,
-      sprint?: Sprint,
-      rank?: string,
-      labels?: Array<Label>,
-      watchers?: WatchersInfo,
-      fields?: {
-          [key: string]: FieldValue
-      },
-      issuePerms: IssuePerms,
-      [key: string]: any
-  }
-  export interface Label {
-      id: number,
-      name: string,
-  }
-  export interface WatchersInfo {
-      count: number,
-      watching: boolean,
-  }
-  export interface IssuePerms {
-      canEditIssue: boolean,
-      canAssignIssue: boolean,
-      canTransitIssue: boolean,
-      canMoveIssue: boolean,
-      canDeleteIssue: boolean,
-      canCreateComments: boolean,
-      canEditOwnComments: boolean,
-      canEditAllComments: boolean,
-      canDeleteAllComments: boolean,
-      canDeleteOwnComments: boolean,
-      canCreateAttachments: boolean,
-      canDeleteAllAttachments: boolean,
-      canDeleteOwnAttachments: boolean,
-      canCreateWorklogs: boolean,
-      canEditAllWorklogs: boolean,
-      canEditOwnWorklogs: boolean,
-      canDeleteAllWorklogs: boolean,
-      canDeleteOwnWorklogs: boolean,
-      canViewWatchers: boolean,
-      canManageWatchers: boolean,
   }
   export interface BoardIssues {
       issues: Array<Issue>,
@@ -988,33 +1252,9 @@ export const Injections: {
       created: string,
       changeItems: {[key: string]: ChangeItem},
   }
-  export interface IssueTypeSchema {
-      id: number,
-      name: string,
-      description?: string,
-      issueTypes: Array<IssueType>,
-      issueTypeIds: Array<number>,
-  }
   export interface PriorityAffectedSchemas {
       priority: Priority,
       prioritySchemas: Array<PrioritySchema>,
-  }
-  export interface PrioritySchema {
-      id: number,
-      name: string,
-      description?: string,
-      priorities: Array<Priority>,
-  }
-  export interface Resolution {
-      id: number,
-      name: string,
-      description?: string,
-  }
-  export interface ResolutionSchema {
-      id: number,
-      name: string,
-      description?: string,
-      resolutions: Array<Resolution>,
   }
   export interface IssueKey {
       key: string
@@ -1023,29 +1263,6 @@ export const Injections: {
   }
   export interface IssueSearchResult extends SearchResult<Issue> {
       fields: Array<IssueField>
-  }
-  export interface FieldLayoutItem {
-      fieldId: string,
-      field: IssueField,
-      required: boolean,
-  }
-  export interface FieldLayout {
-      id: number,
-      name: string,
-      description: string,
-      fieldLayoutItems: Array<FieldLayoutItem>
-  }
-  export interface FieldLayoutSchemaEntry {
-      issueType: IssueType,
-      fieldLayout: FieldLayout,
-  }
-  export interface FieldLayoutSchema {
-      id: number,
-      name: string,
-      description: string,
-      defaultLayout: FieldLayout,
-      defaultLayoutId: number,
-      entries: Array<FieldLayoutSchemaEntry>
   }
   export interface IssueLinkType {
       id: number,
@@ -1103,6 +1320,21 @@ export const Injections: {
       descriptionField: MetaIssueField,
       priorityField: MetaIssueField,
       labelField: MetaIssueField,
+      subtaskTypes: Array<IssueType>,
+      customActions: Array<WebNode>,
+  }
+  export interface WebNode {
+      id: number,
+      name: string,
+      routeName: string,
+      eventName: string,
+      routeParams: {[key: string]: string},
+      routeQuery: {[key: string]: string},
+      iconUrl: string,
+      iconTitle: string,
+      hint: string,
+      children: Array<WebNode>,
+      section: boolean,
   }
   export interface IssueMoveResponse {
       project: Project,
@@ -1197,76 +1429,9 @@ export const Injections: {
     issueTypeScreenSchemas: Array<IssueTypeScreenSchema>
     fieldLayoutSchemas: Array<FieldLayoutSchema>
   }
-  export interface WorkflowSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      defaultWorkflow: WorkflowSimple,
-      defaultWorkflowId: number,
-      entries: Array<WorkflowSchemaEntry>,
-      active: boolean,
-  }
-  export interface WorkflowSimple {
-      id: number,
-      name: string,
-      description: string|null,
-      originalId: number|null,
-  }
-  export interface WorkflowSchemaEntry {
-      issueType: IssueType,
-      workflow: WorkflowSimple,
-  }
-  export interface IssueTypeScreenSchema {
-      id: number,
-      name: string,
-      description?: string | null,
-      defaultScreenSchema: ScreenSchema,
-      defaultScreenSchemaId: number,
-      entries: {
-          [key: number]: ScreenSchema
-      },
-      assignedIssueTypesMap: {[key: number]: IssueType}
-  }
-  export interface ScreenSchema {
-      id: number,
-      name: string,
-      description?: string | null,
-      defaultScreen: Screen,
-      defaultScreenId: number,
-      createScreen?: Screen,
-      createScreenId?: number,
-      editScreen?: Screen,
-      editScreenId?: number,
-      viewScreen?: Screen,
-      viewScreenId?: number,
-  }
-  export interface Screen {
-      id: number,
-      name: string,
-      description: string,
-      tabs: Array<ScreenTab>
-  }
-  export interface ScreenTab {
-      id: number,
-      name: string,
-      fieldIds: Array<string>,
-      fields: Array<IssueField>,
-  }
   export interface ScreenSchemaAffectedSchemas {
       screenSchema: ScreenSchema,
       issueTypeScreenSchemas: Array<IssueTypeScreenSchema>,
-  }
-  export interface SearchFilter extends SharedObject {
-      id: number,
-      name: string,
-      description: string,
-      queryString: string,
-      author: User,
-      authorId: number,
-      updateAuthorId?: number,
-      created: string,
-      updated?: string,
-  
   }
   export interface SearchFilterQueryParams extends SearchQuery {
       author?: Array<number>,
@@ -1283,24 +1448,6 @@ export const Injections: {
       editComponent: string | null,
   }
   export type WorkflowFunctionType = 'postfunction' | 'validator' | 'condition';
-  export interface WorkflowFunctionParams {
-      [key: string]: string
-  }
-  export interface WorkflowFunctionViewParams {
-      [key: string]: any
-  }
-  export interface WorkflowActionFunction extends WorkflowFunctionDescriptor {
-      id: string,
-      params: null | WorkflowFunctionParams,
-      viewParams: null | WorkflowFunctionViewParams,
-  }
-  export type ConditionOperator = "and" | "or";
-  export interface WorkflowActionConditionGroup {
-      id: string,
-      condition: WorkflowActionFunction | null,
-      items: Array<WorkflowActionConditionGroup> | null,
-      operator: ConditionOperator,
-  }
   export interface WorkflowAction {
       id: number,
       name: string,
@@ -1394,31 +1541,12 @@ export const Injections: {
       name: string,
       description?: string
   }
-  export interface UserActivity {
-      dashboardId: number|null,
-      navigatorQs: string | null,
-      navigatorFilterId: number | null,
-      navigatorColumnIds: Array<string>,
-      lastVisitedIssuesIds: Array<number>,
-      lastVisitedProjectIds: Array<number>,
-      navigatorColumns: Array<IssueField>,
-      lastVisitedFilterIds: Array<number>,
-      lastVisitedFilters: Array<SearchFilter>,
-      lastVisitedBoardIds: Array<number>,
-      favoriteFilterIds: Array<number>,
-      favoriteBoardIds: Array<number>,
-  }
   export interface UserActivityRequest {
       navigatorColumnIds: Array<string>,
       favoriteFilterIds: Array<number>,
       unFavoriteFilterIds: Array<number>,
       favoriteBoardIds: Array<number>,
       unFavoriteBoardIds: Array<number>,
-  }
-  export interface UserProfile extends User {
-      activity: UserActivity,
-      admin: boolean,
-      viewUsers: boolean,
   }
   export interface PortPosition extends Position {
       direction?: Direction|null,
@@ -1481,52 +1609,6 @@ export const Injections: {
       workflowSchemaId: number|null,
       permissionSchemaId: number|null,
       notificationSchemaId: number|null,
-  }
-  export interface ProjectWithSchemas extends Project {
-      issueTypeSchemaId: number | null,
-      resolutionSchemaId: number | null,
-      issueTypeScreenSchemaId: number | null,
-      fieldLayoutSchemaId: number | null,
-      fieldLayoutSchema: FieldLayoutSchema | null,
-      prioritySchemaId: number | null,
-      issueTypeSchema: IssueTypeSchema | null,
-      resolutionSchema: ResolutionSchema | null,
-      issueTypeScreenSchema: IssueTypeScreenSchema | null,
-      prioritySchema: PrioritySchema | null,
-      workflowSchemaId: number|null,
-      workflowSchema: WorkflowSchema|null,
-      permissionSchemaId: number|null,
-      permissionSchema: PermissionSchema|null,
-      notificationSchemaId: number|null,
-      notificationSchema: NotificationSchema|null,
-  }
-  export interface PermissionSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      permissionsMap: {
-          [key: string]: PermissionSchemaEntry
-      }
-  }
-  export interface PermissionSchemaEntry {
-      userIds: Array<number>,
-      groupNames: Array<string>,
-      projectRoleIds: Array<number>,
-      userFieldIds: Array<string>,
-  }
-  export interface NotificationSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      notificationsMap: {
-          [key: string]: NotificationSchemaEntry
-      }
-  }
-  export interface NotificationSchemaEntry {
-      userIds: Array<number>,
-      groupNames: Array<string>,
-      projectRoleIds: Array<string>,
-      userFieldIds: Array<string>,
   }
   export interface ProjectMembers {
       project: Project,
@@ -1836,6 +1918,7 @@ export const Injections: {
       path: string,
       enabled: boolean,
       resourceUrl: string,
+      mount?: 'admin' | 'general',
   }
   export enum RankingPhase {
     CALC = 'calc',
@@ -1963,18 +2046,6 @@ export const Injections: {
   export interface NamedResponse {
     id: number,
     name: string,
-  }
-  export interface WebNode {
-      id: number,
-      name: string,
-      routeName: string,
-      routeParams: {[key: string]: string},
-      routeQuery: {[key: string]: string},
-      iconUrl: string,
-      iconTitle: string,
-      hint: string,
-      children: Array<WebNode>,
-      section: boolean,
   }
   export interface WebRoute {
       routeName: string,
