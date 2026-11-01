@@ -1,10 +1,10 @@
-import { client } from "@/utils/client.ts";
-import { WorkflowScript, WorkflowScriptsResponse } from "@/interfaces/workflow.ts";
-import { WorkflowFunctionType } from "luna";
+import { client } from "@/utils/client";
+import type { WorkflowScript, WorkflowScriptsDto } from "@/interfaces/workflow";
+import type { WorkflowFunctionType } from "luna";
 
 class WorkflowService {
   getScripts() {
-    return client.get<WorkflowScriptsResponse>('/gravity/workflow/scripts');
+    return client.get<WorkflowScriptsDto>('/gravity/workflow/scripts');
   }
 
   setDisabled(workflowId: number, actionId: number, functionType: WorkflowFunctionType, functionId: string, disabled: boolean) {

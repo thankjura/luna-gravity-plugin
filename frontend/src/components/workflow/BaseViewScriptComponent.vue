@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
 import CodeView from "@/components/CodeView.vue";
-import { PropType } from "vue";
-import { WorkflowActionFunction } from "luna";
+import { type PropType } from "vue";
+import { type WorkflowActionFunction } from "luna";
 
 defineProps({
   func: Object as PropType<WorkflowActionFunction>,

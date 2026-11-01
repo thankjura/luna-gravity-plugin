@@ -1,6 +1,6 @@
-import { baseURL, client } from "@/utils/client.ts";
+import { baseURL, client } from "@/utils/client";
 import type * as MonacoEditor from 'monaco-editor';
-import { Signature, Suggestion } from "@/interfaces/script.ts";
+import type { Signature, Suggestion } from "@/interfaces/script";
 
 
 class ScriptService {

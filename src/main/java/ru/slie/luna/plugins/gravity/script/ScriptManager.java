@@ -117,8 +117,11 @@ public class ScriptManager implements InitializingBean {
             return Optional.empty();
         }
 
-        Optional<ScriptListenerEntity> entity = activeDocManager.getById(ScriptListenerEntity.class, id);
-        return entity.map(ListenerScript::new);
+        ScriptListenerEntity entity = activeDocManager.getById(ScriptListenerEntity.class, id);
+        if (entity == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new ListenerScript(entity));
     }
 
     @Transactional
@@ -127,7 +130,7 @@ public class ScriptManager implements InitializingBean {
 
         ScriptListenerEntity entity = null;
         if (script.getId() != null) {
-            entity = activeDocManager.getById(ScriptListenerEntity.class, script.getId()).orElse(null);
+            entity = activeDocManager.getById(ScriptListenerEntity.class, script.getId());
         }
 
         if (entity == null) {

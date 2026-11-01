@@ -1,6 +1,6 @@
-import { SearchQuery, SearchResult } from "luna";
-import { client } from "@/utils/client.ts";
-import { MetricPointCollection, ScriptRunResult } from "@/interfaces/metrics.ts";
+import type { SearchQuery, SearchResult } from "luna";
+import { client } from "@/utils/client";
+import type { MetricPointCollection, ScriptRunResult } from "@/interfaces/metrics";
 
 class MetricService {
   getResults(scriptId: string, query: SearchQuery) {

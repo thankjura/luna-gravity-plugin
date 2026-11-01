@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import { onBeforeUnmount, onMounted, PropType, useTemplateRef, watch } from "vue";
-import { MetricPointCollection } from "@/interfaces/metrics.ts";
-import { Chart, ChartData, ChartDataset, ChartOptions } from "chart.js";
+import { onBeforeUnmount, onMounted, type PropType, useTemplateRef, watch } from "vue";
+import type { MetricPointCollection } from "@/interfaces/metrics";
+import { Chart, type ChartData, type ChartDataset, type ChartOptions } from "chart.js";
 import { DateTime } from "luxon";
-import { $i18n } from "@/utils/i18n.ts";
+import { $i18n } from "@/utils/i18n";
 
 const props = defineProps({
   metrics: Object as PropType<MetricPointCollection>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import CodeEditor from "@/components/CodeEditor.vue";
-import { computed, inject, PropType } from "vue";
-import { Errors, Injections } from "luna";
-import { $i18n } from "@/utils/i18n.ts";
+import { computed, inject, type PropType } from "vue";
+import { type Errors, Injections } from "luna";
+import { $i18n } from "@/utils/i18n";
 
 defineProps({
   errors: Object as PropType<Errors>,

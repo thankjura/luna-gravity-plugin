@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { BaseDialog, ButtonBusy } from "luna";
-import { ListenerScript } from "@/interfaces/listener.ts";
+import { type ListenerScript } from "@/interfaces/listener";
 import { ref, useTemplateRef } from "vue";
-import { listenerService } from "@/services/listenerService.ts";
-import { $i18n } from "@/utils/i18n.ts";
+import { listenerService } from "@/services/listenerService";
+import { $i18n } from "@/utils/i18n";
 
 const emits = defineEmits({
   deleted:(_id: number) => true

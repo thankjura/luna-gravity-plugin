@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import CodeEditor from "@/components/CodeEditor.vue";
-import { inject, ref } from "vue";
-import { ButtonBusy, Errors, Injections } from "luna";
-import { scriptService } from "@/services/scriptService.ts";
-import { $i18n } from "@/utils/i18n.ts";
+import { ref } from "vue";
+import { ButtonBusy, type Errors, $notify } from "luna";
+import { scriptService } from "@/services/scriptService";
+import { $i18n } from "@/utils/i18n";
 
 const value = ref<string>("System.out.println(\"Hello\");\nlog.info(\"hello world\")");
 const busy = ref(false);
 const out = ref<Array<string>>([]);
 const activeTab = ref<'log'|'result'>('result');
 const result = ref<string>(null);
-const $notify = inject(Injections.$notify);
 const LIMIT = 300;
 const errors = ref<Errors>({});
 

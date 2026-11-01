@@ -1,148 +1,366 @@
 // Luna exposes version: 4.0.0-SNAPSHOT
 declare module 'luna' {
-  import type { DefineComponent, SlotsType, InjectionKey, Ref } from 'vue';
-  import type RouteLocationRaw from 'vue-router';
+  import type { ComputedRef, DefineComponent, InjectionKey, Ref, SlotsType } from 'vue';
+  import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
+  import type { AxiosResponse } from 'axios';
+  import type { SortableEvent } from 'sortablejs';
+  import type { Emitter } from 'mitt';
+
+  export type { Emitter } from 'mitt';
+
+  export const AssignStrategy: { readonly LEAD: "lead"; readonly AUTHOR: "author" };
+  export const ColorStrategy: { readonly Priority: "priority"; readonly Query: "queryString" };
+  export const ISSUE_PERMS: readonly ["edit", "assign", "transit", "move", "delete", "create_attachments", "create_comments", "create_worklogs", "create_issues", "view_watchers", "manage_watchers", "browse_workflow", "edit_all_comments", "edit_own_comments", "delete_all_comments", "delete_own_comments", "delete_all_attachments", "delete_own_attachments", "edit_all_worklogs", "edit_own_worklogs", "delete_all_worklogs", "delete_own_worklogs"];
+  export const IconSize: { readonly ORIGINAL: "original"; readonly SMALL: "32x32"; readonly MEDIUM: "64x64"; readonly LARGE: "128x128"; readonly X_LARGE: "256x256" };
+  export const IconType: { readonly ISSUE_TYPE: "issuetypes"; readonly PRIORITY: "priorities"; readonly PROJECT: "projects"; readonly AVATAR: "users" };
+  export const SprintState: { readonly NEW: "new"; readonly ACTIVE: "active"; readonly COMPLETE: "complete" };
+  export const StatusCategoryKey: { readonly TODO: "todo"; readonly IN_PROGRESS: "in_progress"; readonly DONE: "done" };
+
+  export class BundleI18N implements I18N {
+    strings: Ref<Record<string, string>>;
+    locale: Ref<string>;
+    supportedLocales: Array<string>;
+    loader: (locale: string) => Promise<Record<string, string>>;
+    constructor(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>);
+    loadMessages(locale: string): Promise<void>;
+    t(text: string, ...args: Array<string|number>): string;
+    p(text: string, params: {gender: 'male'|'female'}, ...args: Array<string|number>): string;
+  }
 
   export const BusyIconComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, SlotsType<{}>>;
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {},
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ButtonBusy: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       type?: "button" | "submit" | "reset"
       busy?: boolean
       disabled?: boolean
-    }, {}, {}, SlotsType<{
-      default: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
   export const LoadOverlayComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       absolute?: boolean
       dim?: boolean
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const PagePaginator: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'setPage': [_page: number]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'setPage'(_page: number): void
+    },
+    'setPage',
+    {
       busy?: boolean
       compact?: boolean
       page?: number
       maxItems?: number
       limit?: number
       total: number
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const PopoverComponent: DefineComponent<
-    {},{
+    {},
+    {
       toggle: (event: MouseEvent, target?: HTMLElement) => void
       show: (event: MouseEvent, target?: HTMLElement) => void
       hide: () => void
       active: boolean
-    }, {}, {}, {}, {}, {}, {
-      'hide': []
-    }, {}, {
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'hide'(): void
+    },
+    'hide',
+    {
       closeButton?: boolean
       prefferedAlign?: ALIGN[]
       group?: string
-    }, {}, {}, SlotsType<{
-      default: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
   export const StatusComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       name?: string
       category?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const TogglePanel: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'toggle': [_state: boolean]
-      'show': []
-    }, {}, {
-      hideActions?: boolean
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'toggle'(_state: boolean): void
+      'show'(): void
+    },
+    'toggle' | 'show',
+    {
+      hideActionsOnCollapse?: boolean
       initState?: boolean
+      hideActionsOnHover?: boolean
       title?: string
+      description?: string
       storeKey?: string
-    }, {}, {}, SlotsType<{
-      actions: any,
-      default: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      actions: any
+      default: any
+    }>
+  >;
   export const UserAvatarComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       size?: IconSize
       user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const UserLinkComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
-      user?: User
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
+      showIcon?: boolean
+      user?: UserValueDto
       label?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const BaseDialog: DefineComponent<
-    {},{
+    {},
+    {
       show: () => void
       hide: () => void
-    }, {}, {}, {}, {}, {}, {
-      'closed': []
-    }, {}, {
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'closed'(): void
+    },
+    'closed',
+    {
       busy?: boolean
       showClose?: boolean
-    }, {}, {}, SlotsType<{
-      header: any,
-      default: any,
-      footer: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      header: any
+      default: any
+      footer: any
+    }>
+  >;
   export const ButtonsGroupComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       max?: number
       moreLabel?: string
       maxWidth?: number
       zIndex?: number
       group?: string
       options: DropDownGroupOption[]
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const DropDownButton: DefineComponent<
-    {},{
+    {},
+    {
       show: () => Promise<void>
       hide: () => void
       active: boolean
-    }, {}, {}, {}, {}, {}, {}, {}, {
-      fixed?: boolean
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       busy?: boolean
       disabled?: boolean
       maxWidth?: number
       zIndex?: number | "auto"
       toggleIcon?: boolean
+      fixed?: boolean
       align?: "left" | "right" | "auto"
       cacheOptions?: boolean
       offset?: { x: number; y: number; }
       group?: string
       options: DropDownGroupOption[] | OptionsGetterSync | OptionsGetterAsync
       layerClass?: string
-    }, {}, {}, SlotsType<{
-      default: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
   export const DropDownLayer: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'clicked': [_option: DropDownOption, _event: MouseEvent]
-    }, {}, {
-      fixed?: boolean
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'clicked'(_option: DropDownOption, _event: MouseEvent): void
+    },
+    'clicked',
+    {
       busy?: boolean
       prefferedAlign?: "left" | "right"
       maxWidth?: number
       zIndex?: number
+      fixed?: boolean
       align?: "left" | "right" | "auto"
       options?: DropDownGroupOption[]
       parentPosition?: ElemRect
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const DropDownLayerItem: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       option?: DropDownOption
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const CheckBoxesComponent: DefineComponent<
-    {},{
+    {},
+    {
       focusTerm: () => void
       addValue: (opt: T) => void
       delValue: (optId: string | number) => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-      'remove': [value: string | number]
-      'update:modelValue': [value: (string | number)[]]
-    }, {}, {
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'select'(value: T): void
+      'remove'(value: string | number): void
+      'update:modelValue'(value: (string | number)[]): void
+    },
+    'select' | 'remove' | 'update:modelValue',
+    {
       optionGroups: OptionsGroup<T>[]
       valueKey?: keyof T
       disabled?: boolean
@@ -150,102 +368,230 @@ declare module 'luna' {
       emitsOnly?: boolean
       maxHeight?: string
       modelValue?: (string | number)[]
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ColorPickerDialog: DefineComponent<
-    {},{
+    {},
+    {
       show: (colorValue: string, elementValue: HTMLElement) => void
-    }, {}, {}, {}, {}, {}, {
-      'update': [_color: string]
-    }, {}, {}, {}, {}, SlotsType<{}>>;
+      colorHex: string
+      visible: boolean
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update'(_color: string): void
+    },
+    'update',
+    {
+      manualInput?: boolean
+      manualInputPlaceholder?: string
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ColorPickerInput: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    {
       modelValue?: string
-    }, {}, {}, SlotsType<{
-      default: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
   export const ColorPickerLayer: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: HSV]
-    }, {}, {
+    {},
+    {
+      layer: HTMLDivElement
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: HSV): void
+    },
+    'update:modelValue',
+    {
       modelValue?: HSV
       field?: HTMLElement
       origValue?: HSV
-    }, {}, {}, SlotsType<{
-      default: any,
-      footer: any,
-    }>>;
+    },
+    {},
+    {},
+    SlotsType<{
+      default: any
+      footer: any
+    }>
+  >;
   export const DateTimePicker: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    {
       disabled?: boolean
       withTime?: boolean
       modelValue?: string
       placeholder?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const IconSelector: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    {
       type: IconType
       modelValue?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const MultiSelect: DefineComponent<
-    {},{
+    {},
+    {
       addValue: (opt: T) => void
-      delValue: (optId: string | number) => void
+      delValue: (optId: T[K]) => void
       showLayer: () => void
       hideLayer: () => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-      'remove': [value: string | number]
-      'create': [value: string]
-      'update:modelValue': [value: (string | number)[]]
-    }, {}, {
-      options: T[] | OptionsFunc<T>
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'select'(value: T): void
+      'remove'(value: T[K]): void
+      'create'(value: string): void
+      'update:modelValue'(value: T[K][]): void
+    },
+    'select' | 'remove' | 'create' | 'update:modelValue',
+    {
+      options: T[] | OptionsFunc<T, K>
       modelData?: T[]
       showIcons?: boolean
       minTagLen?: number
       suggestionKey?: keyof T
+      tagLabel?: (term: string) => string
       labelKey?: keyof T
-      valueKey?: keyof T
+      valueKey?: keyof T & K
       id?: string
       cropSuggestions?: boolean
       iconRadius?: string
       missingIconLiteralKey?: keyof T
-      modelValue?: (string | number)[]
-    }, {}, {}, SlotsType<{}>>;
+      modelValue?: T[K][]
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const QsInput: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-      'update:error': [value: string]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: string): void
+      'update:error'(value: string): void
+    },
+    'update:modelValue' | 'update:error',
+    {
       disabled?: boolean
+      maxResult?: number
       modelValue?: string
       error?: string
-    }, {}, {}, SlotsType<{}>>;
+      initFunc?: () => Promise<QsFormData>
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const QsViewer: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       qs?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SingleSelect: DefineComponent<
-    {},{
+    {},
+    {
       setValue: (opt: T) => void
       showLayer: () => void
       hideLayer: () => void
-    }, {}, {}, {}, {}, {}, {
-      'select': [value: T]
-      'create': [value: string]
-      'update:modelValue': [value: string | number]
-    }, {}, {
-      options: T[] | OptionsFunc<T>
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'select'(value: T): void
+      'create'(value: string): void
+      'update:modelValue'(value: T[K]): void
+    },
+    'select' | 'create' | 'update:modelValue',
+    {
+      options: T[] | OptionsFunc<T, K>
       modelData?: T
       showIcons?: boolean
       minTagLen?: number
+      tagLabel?: (term: string) => string
       suggestionKey?: keyof T
-      valueKey?: keyof T
+      valueKey?: keyof T & K
       labelKey?: keyof T | ((item: T) => string)
       name?: string
       cropSuggestions?: boolean
@@ -257,54 +603,119 @@ declare module 'luna' {
       enableClear?: boolean
       suggestionsWidth?: string
       id?: string
-      modelValue?: string | number
-    }, {}, {}, SlotsType<{}>>;
+      modelValue?: T[K]
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SliderTrack: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: number]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: number): void
+    },
+    'update:modelValue',
+    {
       max?: number
       min?: number
       step?: number
       modelValue?: number
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SortableList: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update': [value: T[]]
-      'moved': [optionId: string | number, prevOptionId: string | number]
-      'deleted': [option: T]
-      'update:modelValue': [value: T[]]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update'(value: T[]): void
+      'moved'(optionId: T["id"], prevOptionId: T["id"]): void
+      'deleted'(option: T): void
+      'update:modelValue'(value: T[]): void
+    },
+    'update' | 'moved' | 'deleted' | 'update:modelValue',
+    {
       modelValue: T[]
       showIcons?: boolean
       removable?: boolean
       emitsOnly?: boolean
       busy?: boolean
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SortableSelect: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update': [_value: T[]]
-      'update:modelValue': [value: T[]]
-    }, {}, {
-      modelValue: T[]
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update'(_value: T[]): void
+      'update:modelValue'(value: T[]): void
+    },
+    'update' | 'update:modelValue',
+    {
       showIcons?: boolean
       options: T[] | OptionsFunc<T>
-    }, {}, {}, SlotsType<{}>>;
+      modelValue?: T[]
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SuggestionIconComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       option: T
       missingIconLiteralKey: keyof T
       iconRadius?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SuggestionsComponent: DefineComponent<
-    {},{
+    {},
+    {
       focusNext: (event?: KeyboardEvent) => void
       updatePosition: () => void
-    }, {}, {}, {}, {}, {}, {
-      'hide': []
-      'select': [value: T]
-      'create': [value: string]
-    }, {}, {
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'hide'(): void
+      'select'(value: T): void
+      'create'(value: string): void
+    },
+    'hide' | 'select' | 'create',
+    {
       suggestions: T[]
       showIcons?: boolean
       term?: string
@@ -316,402 +727,181 @@ declare module 'luna' {
       iconRadius?: string
       missingIconLiteralKey?: keyof T
       width?: string
-    }, {}, {}, SlotsType<{}>>;
+      tagLabel?: (term: string) => string
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const MarkdownEditor: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: string]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    {
       modelValue?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const MarkdownViewer: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       value?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ProgressBar: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       busy?: boolean
-      value?: number
       total?: number
-    }, {}, {}, SlotsType<{}>>;
+      value?: number
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ProgressComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
-      value: number
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       total: number
-    }, {}, {}, SlotsType<{}>>;
+      value: number
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ImageViewer: DefineComponent<
-    {},{
+    {},
+    {
       show: (imagesData: ImageItem[], idx?: number) => void
-    }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {},
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const CopyToBufferButton: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {}, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    string,
+    {
       value?: string
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const ToggleComponent: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'update:modelValue': [value: boolean]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'update:modelValue'(value: boolean): void
+    },
+    'update:modelValue',
+    {
       busy?: boolean
       disabled?: boolean
       manual?: boolean
       id?: string
       modelValue?: boolean
-    }, {}, {}, SlotsType<{}>>;
+    },
+    {},
+    {},
+    SlotsType<{}>
+  >;
   export const SortableTable: DefineComponent<
-    {},{}, {}, {}, {}, {}, {}, {
-      'updated': [_event: SortableEvent]
-      'changed': [_event: SortableEvent]
-    }, {}, {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      'updated'(_event: SortableEvent): void
+      'changed'(_event: SortableEvent): void
+    },
+    'updated' | 'changed',
+    {
       group?: string
-    }, {}, {}, SlotsType<{
-      header: any,
-      default: any,
-      footer: any,
-    }>>;
-  export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
-  export const RouteNames: {
-        home: "home",
-        dashboard: "dashboard",
-        navigator: "navigator",
-        bulkAction: "bulkAction",
-        bulkActionProgress: "bulkActionProgress",
-        projects: "projects",
-        project: {
-            project: "project",
-            summary: "projectSummary",
-            issues: "projectIssues",
-            activity: "projectActivity",
-            reports: "projectReports",
-            settings: {
-                settings: "projectSettings",
-                summary: "projectSettingsSummary",
-                details: "projectSettingsDetails",
-                issueTypes: "projectSettingsIssueTypes",
-                users: "projectSettingsUsers",
-                schemas: "projectSettingsSchemas",
-                delete: "projectSettingsDelete",
-            },
-        },
-        login: "login",
-        logout: "logout",
-        profile: "profile",
-        searchFilters: "searchFilters",
-        issue: "issue",
-        agile: {
-            boards: "agileBoards",
-            view: "agileBoardView",
-            backlog: "agileBoardBacklog",
-            reports: "agileBoardReports",
-            settings: "agileBoardSettings",
-        },
-        admin: {
-            admin: "admin",
-            users: {
-                users: "adminUsers",
-                list: "adminUserList",
-                user: "adminUser",
-                roles: "adminUserRoles",
-            },
-            groups: "adminGroups",
-            issueTypes: "adminIssueTypes",
-            issueTypeSchemas: "adminIssueTypeSchemas",
-            priorities: "adminPriorities",
-            prioritySchemas: "adminPrioritySchemas",
-            statuses: "adminStatuses",
-            workflows: "adminWorkflows",
-            workflowSchemas: "adminWorkflowSchemas",
-            projects: "adminProjects",
-            projectRoles: "adminProjectRoles",
-            customFields: "adminCustomFields",
-            screens: "adminScreens",
-            screenSchemas: "adminScreenSchemas",
-            issueTypeScreenSchemas: "adminIssueTypeScreenSchemas",
-            permissionSchemas: "adminPermissionSchemas",
-            outgoingMailServers: "adminOutgoingMailServers",
-            outgoingMailQueue: "adminOutgoingMailQueue",
-            incomingMailServers: "adminIncomingMailServers",
-            messageHandlers: "adminMessageHandlers",
-            notificationSchemas: "adminNotificationSchemas",
-            fieldLayouts: "adminFieldLayouts",
-            fieldLayoutSchemas: "adminFieldLayoutSchemas",
-            globalPermissions: "adminGlobalPermissions",
-            properties: "adminProperties",
-            systemInfo: "adminSystemInfo",
-            plugins: "adminPlugins",
-            scheduler: "adminScheduler",
-            issueLinkTypes: "adminIssueLinkTypes",
-            directories: "adminDirectories",
-            indexing: "adminIndexing",
-            backup: "adminBackup",
-            projectImport: "adminProjectImport",
-            logging: "adminLogging",
-            ranking: "adminRanking",
-            docs: "adminDocs",
-            license: "adminLicense",
-            icons: "adminIcons",
-            eventTypes: "adminEventTypes",
-            mailTester: "adminMailTester",
-        },
-        maintenance: "maintenance",
-    }
-  export const Injections: {
-    $notify: InjectionKey<NotifyComponentInterface>,
-    project: InjectionKey<Ref<Project>>,
-    board: InjectionKey<Ref<Board>>,
-    workflowAction: InjectionKey<Ref<WorkflowAction>>,
-    workflowFuncType: InjectionKey<Ref<WorkflowFunctionType>>,
-    workflowActionFunc: InjectionKey<Ref<WorkflowFunctionDescriptor>>,
-    metaIssue: InjectionKey<Ref<MetaIssue>>,
-  }
-  export const $bus: Emitter<BusEvents>
-  export interface NotifyComponentInterface {
-      info: (title: string, body?: string, closable?: boolean) => void;
-      warn: (title: string, body?: string, closable?: boolean) => void;
-      ok: (title: string, body?: string, closable?: boolean) => void;
-      error: (title: string, body?: string, closable?: boolean) => void;
-  }
-  export interface I18N {
-      loadMessages(locale: string): Promise<void>,
-      supportedLocales: Array<string>,
-      t(text: string, ...args: Array<string|number>): string,
-      p(text: string, params: Record<string, any>, ...args: Array<string|number>): string,
-  }
-  export interface Errors {
-      [key: string]: string
-  }
-  export interface Emitter<Events extends Record<EventType, unknown>> {
-      all: EventHandlerMap<Events>;
-      on<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void;
-      on(type: '*', handler: WildcardHandler<Events>): void;
-      off<Key extends keyof Events>(type: Key, handler?: Handler<Events[Key]>): void;
-      off(type: '*', handler: WildcardHandler<Events>): void;
-      emit<Key extends keyof Events>(type: Key, event: Events[Key]): void;
-      emit<Key extends keyof Events>(type: undefined extends Events[Key] ? Key : never): void;
-  }
-  export declare type EventType = string | symbol;
-  export declare type EventHandlerMap<Events extends Record<EventType, unknown>> = Map<keyof Events | '*', EventHandlerList<Events[keyof Events]> | WildCardEventHandlerList<Events>>;
-  export declare type EventHandlerList<T = unknown> = Array<Handler<T>>;
-  export declare type Handler<T = unknown> = (event: T) => void;
-  T = any
-  export declare type WildCardEventHandlerList<T = Record<string, unknown>> = Array<WildcardHandler<T>>;
-  export declare type WildcardHandler<T = Record<string, unknown>> = (type: keyof T, event: T[keyof T]) => void;
-  export type BusEvents = {
-      'issue.updated': {issue: Issue, fields?: Array<string>, initiator?: string},
-      'issue.created': {issue: Issue, initiator?: string},
-      'issue.deleted': {issue: Issue},
-      'issue.worklog.created': {worklog: Worklog},
-      'issue.worklog.updated': {worklog: Worklog},
-      'issue.attachment.added': {issueKey: string, attachments: Array<Attachment>, initiator: string},
-      'action.create_comment': {issue: Issue},
-      'action.create_link': {issueKey: string, initiator?: string},
-      'action.move_issue': {issue: Issue, initiator?: string},
-      'action.edit_issue': {issueKey: string, fields?: Array<string>, initiator?: string},
-      'action.assign_issue': {issue: Issue, fields?: Array<string>, initiator?: string},
-      'action.delete_issue': {issue: Issue, initiator?: string},
-      'action.transit_issue': {issueKey: string, actionId: number, showDialog: boolean, fields?: Array<string>, initiator?: string},
-      'action.edit_worklog': {issueKey: string, worklog: Worklog},
-      'action.create_worklog': {issueKey: string},
-      'action.edit_field': {issueKey: string, fieldId: string},
-      'action.custom': {name: string, issue?: Issue, initiator?: string, params: Record<string, string>},
-      // workflow
-      'workflow.edit_condition': {condGroup: WorkflowActionConditionGroup},
-      'workflow.remove_condition': {condGroup: WorkflowActionConditionGroup},
-      'workflow.add_condition': {condGroup: WorkflowActionConditionGroup},
-      // user
-      'user.login.required': {resolve?: (user: UserProfile) => void, reject?: () => void},
-      'user.self.updated': {user: UserProfile},
-      // size
-      'site.theme.switched': {theme: 'dark'|'light'}
-  
-      // project
-      'project.updated': {project: ProjectWithSchemas},
-  
-      // filters
-      'search_filter.deleted': {searchFilterId: number}
-  
-      // popovers
-      'popover.show': {event: MouseEvent, group: string, target?: Element, id: string},
-  }
-  export interface Issue extends IssueInfo {
-      parent?: IssueInfo,
-      projectId: number,
-      assignee?: User,
-      author?: User,
-      project: Project,
-      priority?: Priority,
-      estimate?: string,
-      timeLeft?: string,
-      timeSpent?: string,
-      estimateValue?: number,
-      timeLeftValue?: number,
-      timeSpentValue?: number,
-      priorityId?: number,
-      status: Status,
-      statusId: number,
-      summary: string,
-      description: string,
-      created: string,
-      updated: string,
-      color?: string,
-      sprint?: Sprint,
-      rank?: string,
-      labels?: Array<Label>,
-      watchers?: WatchersInfo,
-      fields?: {
-          [key: string]: FieldValue
-      },
-      issuePerms: IssuePerms,
-      [key: string]: any
-  }
-  export interface IssueInfo extends IssueKey {
+    },
+    {},
+    {},
+    SlotsType<{
+      header: any
+      default: any
+      footer: any
+    }>
+  >;
+
+  export const $i18n: typeof BundleI18N;
+  export const $notify: NotifyComponentInterface;
+  export const $bus: Emitter<BusEvents>;
+  export const RouteNames: { readonly home: "home"; readonly dashboard: "dashboard"; readonly navigator: "navigator"; readonly bulkAction: "bulkAction"; readonly bulkActionProgress: "bulkActionProgress"; readonly projects: "projects"; readonly project: { readonly project: "project"; readonly summary: "projectSummary"; readonly issues: "projectIssues"; readonly activity: "projectActivity"; readonly reports: "projectReports"; readonly settings: { readonly settings: "projectSettings"; readonly summary: "projectSettingsSummary"; readonly details: "projectSettingsDetails"; readonly schemas: "projectSettingsSchemas"; readonly users: "projectSettingsUsers"; readonly permissions: "projectSettingsPermissions"; readonly issueTypes: "projectSettingsIssueTypes"; readonly notifications: "projectSettingsNotifications"; readonly priorities: "projectSettingsPriorities"; readonly indexing: "projectSettingsIndexing"; readonly delete: "projectSettingsDelete" } }; readonly login: "login"; readonly logout: "logout"; readonly profile: "profile"; readonly searchFilters: "searchFilters"; readonly issue: "issue"; readonly agile: { readonly boards: "agileBoards"; readonly view: "agileBoardView"; readonly backlog: "agileBoardBacklog"; readonly reports: "agileBoardReports"; readonly settings: "agileBoardSettings" }; readonly admin: { readonly admin: "admin"; readonly users: { readonly users: "adminUsers"; readonly list: "adminUserList"; readonly user: "adminUser"; readonly roles: "adminUserRoles" }; readonly groups: "adminGroups"; readonly issueTypes: "adminIssueTypes"; readonly issueTypeSchemas: "adminIssueTypeSchemas"; readonly priorities: "adminPriorities"; readonly prioritySchemas: "adminPrioritySchemas"; readonly statuses: "adminStatuses"; readonly workflows: "adminWorkflows"; readonly workflowSchemas: "adminWorkflowSchemas"; readonly projects: "adminProjects"; readonly archivedProjects: "adminArchivedProjects"; readonly projectRoles: "adminProjectRoles"; readonly customFields: "adminCustomFields"; readonly screens: "adminScreens"; readonly screenSchemas: "adminScreenSchemas"; readonly issueTypeScreenSchemas: "adminIssueTypeScreenSchemas"; readonly permissionSchemas: "adminPermissionSchemas"; readonly outgoingMailServers: "adminOutgoingMailServers"; readonly outgoingMailQueue: "adminOutgoingMailQueue"; readonly incomingMailServers: "adminIncomingMailServers"; readonly messageHandlers: "adminMessageHandlers"; readonly notificationSchemas: "adminNotificationSchemas"; readonly themes: "adminThemes"; readonly fieldLayouts: "adminFieldLayouts"; readonly fieldLayoutSchemas: "adminFieldLayoutSchemas"; readonly globalPermissions: "adminGlobalPermissions"; readonly properties: "adminProperties"; readonly systemInfo: "adminSystemInfo"; readonly plugins: "adminPlugins"; readonly scheduler: "adminScheduler"; readonly issueLinkTypes: "adminIssueLinkTypes"; readonly directories: "adminDirectories"; readonly indexing: "adminIndexing"; readonly backup: "adminBackup"; readonly projectImport: "adminProjectImport"; readonly logging: "adminLogging"; readonly ranking: "adminRanking"; readonly docs: "adminDocs"; readonly license: "adminLicense"; readonly icons: "adminIcons"; readonly eventTypes: "adminEventTypes"; readonly mailTester: "adminMailTester"; readonly cluster: "adminCluster" }; readonly maintenance: "maintenance" };
+  export const Injections: { issueKey: InjectionKey<Ref<string, string>>; selectedIssues: InjectionKey<ComputedRef<Array<IssueDto>>>; project: InjectionKey<Ref<ProjectInfoDto, ProjectInfoDto>>; board: InjectionKey<Ref<BoardDto, BoardDto>>; workflowAction: InjectionKey<Ref<WorkflowActionDto, WorkflowActionDto>>; workflowFuncType: InjectionKey<Ref<WorkflowFunctionType, WorkflowFunctionType>>; workflowActionFunc: InjectionKey<Ref<WorkflowFunctionDescriptorDto, WorkflowFunctionDescriptorDto>>; };
+  export const projectService: ProjectService;
+  export const issueTypeService: IssueTypeService;
+  export const queryService: QueryService;
+  export const fieldService: FieldService;
+  export const issueEventService: IssueEventService;
+
+  export interface AttachmentDto {
       id: number,
-      summary: string,
-      issueType: IssueType,
-      issueTypeId: number,
-      status: Status,
-      priority?: Priority,
-  }
-  export interface IssueType {
-      id: number,
-      name: string,
-      subtask?: boolean,
-      description?: string,
-      iconPath: string,
-      iconUrl: string,
-  }
-  export interface Status {
-      id: number,
-      name: string,
-      description: string|null,
-      category: StatusCategory,
-      categoryKey: string,
-  }
-  export interface StatusCategory {
-      key: StatusCategoryEnum,
-      name: string,
-  }
-  export enum StatusCategoryEnum {
-      TODO = "todo",
-      IN_PROGRESS = "in_progress",
-      DONE = "done",
-  }
-  export interface Priority {
-      id: number,
-      name: string,
-      description?: string,
-      iconPath?: string,
-      iconUrl?: string,
-      position: number
-  }
-  export interface User {
-      id: number
-      directoryId: number,
-      externalId: string,
-      login: string
-      email: string
-      name: string
-      lastName?: string | null
-      displayName: string | null
-      groups?: Array<string>,
-      locale: string,
-      iconPath?: string,
-      iconUrl?: string,
-      gender: 'male'|'female',
-      active: boolean,
-  }
-  export interface Project {
-      id: number,
-      key: string,
-      name: string,
-      description?: string,
-      iconPath?: string,
-      iconUrl?: string,
-      canAdminProject: boolean,
-      created: string,
-      lead: User,
-      leadId?: number,
-      assignStrategy: AssignStrategy,
-  }
-  export enum AssignStrategy {
-      LEAD = "lead",
-      AUTHOR = "author",
-  }
-  export interface Sprint {
-      id: number;
-      name: string;
-      author: User,
-      authorId: number;
-      goal: string;
-      boardId: number,
-      displayName: string,
-      state: SprintState,
-      active: boolean,
-      complete: boolean,
-      startDate: string,
-      finishDate: string,
-      activatedDate: string,
-      completedDate: string,
-      auditEntries: Array<SprintAuditEntry>
-  }
-  export enum SprintState {
-      NEW = 'new',
-      ACTIVE = 'active',
-      COMPLETE = 'complete',
-  }
-  export interface SprintAuditEntry {
-      id: number,
-      author: User,
-      authorId: number,
-      state: SprintState,
-      created: string,
-  }
-  export interface Label {
-      id: number,
-      name: string,
-  }
-  export interface WatchersInfo {
-      count: number,
-      watching: boolean,
-  }
-  export type FieldValue = string | null | undefined | object | Array<string>
-  export interface IssuePerms {
-      canEditIssue: boolean,
-      canAssignIssue: boolean,
-      canTransitIssue: boolean,
-      canMoveIssue: boolean,
-      canDeleteIssue: boolean,
-      canCreateComments: boolean,
-      canEditOwnComments: boolean,
-      canEditAllComments: boolean,
-      canDeleteAllComments: boolean,
-      canDeleteOwnComments: boolean,
-      canCreateAttachments: boolean,
-      canDeleteAllAttachments: boolean,
-      canDeleteOwnAttachments: boolean,
-      canCreateWorklogs: boolean,
-      canEditAllWorklogs: boolean,
-      canEditOwnWorklogs: boolean,
-      canDeleteAllWorklogs: boolean,
-      canDeleteOwnWorklogs: boolean,
-      canViewWatchers: boolean,
-      canManageWatchers: boolean,
-      canCreateIssues: boolean,
-  }
-  export interface Worklog {
-      id: number,
-      author: User,
-      authorId: number,
-      created: string
-      updater: User|null,
-      updaterId: number|null,
-      updated: string|null,
-      startDate: string,
-      timeSpent: string,
-      comment: string|null,
-  }
-  export interface Attachment {
-      id: number,
-      authorId: number,
-      author: User,
+      author: UserInfoDto,
       created: string,
       fileName: string,
       fileUrl: string,
@@ -720,256 +910,69 @@ declare module 'luna' {
       thumbName: string,
       thumbUrl: string,
   }
-  export interface WorkflowActionConditionGroup {
-      id: string,
-      condition: WorkflowActionFunction | null,
-      items: Array<WorkflowActionConditionGroup> | null,
-      operator: ConditionOperator,
+  export interface BaseOption {
+      //name: string;
+      [key: string]: any;
   }
-  export interface WorkflowActionFunction extends WorkflowFunctionDescriptor {
-      id: string,
-      params: null | WorkflowFunctionParams,
-      viewParams: null | WorkflowFunctionViewParams,
-  }
-  export interface WorkflowFunctionParams {
-      [key: string]: string
-  }
-  export interface WorkflowFunctionViewParams {
-      [key: string]: any
-  }
-  export type ConditionOperator = "and" | "or";
-  export interface UserProfile extends User {
-      activity: UserActivity,
-      admin: boolean,
-      viewUsers: boolean,
-  }
-  export interface UserActivity {
-      dashboardId: number|null,
-      navigatorQs: string | null,
-      navigatorFilterId: number | null,
-      navigatorColumnIds: Array<string>,
-      lastVisitedIssuesIds: Array<number>,
-      lastVisitedProjectIds: Array<number>,
-      navigatorColumns: Array<IssueField>,
-      lastVisitedFilterIds: Array<number>,
-      lastVisitedFilters: Array<SearchFilter>,
-      lastVisitedBoardIds: Array<number>,
-      favoriteFilterIds: Array<number>,
-      favoriteBoardIds: Array<number>,
-  }
-  export interface IssueField {
-      id: string,
-      name: string,
-      description?: string
-      fieldTypeKey: string
-      fieldTypeName: string,
-      editComponent?: string,
-      editComponents?: Array<string>,
-      viewComponent?: string,
-      viewComponents?: Array<string>,
-      navigatorComponent?: string,
-      navigatorComponents?: Array<string>,
-      optionsComponent?: string,
-      searcherKey: string
-      searcherName: string,
-      valid: boolean,
-      systemField: boolean,
-      contexts?: Array<IssueFieldContext>,
-      options?: Array<Option<number>>,
-  }
-  export interface IssueFieldContext {
+  export interface BoardColumnDto {
       id: number,
       name: string,
-      description?: string,
-      projectIds?: Array<number>,
-      issueTypeIds?: Array<number>,
-      projects?: Array<Project>,
-      issueTypes?: Array<IssueType>,
-      defaultValue?: FieldValue,
-      options?: Array<Option<number>>,
+      statusIds: Array<number>,
   }
-  export interface Option<T> {
-      id: T,
-      name: string,
-      iconUrl?: string,
-      altName?: string,
+  export interface BoardDto extends BoardInfoDto {
+      filterId: number,
+      columns: Array<BoardColumnDto>,
+      filters: Array<BoardFilterDto>,
+      rankField: IssueFieldInfoDto,
+      cardColorStrategy?: ColorStrategy,
+      cardColorPreset?: CardColorPresetDto,
+      cardExtraFieldShowNames: boolean,
+      cardExtraFieldIds: Array<string>,
+      cardExtraFields: Array<IssueFieldInfoDto>,
+      detailViewFieldIds: Array<string>,
+      detailViewFields: Array<IssueFieldInfoDto>,
+      doneLimitDays: number,
+      activeSprints: Array<SprintInfoDto>,
   }
-  export interface SearchFilter extends SharedObject {
+  export interface BoardFilterDto {
       id: number,
       name: string,
       description: string,
       queryString: string,
-      author: User,
-      authorId: number,
-      updateAuthorId?: number,
-      created: string,
-      updated?: string,
-  
   }
-  export interface ProjectWithSchemas extends Project {
-      issueTypeSchemaId: number | null,
-      resolutionSchemaId: number | null,
-      issueTypeScreenSchemaId: number | null,
-      fieldLayoutSchemaId: number | null,
-      fieldLayoutSchema: FieldLayoutSchema | null,
-      prioritySchemaId: number | null,
-      issueTypeSchema: IssueTypeSchema | null,
-      resolutionSchema: ResolutionSchema | null,
-      issueTypeScreenSchema: IssueTypeScreenSchema | null,
-      prioritySchema: PrioritySchema | null,
-      workflowSchemaId: number|null,
-      workflowSchema: WorkflowSchema|null,
-      permissionSchemaId: number|null,
-      permissionSchema: PermissionSchema|null,
-      notificationSchemaId: number|null,
-      notificationSchema: NotificationSchema|null,
-  }
-  export interface FieldLayoutSchema {
-      id: number,
-      name: string,
+  export interface BoardInfoDto extends BoardValueDto, SharedObjectDto {
       description: string,
-      defaultLayout: FieldLayout,
-      defaultLayoutId: number,
-      entries: Array<FieldLayoutSchemaEntry>
+      author: UserInfoDto,
   }
-  export interface FieldLayout {
+  export interface BoardValueDto {
       id: number,
       name: string,
-      description: string,
-      fieldLayoutItems: Array<FieldLayoutItem>
+      type: BoardType,
   }
-  export interface FieldLayoutItem {
-      fieldId: string,
-      field: IssueField,
-      required: boolean,
-  }
-  export interface FieldLayoutSchemaEntry {
-      issueType: IssueType,
-      fieldLayout: FieldLayout,
-  }
-  export interface IssueTypeSchema {
+  export interface CardColorDto {
       id: number,
-      name: string,
-      description?: string,
-      issueTypes: Array<IssueType>,
-      issueTypeIds: Array<number>,
+      value: string,
+      color: string,
   }
-  export interface ResolutionSchema {
-      id: number,
-      name: string,
-      description?: string,
-      resolutions: Array<Resolution>,
+  export interface CardColorPresetDto {
+      strategy: string,
+      colors: Array<CardColorDto>,
   }
-  export interface Resolution {
-      id: number,
-      name: string,
-      description?: string,
+  export interface ClauseValue {
+      value: string,
+      displayValue: string,
   }
-  export interface IssueTypeScreenSchema {
-      id: number,
-      name: string,
-      description?: string | null,
-      defaultScreenSchema: ScreenSchema,
-      defaultScreenSchemaId: number,
-      entries: {
-          [key: number]: ScreenSchema
-      },
-      assignedIssueTypesMap: {[key: number]: IssueType}
-  }
-  export interface ScreenSchema {
-      id: number,
-      name: string,
-      description?: string | null,
-      defaultScreen: Screen,
-      defaultScreenId: number,
-      createScreen?: Screen,
-      createScreenId?: number,
-      editScreen?: Screen,
-      editScreenId?: number,
-      viewScreen?: Screen,
-      viewScreenId?: number,
-  }
-  export interface Screen {
-      id: number,
-      name: string,
-      description: string,
-      tabs: Array<ScreenTab>
-  }
-  export interface ScreenTab {
-      id: number,
-      name: string,
-      fieldIds: Array<string>,
-      fields: Array<IssueField>,
-  }
-  export interface PrioritySchema {
-      id: number,
-      name: string,
-      description?: string,
-      priorities: Array<Priority>,
-  }
-  export interface WorkflowSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      defaultWorkflow: WorkflowSimple,
-      defaultWorkflowId: number,
-      entries: Array<WorkflowSchemaEntry>,
-      active: boolean,
-  }
-  export interface WorkflowSimple {
-      id: number,
-      name: string,
-      description: string|null,
-      originalId: number|null,
-  }
-  export interface WorkflowSchemaEntry {
-      issueType: IssueType,
-      workflow: WorkflowSimple,
-  }
-  export interface PermissionSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      permissionsMap: {
-          [key: string]: PermissionSchemaEntry
-      }
-  }
-  export interface PermissionSchemaEntry {
-      userIds: Array<number>,
-      groupNames: Array<string>,
-      projectRoleIds: Array<number>,
-      userFieldIds: Array<string>,
-  }
-  export interface NotificationSchema {
-      id: number,
-      name: string,
-      description: string|null,
-      notificationsMap: {
-          [key: string]: NotificationSchemaEntry
-      }
-  }
-  export interface NotificationSchemaEntry {
-      userIds: Array<number>,
-      groupNames: Array<string>,
-      projectRoleIds: Array<string>,
-      userFieldIds: Array<string>,
-  }
-  export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
-  export enum IconSize {
-      ORIGINAL = "original",
-      SMALL = "32x32",
-      MEDIUM = "64x64",
-      LARGE = "128x128",
-      X_LARGE = "256x256",
+  export interface DeleteResult {
+      count: number
   }
   export interface DropDownGroupOption {
-      id: string|number,
+      id: ID,
       label?: string;
       options: Array<DropDownOption>;
       className?: string,
   }
   export interface DropDownOption {
-      id: string|number,
+      id: ID,
       label: string;
       iconUrl?: string;
       iconTitle?: string;
@@ -983,23 +986,73 @@ declare module 'luna' {
       title?: string,
       selected?: boolean,
   }
-  export type OptionsGetterSync = () => DropDownGroupOption[]
-  export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
   export interface ElemRect {
     x: number,
     y: number,
     width: number,
     height: number
   }
-  export type HSV = { h: number, s: number, v: number, a?: number };
-  export enum IconType {
-      ISSUE_TYPE = "issuetypes",
-      PRIORITY = "priorities",
-      PROJECT = "projects",
-      AVATAR = "users",
+  export interface Errors {
+      [key: string]: string
   }
-  export type OptionsFunc<T> = (term: string | null, selected: Array<ID>) => Promise<Array<T>>;
-  export type ID = string|number;
+  export interface FieldLayoutSchemaDto extends FieldLayoutValueDto {
+      description: string,
+      defaultLayout: FieldLayoutValueDto,
+      entries: Array<FieldLayoutSchemaEntryDto>
+  }
+  export interface FieldLayoutSchemaEntryDto {
+      issueType: IssueTypeValueDto,
+      fieldLayout: FieldLayoutValueDto,
+  }
+  export interface FieldLayoutValueDto {
+      id: number,
+      name: string,
+      description: string,
+  }
+  export interface FieldSearcherDescriptorDto {
+      key: string,
+      name: string,
+      description?: string,
+  }
+  export interface FieldService {
+    getById: (id: string) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    getCustomFields: (includeBroken: boolean) => Promise<AxiosResponse<Array<IssueFieldInfoTypeDto>>>
+    getStatisticFields: () => Promise<AxiosResponse<Array<IssueFieldInfoDto>>>
+    getRankFields: () => Promise<AxiosResponse<Array<IssueFieldInfoDto>>>
+    getBulkEditableFields: () => Promise<AxiosResponse<Array<IssueFieldInfoDto>>>
+    getSystemFields: () => Promise<AxiosResponse<Array<IssueFieldInfoDto>>>
+    getAllFields: (includeBroken: boolean, force?: boolean) => Promise<AxiosResponse<Array<IssueFieldInfoTypeDto>>>
+    createCustomField: (name: string | null, description: string | null, fieldType: string | null) => Promise<AxiosResponse<IssueFieldDto>>
+    updateCustomField: (id: string, name: string | null, description?: string | null, searcher?: string | null) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    updateFieldRenders: (id: string, renders: Partial<IssueFieldDto>) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    deleteCustomField: (id: string) => Promise<AxiosResponse<DeleteResult>>
+    getFieldTypes: () => Promise<AxiosResponse<Array<FieldTypeDescriptorDto>>>
+    getFieldSearchers: (fieldId: string) => Promise<AxiosResponse<Array<FieldSearcherDescriptorDto>>>
+    createFieldContext: (fieldId: string, context: Partial<IssueFieldContextDto>) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    updateFieldContext: (fieldId: string, contextId: number, context: Partial<IssueFieldContextDto>) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    deleteFieldContext: (fieldId: string, contextId: number) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    getOptions: (fieldId: string, contextId: number) => Promise<AxiosResponse<Array<Option<number>>>>
+    createOption: (fieldId: string, contextId: number, option: Partial<Option<number>>) => Promise<AxiosResponse<Option<number>>>
+    updateOption: (fieldId: string, contextId: number, optionId: string, option: Partial<Option<number>>) => Promise<AxiosResponse<Option<number>>>
+    deleteOption: (fieldId: string, contextId: number, optionId: number) => Promise<AxiosResponse<DeleteResult>>
+    moveOption: (fieldId: string, contextId: number, optionId: number, prevOptionId: number | null) => Promise<AxiosResponse<Array<Option<number>>>>
+  }
+  export interface FieldTypeDescriptorDto {
+      key: string,
+      name: string,
+      description?: string,
+      iconUrl?: string,
+      navigatorComponents?: Array<string>,
+      viewComponents?: Array<string>,
+      formComponents?: Array<string>,
+  }
+  export interface I18N {
+      locale: Ref<string>,
+      loadMessages(locale: string): Promise<void>,
+      supportedLocales: Array<string>,
+      t(text: string, ...args: Array<string|number>): string,
+      p(text: string, params: Record<string, any>, ...args: Array<string|number>): string,
+  }
   export interface ImageItem {
     id: number,
     name: string,
@@ -1007,169 +1060,40 @@ declare module 'luna' {
     imageUrl: string,
     thumbUrl?: string,
   }
-  export interface ActivityStreamSearchQuery extends SearchQuery {
-      projectKey?: string
-      user?: string
-  }
-  export interface ActivityStreamItem {
-      issue: IssueInfo
-      activityStreamTitle: string
-      author: User
-      comment?: Comment
-      worklog?: Worklog
-      changeItems?: Array<ChangeItem>
-      attachments?: Array<Attachment>
-      date: string
-  }
-  export interface Comment {
+  export interface IssueDto {
       id: number,
-      author: User,
-      created: string,
-      updated?: string,
-      updater?: User,
-      text: string
-  }
-  export interface ChangeItem {
-      id: number,
-      fieldId: string,
-      fieldName: string,
-      oldStringValue: string,
-      newStringValue: string,
-  }
-  export interface ActivityStreamItemGrouped {
-      groupedUser: User
-      items: Array<ActivityStreamItem>
-  }
-  export enum ColorStrategy {
-      Priority = "priority",
-      Query = "queryString",
-  }
-  export interface Board extends SharedObject {
-      id: number,
-      name: string;
-      authorId: number,
-      author: User,
-      description: string,
-      type: 'kanban'|'scrum',
-      columns: Array<BoardColumn>,
-      filters: Array<BoardFilter>,
-      filterId: number,
-      rankField: IssueField,
-      rankFieldId: string,
-      cardColorStrategy: ColorStrategy,
-      cardColorPreset?: CardColorPreset,
-      cardExtraFieldIds: Array<string>,
-      cardExtraFields: Array<IssueField>,
-      detailViewFieldIds: Array<string>,
-      detailViewFields: Array<IssueField>,
-      doneLimitDays: number,
-      activeSprints: Array<Sprint>,
-  }
-  export interface BoardColumn {
-      id: number,
-      name: string,
-      color: string,
-      statusIds: Array<number>,
-  }
-  export interface BoardFilter {
-      id: number,
-      name: string,
-      description: string,
-      queryString: string,
-  }
-  export interface CardColorPreset {
-      strategy: ColorStrategy,
-      colors: Array<CardColor>,
-  }
-  export interface CardColor {
-      id: number,
-      value: string,
-      color: string,
-  }
-  export interface KanbanBoard extends Board {
-  
-  }
-  export interface ScrumBoard extends Board {
-  
-  }
-  export interface BacklogResponse {
-      backlogIssues: SearchResult<Issue>,
-      sprintIssues: Array<Issue>,
-  }
-  export interface SearchResult<T> {
-      total: number,
-      results: Array<T>,
-      page: number,
-      limit: number,
-  }
-  export interface BoardIssues {
-      issues: Array<Issue>,
-      total: number,
-      limit: number,
-  }
-  export interface BoardSearchQuery extends SearchQuery {
-      type?: 'kanban'|'scrum';
-      author?: Array<string>;
-      favorite?: 1|0,
-  }
-  export interface SprintReportResponse {
-      sprint: Sprint,
-      board: Board,
-      issuesMap: Record<string, IssueInfo>,
-      chartData: Array<ChartData>,
-      statusCategoryMap: Record<string, StatusCategory>,
-  }
-  export interface ChartData {
-      value: string,
-      chartValues: Array<ChartValue>,
-  }
-  export interface ChartValue {
-      dateValue: number,
-      date: string,
-      count: number,
-  }
-  export interface LoginResponse {
-      user?: User,
-      error?: string
-  }
-  export interface Dashboard {
-      id: number,
-      name: string,
-      description: string,
-      author: User,
-      sharedForGroups: Array<string>,
-      sharedForUserIds: Array<number>,
-      widgets: Array<DashboardWidget>,
-  }
-  export interface DashboardWidget extends WidgetPosition {
-      id: number,
-      widgetDescriptor: DashboardWidgetDescriptor,
-      params: WidgetParams,
-  }
-  export interface DashboardWidgetDescriptor {
       key: string,
-      name: string,
-      description: string,
-      previewImageUrl: string,
-      viewComponent: string,
-      editComponent: string,
+      summary?: string,
+      issueType?: IssueTypeValueDto,
+      project?: ProjectValueDto,
+      parent?: IssueValueDto,
+      assignee?: UserValueDto,
+      author?: UserValueDto,
+      priority?: PriorityValueDto,
+      estimate?: string,
+      timeLeft?: string,
+      timeSpent?: string,
+      estimateValue?: number,
+      timeLeftValue?: number,
+      timeSpentValue?: number,
+      status?: StatusValueDto,
+      statusCategory?: StatusCategory,
+      description?: string,
+      created?: string,
+      updated?: string,
+      sprint?: SprintValueDto,
+      rank?: string,
+      labels?: Array<string>,
+      watchers?: WatchersInfo,
+      perms?: Array<IssuePermKey>,
+      color?: string,
+      [customField: `f${number}`]: FieldValue
   }
-  export type WidgetParams = {[key: string]: string}
-  export interface WidgetPosition {
-      columns: [number, number],
-      rows: [number, number],
-  }
-  export interface DeleteResult {
-      count: number
-  }
-  export interface ResponseError {
-      status: number,
-      reason: string,
-      errors: Errors
-  }
-  export interface MessageSet {
-      errorMessages: Array<string>
-      warningMessages: Array<string>
+  export interface IssueEventService {
+    getAll: (force?: boolean) => Promise<AxiosResponse<Array<IssueEventType>>>;
+    create: (name: string, description: string, baseEventTypeId: number) => Promise<AxiosResponse<IssueEventType>>;
+    update: (eventTypeId: number, name: string, description: string, baseEventTypeId: number) => Promise<AxiosResponse<IssueEventType>>;
+    delete: (eventTypeId: number) => Promise<AxiosResponse<DeleteResult>>;
   }
   export interface IssueEventType {
       id: number,
@@ -1178,429 +1102,170 @@ declare module 'luna' {
       baseEventTypeId: number,
       systemEvent: boolean,
   }
-  export interface IconKey {
-      key: string,
-      type: IconType,
-      format: IconFormat,
-      path: string,
-  }
-  export enum IconFormat {
-      SVG = "svg",
-      PNG = "png",
-  }
-  export interface Icon {
+  export interface IssueFieldContextDto {
       id: number,
-      key: IconKey,
-      fileName: string,
-      path: string,
-      url: string,
-  }
-  export interface BulkActionDescriptor {
-    key: string,
-    name: string,
-    description: string,
-    paramsComponent: string,
-    confirmComponent: string,
-  }
-  export interface BulkActionProgress {
-    taskId: string,
-    actionKey: string,
-    actionName: string,
-    actionDescription: string,
-    initiator: User,
-    startDate: string,
-    finishDate?: string,
-    progress: number,
-    progressMessage: string,
-    active: boolean,
-    duration: number,
-  }
-  export interface BulkActionRequest {
-    actionKey: string,
-    actionParams: any,
-    issueKeys: Array<string>,
-  }
-  export interface ExportModule {
-      key: string,
       name: string,
-      webComponent: string,
+      description: string,
+      projectIds: Array<number>,
+      issueTypeIds: Array<number>,
+      options: Array<Option<number>>
   }
-  export interface ExportParams {
-      moduleKey: string,
-      limit: number,
-      fields: Array<string>,
-      qs: string,
-      extraParams?: {[key: string]: string},
+  export interface IssueFieldContextResolvedDto extends IssueFieldContextDto {
+      projects: Array<ProjectInfoDto>,
+      issueTypes: Array<IssueTypeDto>,
+      defaultViewValue?: FieldValue,
+      defaultFormValue?: FieldValue,
+      formParams: any,
   }
-  export interface FieldTypeDescriptor {
-      key: string,
-      name: string,
-      description?: string,
-      iconUrl?: string,
-      navigatorComponents?: Array<string>,
+  export interface IssueFieldDto extends IssueFieldInfoTypeDto {
+      formComponents?: Array<string>,
       viewComponents?: Array<string>,
-      editComponents?: Array<string>,
+      navigatorComponents?: Array<string>,
+      optionsComponent?: string,
+      searcherKey: string
+      searcherName: string,
+      valid: boolean,
   }
-  export interface FieldSearcherDescriptor {
-      key: string,
+  export interface IssueFieldInfoDto {
+      id: keyof IssueDto,
       name: string,
+      description: string,
+      systemField: boolean,
+      viewComponent?: string,
+      navigatorComponent?: string,
+      formComponent?: string,
+  }
+  export interface IssueFieldInfoTypeDto extends IssueFieldInfoDto {
+      fieldTypeKey: string,
+      fieldTypeName: string,
+      searcherName: string,
+      valid: boolean,
+  }
+  export interface IssueFieldResolvedDto extends IssueFieldDto {
+      contexts: Array<IssueFieldContextResolvedDto>,
+  }
+  export interface IssueTypeDto extends IssueTypeValueDto {
+      iconPath: string,
+      description?: string
+  }
+  export interface IssueTypeSchemaDto extends IssueTypeScreenSchemaValueDto {
       description?: string,
+      issueTypes: Array<IssueTypeDto>,
   }
-  export interface ChangeGroup {
-      id: number,
-      author: User,
-      created: string,
-      changeItems: {[key: string]: ChangeItem},
+  export interface IssueTypeScreenSchemaDto extends IssueTypeScreenSchemaValueDto {
+      description?: string | null,
+      defaultScreenSchema: ScreenSchemaValueDto,
+      entries: {
+          [key: number]: ScreenSchemaValueDto
+      },
+      assignedIssueTypesMap: {[key: number]: IssueTypeValueDto}
   }
-  export interface PriorityAffectedSchemas {
-      priority: Priority,
-      prioritySchemas: Array<PrioritySchema>,
-  }
-  export interface IssueKey {
-      key: string
-      projectKey: string
-      issueNum: number
-  }
-  export interface IssueSearchResult extends SearchResult<Issue> {
-      fields: Array<IssueField>
-  }
-  export interface IssueLinkType {
+  export interface IssueTypeScreenSchemaValueDto {
       id: number,
       name: string,
-      incomingName: string,
-      outgoingName: string,
   }
-  export interface IssueLink {
-      id: number,
-      issueLinkTypeId: number,
-      issueLinkType: IssueLinkType,
-      sourceIssueId: number,
-      sourceIssue: Issue,
-      targetIssueId: number,
-      targetIssue: Issue,
+  export interface IssueTypeService {
+    create: (name: string | null, description: string | null, subtask: boolean, iconPath?: string | null) => Promise<AxiosResponse<IssueTypeDto>>
+    update: (id: number, name: string | null, description?: string | null, iconPath?: string | null) => Promise<AxiosResponse<IssueTypeDto>>
+    getById: (id: number) => Promise<AxiosResponse<IssueTypeDto>>
+    search: (params: SearchQuery, excludes?: Array<number>) => Promise<AxiosResponse<SearchResult<IssueTypeDto>>>
+    getAll: () => Promise<AxiosResponse<Array<IssueTypeDto>>>
+    delete: (id: number) => Promise<AxiosResponse<DeleteResult>>
+    getSchema: (id: number) => Promise<AxiosResponse<IssueTypeSchemaDto>>
+    searchSchemas: (params: SearchQuery, excludes?: Array<number>) => Promise<AxiosResponse<SearchResult<IssueTypeSchemaDto>>>
+    createSchema: (name?: string | null, description?: string | null, issueTypes?: Array<number>) => Promise<AxiosResponse<IssueTypeSchemaDto>>
+    updateSchema: (id: number, name?: string | null, description?: string | null, issueTypes?: Array<number>) => Promise<AxiosResponse<IssueTypeSchemaDto>>
+    deleteSchema: (id: number) => Promise<AxiosResponse<DeleteResult>>
   }
-  export interface IssueLinkRequest {
-      issueLinkTypeId: string,
-      sourceIssueKeys?: Array<String>
-      targetIssueKeys?: Array<String>
-  }
-  export interface MetaIssueField {
-      id: string,
-      name: string,
-      description?: string,
-      required: boolean,
-      value: FieldValue,
-      viewComponent: string,
-      editComponent: string,
-      editable: boolean,
-  }
-  export interface MetaIssueTab {
+  export interface IssueTypeValueDto {
       id: number,
       name: string,
-      fields: Array<MetaIssueField>,
-  }
-  export interface MetaIssueAction {
-      name: string,
-      actionId: number,
-      screenId: number,
-      targetStatusId: number,
-  }
-  export interface MetaIssue {
-      tabs: Array<MetaIssueTab>,
-      issue?: Issue,
-      peopleFields: Array<MetaIssueField>,
-      dateFields: Array<MetaIssueField>,
-      systemFields: Array<string>,
-      actions: Array<MetaIssueAction>,
-      actionName: string|null,
-      perms: IssuePerms,
-      project: Project,
-      issueType: IssueType,
-      requiredFields: Array<string>,
-      descriptionField: MetaIssueField,
-      priorityField: MetaIssueField,
-      labelField: MetaIssueField,
-      subtaskTypes: Array<IssueType>,
-      customActions: Array<WebNode>,
-  }
-  export interface WebNode {
-      id: number,
-      name: string,
-      routeName: string,
-      eventName: string,
-      routeParams: {[key: string]: string},
-      routeQuery: {[key: string]: string},
+      subtask?: boolean,
       iconUrl: string,
-      iconTitle: string,
-      hint: string,
-      children: Array<WebNode>,
-      section: boolean,
   }
-  export interface IssueMoveResponse {
-      project: Project,
-      issueType: IssueType,
-      fields: Array<MetaIssueField>,
-      issue: Issue,
+  export interface IssueValueDto {
+      id: number,
+      key: string,
+      summary: string,
+      iconTypeUrl: string,
   }
-  export type QueryOperator = '=' | '!=' | '~' | '!~' | 'is' | 'not is' | '>' | '>=' | '<' | '<=';
-  export interface QueryParseError {
-      line: number,
-      position: number,
-      message: string
+  export interface NotificationSchemaValueDto {
+      id: number,
+      name: string,
+      description: string|null,
+  }
+  export interface NotifyComponentInterface {
+      info: (title: string, body?: string, closable?: boolean) => void;
+      warn: (title: string, body?: string, closable?: boolean) => void;
+      ok: (title: string, body?: string, closable?: boolean) => void;
+      error: (title: string, body?: string, closable?: boolean) => void;
+  }
+  export interface Option<T extends ID> {
+      id: T,
+      name: string,
+      iconUrl?: string,
+      altName?: string,
+  }
+  export interface OptionsGroup<T extends BaseOption> {
+      id: ID,
+      label?: string,
+      options: Array<T>
   }
   export interface ParseResult {
       valid: boolean,
       errorMessage: string | null,
       errors: Array<QueryParseError>
   }
-  export interface ClauseValue {
-      value: string,
-      displayValue: string,
-  }
-  export interface QueryFunction {
-      functionName: string,
-      list: boolean,
-      valueType: string,
-      clauseValueType: string,
-      minimumRequiredArguments: boolean,
-  }
-  export interface QuerySearcher {
-      id: string,
-      name: string,
-      nameQs: string,
-      valueType: string,
-      allowedOperators: Array<QueryOperator>,
-      supportBasicSearch: boolean,
-  }
-  export interface QuerySorter {
-      id: string,
-      name: string,
-  }
-  export interface SearcherRepresentation {
-      id: string,
-      name: string,
-      qsFragment: string,
-      viewLabel: string,
-      editComponent: string,
-      formValue: any,
-  }
-  export interface QueryRepresentation {
-      valid: boolean,
-      searchers: Array<SearcherRepresentation>,
-  }
-  export interface TimeSheerReportRequest {
-      projectOrFilter: string|number,
-      startDate?: string,
-      finishDate?: string,
-  }
-  export interface TimeSheetIssueRow {
-      issue: IssueInfo,
-      values: Record<string, string>
-      total: string,
-  }
-  export interface TimeSheetCol {
-      id: string,
-      name: string,
-      title: string,
-      iconUrl: string,
-  }
-  export interface TimeSheetIssueReportResponse {
-      rows: Array<TimeSheetIssueRow>;
-      columns: Array<TimeSheetCol>;
-      totalTimeSpent: string;
-      totals: Record<string, string>;
-  }
-  export interface StatisticsGroup {
-      id: string,
-      label: string,
-      iconUrl?: string,
-      count: number,
-      qs: string
-  }
-  export interface StatisticsGroupResult {
-      keys: Array<string>,
-      groups: Array<StatisticsGroup>,
-      issueField: IssueField,
-      totalCount: number,
-  }
-  export interface AffectedSchemas {
-    issueTypeSchemas: Array<IssueTypeSchema>
-    workflowSchemas: Array<WorkflowSchema>
-    issueTypeScreenSchemas: Array<IssueTypeScreenSchema>
-    fieldLayoutSchemas: Array<FieldLayoutSchema>
-  }
-  export interface ScreenSchemaAffectedSchemas {
-      screenSchema: ScreenSchema,
-      issueTypeScreenSchemas: Array<IssueTypeScreenSchema>,
-  }
-  export interface SearchFilterQueryParams extends SearchQuery {
-      author?: Array<number>,
-      favorite?: 0|1,
-  }
-  export interface WorkflowFunction {
-      name: string,
-      description: string,
-      className: string,
-      allowMultiple: boolean,
-  }
-  export interface WorkflowFunctionDescriptor extends WorkflowFunction {
-      viewComponent: string | null,
-      editComponent: string | null,
-  }
-  export type WorkflowFunctionType = 'postfunction' | 'validator' | 'condition';
-  export interface WorkflowAction {
-      id: number,
-      name: string,
-      sourceStatusIds: Array<number>,
-      targetStatusId: number,
-      screenId: number|null,
-      screen: Screen|null,
-      validators: Array<WorkflowActionFunction>,
-      conditions: WorkflowActionConditionGroup,
-      postfunctions: Array<WorkflowActionFunction>,
-  }
-  export interface Workflow extends WorkflowSimple {
-      statuses: Array<Status>,
-      display: {
-          statusPositionMap: {
-              [kay: number]: Position
-          },
-          canvasPosition: Position,
-          actionPorts: {
-              [key: number]: {
-                  left: NodePort,
-                  right: NodePort,
-              }
-          },
-      },
-      createAction: WorkflowAction,
-      actions: Array<WorkflowAction>,
-      author: User | null,
-      updater: User | null,
-      created: string | null,
-      updated: string | null,
-  }
-  export interface Position {
-      x: number,
-      y: number,
-  }
-  export interface NodePort {
-      nodeId: number,
-      direction: Direction|null,
-      index: number,
-  }
-  export type Direction = 'left' | 'right' | 'top' | 'bottom';
-  export interface WorkflowSchemaSimple {
+  export interface PermissionSchemaValueDto {
       id: number,
       name: string,
       description: string|null,
-      workflowIds: Array<number>,
   }
-  export interface WorkflowSearchResult extends SearchResult<WorkflowSimple> {
-      drafts: Array<WorkflowSimple>,
-      schemas: Array<WorkflowSchemaSimple>,
+  export interface PriorityDto extends PriorityValueDto {
+      iconPath?: string,
+      position: number
   }
-  export interface Directory {
-      id: number
-      name: string,
-      description: string,
-      directoryTypeKey: string,
-      directoryType: DirectoryType,
-      attributes: DirectoryAttributes,
-      active: boolean,
-      position: number,
+  export interface PrioritySchemaDto extends PrioritySchemaValueDto {
+      description?: string,
+      priorities: Array<PriorityDto>,
   }
-  export interface DirectoryType {
-      key: string,
-      name: string,
-      description: string,
-      webComponent: string,
-  }
-  export type DirectoryAttributes = {[key: string]: string};
-  export interface Group {
+  export interface PrioritySchemaValueDto {
       id: number,
       name: string,
   }
-  export interface IncludedBy {
-      user: boolean,
-      groups: Array<string>,
+  export interface PriorityValueDto {
+      id: number,
+      name: string,
+      description: string,
+      iconUrl: string,
   }
-  export interface ProjectRoleMap {
-      projectId: number;
-      projectName: string;
-      projectKey: string;
-      rolesMap: Record<number, IncludedBy>
+  export interface ProjectDto extends ProjectInfoDto {
+      lead: UserValueDto,
+      created: string,
+      iconPath?: string,
+      assignStrategy: AssignStrategy,
+      canAdmin: boolean,
   }
-  export interface UserProjectRoles {
-      user: User,
+  export interface ProjectInfoDto extends ProjectValueDto {
+      description?: string,
+      archived?: boolean,
+      archivedDate?: string,
+  }
+  export interface ProjectMembersDto {
       projectRoles: Array<ProjectRole>,
-      projectRoleMaps: Array<ProjectRoleMap>,
+      usersMap: {
+          [key: number]: Array<UserInfoDto>
+      },
+      groupsMap: {
+          [key: number]: Array<string>
+      },
   }
   export interface ProjectRole {
       id: number,
       name: string,
       description?: string
   }
-  export interface UserActivityRequest {
-      navigatorColumnIds: Array<string>,
-      favoriteFilterIds: Array<number>,
-      unFavoriteFilterIds: Array<number>,
-      favoriteBoardIds: Array<number>,
-      unFavoriteBoardIds: Array<number>,
-  }
-  export interface PortPosition extends Position {
-      direction?: Direction|null,
-      index: number,
-  }
-  export interface Curve {
-      id: string,
-      sx: number,
-      sy: number,
-      sd?: Direction|null,
-      ex: number,
-      ey: number,
-      ed?: Direction|null,
-  }
-  export interface NodeModel {
-      id: number,
-      position: Position,
-      name: string,
-      startNode: boolean,
-      leftPorts: number,
-      topPorts: number,
-      rightPorts: number,
-      bottomPorts: number,
-  }
-  export interface NodeLink {
-      id: string,
-      name: string,
-      source: NodePort,
-      target: NodePort,
-  }
-  export interface WorkflowLink extends NodeLink {
-      actionId: number,
-  }
-  export interface BaseOption {
-      name: string;
-      [key: string]: any;
-  }
-  export interface ProgressStep {
-      id: string,
-      name: string,
-      description?: string,
-  }
-  export interface ProjectInfo {
-      id: number,
-      key: string,
-      name: string,
-      description: string,
-      iconPath: string,
-      iconUrl: string,
-  }
-  export interface ProjectWithIssueTypes extends Project {
-      issueTypes: Array<IssueType>
-  }
-  export interface ProjectWithSchemaIds extends Project {
+  export interface ProjectSchemasIds {
       issueTypeSchemaId: number | null,
       resolutionSchemaId: number | null,
       issueTypeScreenSchemaId: number | null,
@@ -1610,449 +1275,328 @@ declare module 'luna' {
       permissionSchemaId: number|null,
       notificationSchemaId: number|null,
   }
-  export interface ProjectMembers {
-      project: Project,
-      projectRoles: Array<ProjectRole>,
-      usersMap: {
-          [key: number]: Array<User>
-      },
-      groupsMap: {
-          [key: number]: Array<string>
-      },
+  export interface ProjectSearchQuery extends SearchQuery {
+      state?: 'active' | 'archived' | 'any'
   }
-  export interface ProjectTemplate {
+  export interface ProjectService {
+    create: (key: string | null, name: string | null, description?: string | null, iconPath?: string | null) => Promise<AxiosResponse<ProjectWithSchemas>>
+    patch: (key: string, data: Partial<ProjectWithSchemaIdsDto> & {leadId?: number}) => Promise<AxiosResponse<ProjectWithSchemas>>
+    get: (keyOrId: string|number) => Promise<AxiosResponse<ProjectDto>>
+    getWithSchemas: (key: string) => Promise<AxiosResponse<ProjectWithSchemas>>
+    getAll: () => Promise<AxiosResponse<Array<ProjectValueDto>>>
+    search: (params: ProjectSearchQuery, excludes?: Array<string|number>, isAdmin?: boolean) => Promise<AxiosResponse<SearchResult<ProjectInfoDto>>>
+    delete: (key: string) => Promise<AxiosResponse<DeleteResult>>
+    getMembers: (key: string) => Promise<AxiosResponse<ProjectMembersDto>>
+    addMembers: (key: string, roles: Array<number>, groups: Array<string>, users: Array<string>) => Promise<AxiosResponse<ProjectMembersDto>>
+    removeUser: (key: string, role: number, userName: string) => Promise<AxiosResponse<ProjectMembersDto>>
+    removeGroup: (key: string, role: number, groupName: string) => Promise<AxiosResponse<ProjectMembersDto>>
+    removeRole: (key: string, role: number) => Promise<AxiosResponse<ProjectMembersDto>>
+  }
+  export interface ProjectValueDto {
+      id: number,
+      key: string,
       name: string,
-      description: string,
       iconUrl: string,
   }
-  export interface ReportCategory {
+  export interface ProjectWithSchemaIdsDto extends ProjectDto, ProjectSchemasIds {}
+  export interface ProjectWithSchemas extends ProjectDto {
+      fieldLayoutSchema: FieldLayoutSchemaDto | null,
+      issueTypeSchema: IssueTypeSchemaDto | null,
+      issueTypeScreenSchema: IssueTypeScreenSchemaDto | null,
+      prioritySchema: PrioritySchemaDto | null,
+      workflowSchema: WorkflowSchemaDto | null,
+      permissionSchema: PermissionSchemaValueDto | null,
+      notificationSchema: NotificationSchemaValueDto | null,
+  }
+  export interface QsFormData {
+      searchers: Array<QuerySearcherDto>,
+      sorters: Array<QuerySorterDto>,
+      functions: Array<QueryFunctionDto>,
+  }
+  export interface QueryFunctionDto {
+      functionName: string,
+      value: string,
+      list: boolean,
+      valueType: string
+  }
+  export interface QueryParseError {
+      line: number,
+      position: number,
+      message: string
+  }
+  export interface QueryRepresentation {
+      valid: boolean,
+      searchers: Array<SearcherRepresentation>,
+      sorters: Array<SortRepresentationDto>,
+  }
+  export interface QuerySearcherDto {
       id: string,
       name: string,
+      nameQs: string,
+      valueType: string,
+      allowedOperators: Array<QueryOperator>,
+      supportBasicSearch: boolean,
   }
-  export interface Report {
-      id: string;
-      name: string;
-      category: ReportCategory;
-      description: string;
-      thumbnailUrl: string;
-      webComponent: string;
-      weight: number;
+  export interface QueryService {
+    parseQuery: (qs: string) => Promise<AxiosResponse<ParseResult>>
+    getQsData: () => Promise<AxiosResponse<QsFormData>>
+    getSuggestions: (fieldName: string, term: string | null, excludes: Array<string>) => Promise<AxiosResponse<Array<ClauseValue>>>
+    getSuggestionsForType: (valueType: string, term: string | null, excludes: Array<string>) => Promise<AxiosResponse<Array<ClauseValue>>>
+    transformQuery: (qs: string) => Promise<AxiosResponse<QueryRepresentation>>
+    transformSearcher: (fieldId: string, params: any) => Promise<AxiosResponse<SearcherRepresentation>>
   }
-  export interface SearchResultWithSchemas<T, S> extends SearchResult<T> {
-    schemas: Array<S>
+  export interface QuerySorterDto {
+      id: string,
+      name: string,
+      label: string,
   }
-  export interface ScreenSearchResult extends SearchResultWithSchemas<Screen, ScreenSchema> {
-      workflows: Array<Workflow>
+  export interface ResponseError {
+      status: number,
+      reason: string,
+      errors: Errors
+  }
+  export interface ScreenSchemaValueDto {
+      id: number,
+      name: string,
+  }
+  export interface ScreenValueDto {
+      id: number,
+      name: string,
+      description: string,
+  }
+  export interface SearchFilterValueDto {
+      id: number,
+      name: string,
+      queryString: string,
   }
   export interface SearchQuery extends LocationQueryRaw {
       term?: string,
       page?: number,
       limit?: number,
   }
-  export interface ScreenSearchQuery extends SearchQuery {
-      fieldIds?: Array<string>
+  export interface SearchResult<T> {
+      total: number,
+      results: Array<T>,
+      page: number,
+      limit: number,
   }
-  export interface UserSearchQuery extends SearchQuery {
-      directoryIds?: Array<string>,
-      groups?: Array<string>
+  export interface SearcherRepresentation {
+      id: string,
+      name: string,
+      qsFragment: string,
+      viewLabel: string,
+      formComponent: string,
+      formValue: any,
   }
-  export interface IssueSearchQuery extends SearchQuery {
-      filter?: number,
-      qs?: string,
-      fields?: Array<string>,
-      updateActivity?: 1|0,
-  }
-  export interface SearchQueryExt {
-      term?: string,
-      page?: number,
-      limit?: number,
-      excludes?: Array<string|number>
-  }
-  export interface ProjectOrFilter {
-      filterId?: string,
-      projectKey?: string
-  }
-  export interface ShareEntry  {
-      users: Array<User>;
+  export interface ShareEntryDto  {
+      users: Array<UserValueDto>;
       userIds: Array<number>;
       groupNames: Array<string>;
   }
-  export interface ApplicationProperties {
-      baseUrl: string,
-      applicationTitle: string,
-      defaultLocale: string,
-      indexingLocale: string,
+  export interface SharedObjectDto {
+      editAccess: boolean,
+      viewAccess: boolean,
+      viewPerms: ShareEntryDto,
+      editPerms: ShareEntryDto,
   }
-  export interface BackupTableStatus {
-    tableName: string,
-    totalRows: number,
-    completedRows: number,
-  }
-  export enum BackupPhase {
-    CALC = "calc",
-    BACKUP = "backup",
-    DONE = "done",
-    FAIL = "fail",
-    CANCELED = "canceled",
-  }
-  export interface BackupStatus {
-    startDate: string,
-    finishDate: string,
-    duration: number,
-    progress: number,
-    planningCompleteDate: string,
-    phase: BackupPhase,
-    totalRows: number,
-    completedRows: number,
-    filePath: string,
-    tableStatus: BackupTableStatus,
-    cancelled: boolean,
-    running: boolean,
-  }
-  export interface BackupStatusResponse {
-    status: BackupStatus,
-    backupDir: string
-  }
-  export interface OpenApiDoc {
-    url: string,
-    name: string,
-  }
-  export enum IndexingPhase {
-      CALC = 'calc',
-      INDEXING = 'indexing',
-      DONE = 'done',
-      FAIL = 'fail',
-  }
-  export interface IndexingStatus {
-      startDate: string,
-      finishDate: string,
-      duration: number,
-      total: number,
-      completed: number,
-      failures: number,
-      phase: IndexingPhase,
-      running: boolean,
-      progress: number,
-      planningCompleteDate: string,
-  }
-  export interface IndexingStats {
-      indexedIssuesCount: number,
-      storedIssuesCount: number,
-  }
-  export interface SystemInfo {
-    groups: Array<SystemInfoGroup>;
-  }
-  export interface SystemInfoGroup {
-    key: string,
-    label: string,
-    entries: Array<SystemInfoEntry>,
-  }
-  export interface SystemInfoEntry {
-    key: string,
-    label: string,
-    value: string,
-  }
-  export enum LicenceType {
-    DEVELOPMENT = 'development',
-    COMMERCIAL = 'commercial',
-    TRIAL = 'trial',
-  }
-  export interface LicenseDetails {
-    id: string,
-    serverId: string,
-    app: string,
-    type: LicenceType,
-    version: number,
-    startAt: string,
-    expiresAt: string,
-    userLimit: number,
-    current: boolean,
-    expired: boolean,
-  
-    customerName: string,
-    issuedAt: string,
-  }
-  export interface AppLicenseResponse {
-    licenses: Array<LicenseDetails>,
-    activeUserCount: number,
-  }
-  export interface LoggingEntry {
-    id: string,
-    packageName: string,
-    level: string,
-  }
-  export type MailEncryption = 'start_tls' | 'ssl_tls';
-  export interface IncomingMailServer {
-      id: number,
-      name: string,
-      description: string,
-      protocol: 'pop3' | 'imap',
-      encryption: MailEncryption | null,
-      disableCertVerification: boolean,
-      timeout: number,
-      host: string,
-      port: number,
-      login: string,
-      password: string,
-  }
-  export interface OutgoingMailServer {
-      id: number,
-      name: string,
-      description: string | null,
-      fromEmail: string,
-      subjectPrefix: string | null,
-      host: string,
-      port: number,
-      timeout: number,
-      encryption: MailEncryption | null,
-      disableCertVerification: boolean,
-      username: string,
-      password?: string,
-  }
-  export interface OutgoingMailServerRequest extends OutgoingMailServer {
-      subject: string,
-      to: string,
-      body: string,
-  }
-  export interface Mail {
-      subject: string,
-      from: string,
-      to: Array<string>,
-      body: string,
-      contentType: string,
-  }
-  export interface QueueMail extends Mail {
-      id: number,
-      mailServerId: number,
-      created: string,
-      state: string,
-      errorMessage: string,
-  }
-  export interface MessageHandlerFactory {
-      key: string,
-      name: string,
-      description: string,
-      webComponent: string,
-  }
-  export interface MessageHandlerModel {
-      id: number,
-      name: string,
-      description: string,
-      factory: MessageHandlerFactory,
-      factoryKey: string,
-      mailServer: IncomingMailServer,
-      mailServerId: number,
-      handlerParams: Record<string, string>,
-      delayMinutes: number,
-      folderName: string,
-      enabled: boolean,
-  }
-  export interface NotificationSchemaResolved extends NotificationSchema {
-      notificationsMap: {
-          [key: string]: NotificationSchemaEntryResolved
-      }
-  }
-  export interface NotificationSchemaEntryResolved extends NotificationSchemaEntry {
-      users: Array<User>,
-      projectRoles: Array<ProjectRole>,
-      userFields: Array<IssueField>,
-  }
-  export interface MailPreviewResponse {
-      duration: number,
-      eventTypeId: number,
-      subject: string,
-      html: string,
-  }
-  export interface Permission {
+  export interface SortRepresentationDto {
       id: string,
       name: string,
-      description: string|null,
+      asc: boolean,
+      label: string,
   }
-  export interface PermissionSchemaResolved extends PermissionSchema {
-      permissionsMap: {
-          [key: string]: PermissionSchemaEntryResolved
-      }
+  export interface SprintInfoDto extends SprintValueDto {
+      goal: string,
+      startDate: string,
+      displayName: string,
+      finishDate: string,
+      boardId: number,
   }
-  export interface PermissionSchemaEntryResolved extends PermissionSchemaEntry {
-      users: Array<User>,
-      projectRoles: Array<ProjectRole>,
-      userFields: Array<IssueField>,
+  export interface SprintValueDto {
+      id: number,
+      name: string,
+      state: SprintState,
   }
-  export interface GlobalPermissions {
-      adminGroups: Array<string>,
-      allowedLoginGroups: Array<string>,
-      allowedViewUsersGroups: Array<string>,
+  export interface StatusCategory {
+      key: StatusCategoryKey,
+      name: string,
   }
-  export interface SharedObject {
-      hasEditAccess: boolean,
-      hasViewAccess: boolean,
-      viewPerms: ShareEntry,
-      editPerms: ShareEntry,
+  export interface StatusValueDto {
+      id: number,
+      name: string,
+      categoryKey: StatusCategoryKey,
   }
-  export interface PluginModel {
-      key: string,
+  export interface UserActivityDto {
+      navigatorQs: string | null,
+      navigatorFilterId: number | null,
+      lastVisitedIssuesIds: Array<number>,
+      lastVisitedProjectIds: Array<number>,
+      navigatorColumns: Array<IssueFieldInfoDto>,
+      lastVisitedFilters: Array<SearchFilterValueDto>,
+      lastVisitedBoardIds: Array<number>,
+  }
+  export interface UserFavorites {
+      userId: number,
+      filterIds: Array<number>,
+      boardIds: Array<number>,
+  }
+  export interface UserInfoDto extends UserValueDto {
+      gender: Gender,
+  }
+  export interface UserProfileDto extends UserInfoDto {
+      activity: UserActivityDto,
+      favorites: UserFavorites,
+      admin: boolean,
+      name: string,
+      lastName: string,
+      locale: string,
+      dashboardId: number,
+      external: boolean,
+  }
+  export interface UserValueDto {
+      id: number,
+      login: string,
+      displayName: string,
+      email: string,
+      iconUrl: string,
+      active: boolean,
+      name: string,
+  }
+  export interface WatchersInfo {
+      count: number,
+  }
+  export interface WorkflowActionConditionGroup {
+      id: string,
+      condition: WorkflowActionFunction | null,
+      items: Array<WorkflowActionConditionGroup> | null,
+      operator: ConditionOperator,
+  }
+  export interface WorkflowActionDto extends WorkflowActionValueDto {
+      sourceStatusIds: Array<number>,
+      targetStatusId: number,
+      screen: ScreenValueDto|null,
+      validators: Array<WorkflowActionFunction>,
+      conditions: WorkflowActionConditionGroup,
+      postfunctions: Array<WorkflowActionFunction>,
+  }
+  export interface WorkflowActionFunction extends WorkflowFunctionDescriptorDto {
+      id: string,
+      params: null | WorkflowFunctionParams,
+      viewParams: null | WorkflowFunctionViewParams,
+  }
+  export interface WorkflowActionValueDto {
+      id: number,
+      name: string,
+      screenId: number|null,
+  }
+  export interface WorkflowFunctionDescriptorDto {
       name: string,
       description: string,
-      version: string,
-      vendor: PluginVendor,
-      enabled: boolean,
-      components: Array<PluginComponent>,
-      resources: Array<PluginResource>,
-      activeDocs: Array<string>
-  }
-  export interface PluginVendor {
-      name?: string,
-      url?: string,
-  }
-  export interface PluginComponent {
-      key: string,
-      name: string,
       className: string,
-      resources: Array<PluginResource>,
-      enabled: boolean,
+      allowMultiple: boolean,
+      viewComponent: string | null,
+      formComponent: string | null,
   }
-  export interface PluginResource {
-      pluginKey: string,
-      key: string,
-      type: 'comp'|'css'|'i18n'|'any',
-      path: string,
-      enabled: boolean,
-      resourceUrl: string,
-      mount?: 'admin' | 'general',
+  export interface WorkflowFunctionParams {
+      [key: string]: string
   }
-  export enum RankingPhase {
-    CALC = 'calc',
-    RANKING = 'ranking',
-    DONE = 'done',
+  export interface WorkflowFunctionViewParams {
+      [key: string]: any
   }
-  export interface RankingStatus {
-    startDate: string,
-    finishDate: string,
-    duration: number,
-    total: number,
-    completed: number,
-    phase: RankingPhase,
-    running: boolean,
-    planningCompleteDate: string,
-    progress: number,
-    rankField: IssueField,
+  export interface WorkflowSchemaDto extends WorkflowSchemaValueDto {
+      defaultWorkflow: WorkflowValueDto,
+      entries: Array<WorkflowSchemaEntryDto>,
+      active: boolean,
   }
-  export interface RankingStats {
-    issueField: IssueField,
-    missingCount: number,
+  export interface WorkflowSchemaEntryDto {
+      issueType: IssueTypeValueDto,
+      workflow: WorkflowValueDto,
   }
-  export interface BackupMetaProject {
-    id: number,
-    key: string,
-    name: string,
-    description: string,
-    issueCount: number,
-    parseResult?: ProjectParseResult,
+  export interface WorkflowSchemaValueDto {
+      id: number,
+      name: string,
+      description: string|null,
+      workflowIds: Array<number>,
   }
-  export interface ProjectParseResult {
-    startDate: string,
-    finishDate: string,
-    errors: Record<string, MessageSet>,
-    valid: boolean,
-    issueCount: number,
-    attachmentCount: number,
-    commentCount: number,
-    watcherCount: number,
-    worklogCount: number,
-    changeGroupCount: number,
-    changeItemCount: number,
+  export interface WorkflowValueDto {
+      id: number,
+      name: string,
+      description: string|null,
+      originalId: number|null,
   }
-  export interface BackupMeta {
-    backupName: string,
-    backupCRC32: number,
-    backupSize: number,
-    backupDate: string,
-    parseStartDate: string,
-    parseFinishDate: string,
-    projects: Array<BackupMetaProject>,
+  export interface WorklogDto {
+      id: number,
+      author: UserValueDto,
+      created: string
+      updater: UserValueDto|null,
+      updated: string|null,
+      startDate: string,
+      timeSpent: string,
+      comment: string|null,
   }
-  export interface ProjectImportResult {
-    startDate: string,
-    finishDate: string,
-    errors: Record<string, MessageSet>,
-    issueCount: number,
-    attachmentCount: number,
-    commentCount: number,
-    watcherCount: number,
-    worklogCount: number,
-    changeGroupCount: number,
-    changeItemCount: number,
-  }
-  export enum ProjectImportPhase {
-      IDLE = "idle",
-      ANALYZING = "analyzing",
-      VALIDATING = "validating",
-      IMPORTING = "importing",
-  }
-  export interface ProjectImportProgress  {
-    percent: number,
-    message: string,
-  }
-  export interface ProjectImportSession {
-    backupFile: string,
-    backupName: string,
-    phaseStartDate: string,
-    phaseFinishDate: string,
-    phaseProgress: ProjectImportProgress,
-    phase: ProjectImportPhase,
-    errors: Record<string, string>,
-    backupMeta: BackupMeta,
-    selectedProjectKey: string,
-    projectParseResult?: ProjectParseResult,
-    projectImportResult?: ProjectImportResult,
-  }
-  export interface RestoreInfoResponse {
-    importDirectory: string,
-  }
-  export interface Scheduler {
-    cronExpression?: string,
-    runOnce: boolean,
-    interval?: string,
-  }
-  export interface JobDetails {
-    jobId: string,
-    jobRunnerKey: string,
-    schedule: Scheduler,
-    prevRun: string,
-    nextRun: string,
-    running: boolean,
-  }
-  export interface JobRunnerResponse {
-    name: string,
-    description: string,
-    jobRunnerKey: string,
-    jobs: Array<JobDetails>,
-  }
-  export interface JobResult {
-    jobId: string,
-    jobRunnerKey: string,
-    startDate: string,
-    executionTime: number,
-    result: 'successful' | 'failed' | 'aborted',
-    message: string,
-    stackTrace: string,
-  }
-  export interface SystemState {
-      ok: boolean,
-      state: string,
-      progress?: number,
-      plannedCompleteDate?: string,
-  }
-  export interface NamedResponse {
-    id: number,
-    name: string,
-  }
-  export interface WebRoute {
-      routeName: string,
-      routePath: string,
-      componentUrl: string,
-      children: Array<WebRoute>,
-      parent: string,
-  }
-}
+  export type ALIGN = 'top' | 'left' | 'bottom' | 'right';
+  export type AssignStrategy = typeof AssignStrategy[keyof typeof AssignStrategy];
+  export type BoardType = 'kanban'|'scrum';
+  export type BusEvents = {
+      'issue.updated': {issue: IssueDto, fields?: Array<string>, initiator?: string},
+      'issue.created': {issue: IssueDto, initiator?: string},
+      'issue.deleted': {issue: IssueDto},
+      'issue.worklog.created': {worklog: WorklogDto},
+      'issue.worklog.updated': {worklog: WorklogDto},
+      'issue.attachment.added': {issueKey: string, attachments: Array<AttachmentDto>, initiator: string},
+      'action.create_comment': {issue: IssueDto},
+      'action.create_link': {issueKey: string, initiator?: string},
+      'action.move_issue': {issue: IssueDto, initiator?: string},
+      'action.edit_issue': {issueKey: string, fields?: Array<string>, initiator?: string},
+      'action.assign_issue': {issue: IssueDto, fields?: Array<string>, initiator?: string},
+      'action.delete_issue': {issue: IssueDto, initiator?: string},
+      'action.transit_issue': {issueKey: string, actionId: number, showDialog: boolean, fields?: Array<string>, initiator?: string, cb?: (issue: IssueDto) => void},
+      'action.edit_worklog': {issueKey: string, worklog: WorklogDto},
+      'action.create_worklog': {issueKey: string},
+      'action.edit_field': {issueKey: string, fieldId: string},
+      'action.custom': {name: string, issue?: IssueDto, initiator?: string, params: Record<string, string>},
+      // workflow
+      'workflow.edit_condition': {condGroup: WorkflowActionConditionGroup},
+      'workflow.remove_condition': {condGroup: WorkflowActionConditionGroup},
+      'workflow.add_condition': {condGroup: WorkflowActionConditionGroup},
+      // user
+      'user.login.required': {resolve?: (user: UserProfileDto) => void, reject?: () => void},
+      'user.self.updated': {user: UserProfileDto},
+      // size
+      'site.theme.switched': {theme: 'dark'|'light'}
 
+      // project
+      'project.updated': {project: ProjectWithSchemas},
+
+      // filters
+      'search_filter.deleted': {searchFilterId: number}
+
+      // popovers
+      'popover.show': {event: MouseEvent, group: string, target?: Element, id: string},
+
+      // panels
+      'panel.event': {event: MouseEvent, name: string, panelId: string, actionId: string},
+
+      // users
+      'user.panel.show': {loginOrId: string|number},
+  }
+  export type ColorStrategy = typeof ColorStrategy[keyof typeof ColorStrategy];
+  export type ConditionOperator = "and" | "or";
+  export type FieldValue = string | null | undefined | object | Array<string>;
+  export type Gender = 'male' | 'female';
+  export type HSV = { h: number, s: number, v: number, a?: number };
+  export type ID = string|number;
+  export type IconSize = typeof IconSize[keyof typeof IconSize];
+  export type IconType = typeof IconType[keyof typeof IconType];
+  export type IssuePermKey = typeof ISSUE_PERMS[number];
+  export type OptionsFunc<T extends BaseOption, K extends keyof T = 'id'> = (term: string | null, selected: Array<T[K]>) => Promise<Array<T>>;
+  export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
+  export type OptionsGetterSync = () => DropDownGroupOption[]
+  export type QueryOperator = '=' | '!=' | '~' | '!~' | 'is' | 'not is' | '>' | '>=' | '<' | '<=';
+  export type SprintState = typeof SprintState[keyof typeof SprintState];
+  export type StatusCategoryKey = typeof StatusCategoryKey[keyof typeof StatusCategoryKey];
+  export type WorkflowFunctionType = 'postfunction' | 'validator' | 'condition';
+
+  type K = any;
+  type T = any;
+}

@@ -1,4 +1,4 @@
-import { Directive } from "vue";
+import { type Directive } from "vue";
 
 interface LazyElement extends HTMLElement {
   _lazyTimer?: number;

@@ -1,6 +1,6 @@
-import { client } from "@/utils/client.ts";
-import { ListenerScript, ListenerScriptsResponse, ListenerScriptWithProjects } from "@/interfaces/listener.ts";
-import { DeleteResult } from "luna";
+import { client } from "@/utils/client";
+import type { ListenerScript, ListenerScriptsDto, ListenerScriptWithProjectsDto } from "@/interfaces/listener";
+import type { DeleteResult } from "luna";
 
 const ALLOWED_SCRIPT_KEYS: Array<keyof ListenerScript> = [
   'name',
@@ -22,16 +22,16 @@ const filterAllowedFields = (data: Partial<ListenerScript>): Partial<ListenerScr
 
 class ListenerService {
   getAll() {
-    return client.get<ListenerScriptsResponse>('/gravity/listener/scripts');
+    return client.get<ListenerScriptsDto>('/gravity/listener/scripts');
   }
 
   get(id: number) {
-    return client.get<ListenerScriptWithProjects>(`/gravity/listener/scripts/${id}`);
+    return client.get<ListenerScriptWithProjectsDto>(`/gravity/listener/scripts/${id}`);
   }
 
   patch(id: number, script: Partial<ListenerScript>) {
     script = filterAllowedFields(script);
-    return client.patch<ListenerScriptWithProjects>(`/gravity/listener/scripts/${id}`, script);
+    return client.patch<ListenerScriptWithProjectsDto>(`/gravity/listener/scripts/${id}`, script);
   }
 
   delete(id: number) {
@@ -40,7 +40,7 @@ class ListenerService {
 
   create(script: Partial<ListenerScript>) {
     script = filterAllowedFields(script);
-    return client.post<ListenerScriptWithProjects>(`/gravity/listener/scripts`, script);
+    return client.post<ListenerScriptWithProjectsDto>(`/gravity/listener/scripts`, script);
   }
 }
 

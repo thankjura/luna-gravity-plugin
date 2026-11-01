@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ResponseError } from "luna";
+import type { ResponseError } from "luna";
 
 export const baseURL = '/rest/plugin/ru.slie.luna.plugins.gravity';
 const axiosClient = axios.create({baseURL});

@@ -1,14 +1,21 @@
 import * as fs from "fs";
 import * as path from "path";
 
+const TARGET = path.join('.', 'src', 'locales', 'messages.ts');
 const SOURCE_DIR = path.join('.', 'src');
 const FILE_MASK = new RegExp(".*\\.(vue|ts)");
 const REGEX = new RegExp("\\$i18n\\.(?<type>[tp])\\(([\'\"])(?<message>.+?)\\2", 'g');
 
-const TARGET_DIR = path.join('.', 'src', 'locales');
+const TARGET_DIR = path.dirname(TARGET);
 
-const messages = [];
-const messagesMap = {};
+interface MessageRow {
+    key: string,
+    lines: Array<string>,
+    parameterized: boolean
+}
+
+const messages: Array<MessageRow> = [];
+const messagesMap: Record<string, MessageRow> = {};
 
 const findFiles = (directory: string, callback: (filename: string) => void) => {
     const files = fs.readdirSync(directory);
@@ -29,6 +36,8 @@ const findFiles = (directory: string, callback: (filename: string) => void) => {
 const parseLine = (filename: string, line: string, lineNum: number) => {
     const matches = line.matchAll(REGEX);
     for (const match of matches) {
+        if (!match.groups) continue;
+
         const type = match.groups['type'];
         const msg = match.groups['message'];
         const data = messagesMap[msg];
@@ -59,6 +68,10 @@ const fn = (filename: string) => {
 
 findFiles(SOURCE_DIR, fn);
 
+const escapeMessage = (value: string) => value
+    .replaceAll('\\', '\\\\')
+    .replaceAll('"', '\\"');
+
 const writeFile = (filePath: string, existsMessages?: {[key: string]: string}) => {
     const writer = fs.createWriteStream(filePath, {
         flags: 'w'
@@ -80,9 +93,9 @@ const writeFile = (filePath: string, existsMessages?: {[key: string]: string}) =
         }
         let translate = existsMessages[msgObj.key];
         if (translate) {
-            writer.write("  \"" + msgObj.key + "\": \"" + translate + "\",\n");
+            writer.write("  \"" + escapeMessage(msgObj.key) + "\": \"" + escapeMessage(translate) + "\",\n");
         } else {
-            writer.write("  \"" + msgObj.key + "\": \"\",\n");
+            writer.write("  \"" + escapeMessage(msgObj.key) + "\": \"\",\n");
         }
     }
 

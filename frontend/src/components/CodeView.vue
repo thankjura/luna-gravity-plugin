@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import type * as MonacoEditorType from 'monaco-editor';
-import { loadMonacoInstance } from "@/utils/monaco.ts";
-import { registerGroovyLanguageForMonaco } from "@/components/groovy.ts";
+import { loadMonacoInstance } from "@/utils/monaco";
+import { registerGroovyLanguageForMonaco } from "@/components/groovy";
 
 const props = defineProps({
   script: String,

@@ -1,26 +1,24 @@
 <script setup lang="ts">
-import { $i18n } from "@/utils/i18n.ts";
-import { inject, onMounted, ref } from "vue";
+import { $i18n } from "@/utils/i18n";
+import { onMounted, ref } from "vue";
 import {
-  ProjectInfo,
-  IssueEventType,
-  Errors,
+  type ProjectValueDto,
+  type IssueEventType,
+  type Errors,
   MultiSelect,
   ButtonBusy,
-  Injections,
-  ToggleComponent,
+  $notify,
+  ToggleComponent, projectService, issueEventService,
 } from 'luna';
-import { ListenerScript } from "@/interfaces/listener.ts";
-import { listenerService } from "@/services/listenerService.ts";
+import type { ListenerScript } from "@/interfaces/listener";
+import { listenerService } from "@/services/listenerService";
 import { useRoute, useRouter } from "vue-router";
-import { systemService } from "@/services/systemService.ts";
 import CodeEditor from "@/components/CodeEditor.vue";
 
 const busy = ref(false);
 const script = ref<Partial<ListenerScript>>({});
-const projects = ref<Array<ProjectInfo>>([]);
+const projects = ref<Array<ProjectValueDto>>([]);
 const eventTypes = ref<Array<IssueEventType>>([]);
-const $notify = inject(Injections.$notify);
 const route = useRoute();
 const router = useRouter();
 const scriptName = ref<string>();
@@ -84,12 +82,13 @@ const submit = () => {
   }
 }
 
-const projectOptions = (term: string|null, excludes?: Array<number>) => {
-  return systemService.projectSuggestions(term, excludes);
+const projectOptions = async (term: string|null, excludes?: Array<number>) => {
+  const { data } = await projectService.search({term}, excludes);
+  return data.results;
 }
 
 onMounted(() => {
-  systemService.getEventTypes().then((data) => {
+  issueEventService.getAll().then((data) => {
     eventTypes.value = data.data;
   })
   loadScript(route.params.id as string);

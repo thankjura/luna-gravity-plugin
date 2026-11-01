@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { BaseDialog } from "luna";
-import { WorkflowScript } from "@/interfaces/workflow.ts";
+import { type WorkflowScript } from "@/interfaces/workflow";
 import { ref, useTemplateRef } from "vue";
-import { $i18n } from "@/utils/i18n.ts";
-import { ComponentExposed } from "vue-component-type-helpers";
+import { $i18n } from "@/utils/i18n";
+import { type ComponentExposed } from "vue-component-type-helpers";
 import CodeEditor from "@/components/CodeEditor.vue";
 
 const workflowScript = ref<WorkflowScript>(null);

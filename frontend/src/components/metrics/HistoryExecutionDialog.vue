@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { BaseDialog, CopyToBufferButton } from "luna";
 import { ref, useTemplateRef } from "vue";
-import { ComponentExposed } from "vue-component-type-helpers";
-import { $i18n } from "@/utils/i18n.ts";
-import { ScriptRunResult } from "@/interfaces/metrics.ts";
+import { type ComponentExposed } from "vue-component-type-helpers";
+import { $i18n } from "@/utils/i18n";
+import type { ScriptRunResult } from "@/interfaces/metrics";
 
 const dialog = useTemplateRef<ComponentExposed<typeof BaseDialog>>('dialog');
 const results = ref<Array<ScriptRunResult>>();
@@ -76,14 +76,14 @@ defineExpose({
               <span class="label">{{ $i18n.t("Timing") }}</span>
             </div>
             <span class="description">{{ $i18n.t("Timing information related to this script execution. Elapsed measures the real world or «wall clock» duration of the execution whereas CPU time measures the amount of time the CPU was busy.") }}</span>
-            <span class="code-block">
+            <div class="code-block">
               <div>
                 {{ $i18n.t("Elapsed: {0} ms", results[selectedTab].executionTimeMs) }}
               </div>
               <div>
               {{ $i18n.t("CPU time: {0} ms", results[selectedTab].cpuTimeMs) }}
               </div>
-            </span>
+            </div>
           </div>
         </div>
       </div>

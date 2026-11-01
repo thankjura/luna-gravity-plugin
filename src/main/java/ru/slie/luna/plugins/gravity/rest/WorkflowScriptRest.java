@@ -14,15 +14,15 @@ import ru.slie.luna.issue.workflow.action.WorkflowActionValidator;
 import ru.slie.luna.issue.workflow.draft.WorkflowActionBuilder;
 import ru.slie.luna.issue.workflow.draft.WorkflowBuilder;
 import ru.slie.luna.permission.GlobalPermissionManager;
+import ru.slie.luna.plugins.gravity.dto.ProjectValueDto;
+import ru.slie.luna.plugins.gravity.dto.StatusValueDto;
+import ru.slie.luna.plugins.gravity.dto.WorkflowScriptsDto;
 import ru.slie.luna.plugins.gravity.model.WorkflowFunctionType;
 import ru.slie.luna.plugins.gravity.model.WorkflowScript;
 import ru.slie.luna.plugins.gravity.rest.request.WorkflowScriptStateRequest;
-import ru.slie.luna.plugins.gravity.rest.response.ProjectInfoImpl;
-import ru.slie.luna.plugins.gravity.rest.response.WorkflowScriptsResponse;
 import ru.slie.luna.plugins.gravity.script.ScriptManager;
 import ru.slie.luna.plugins.gravity.workflow.AbstractGravityFunction;
 import ru.slie.luna.project.Project;
-import ru.slie.luna.project.ProjectInfo;
 import ru.slie.luna.project.ProjectManager;
 import ru.slie.luna.security.AuthenticationContext;
 import ru.slie.luna.user.User;
@@ -57,12 +57,12 @@ public class WorkflowScriptRest {
     }
 
     @GetMapping("/scripts")
-    public WorkflowScriptsResponse getWorkflowScripts() {
+    public WorkflowScriptsDto getWorkflowScripts() {
         List<WorkflowScript> scripts = scriptManager.getWorkflowScripts();
         Map<String, Project> projectsMap = new HashMap<>();
         Map<Long, Set<String>> workflowProjectKeysMap = new HashMap<>();
         Map<Long, Set<String>> schemaProjectMap = new HashMap<>();
-        for (Project project : projectManager.getAll()) {
+        for (Project project : projectManager.getActiveProjects()) {
             if (project.getWorkflowSchemaId() == null) {
                 continue;
             }
@@ -83,7 +83,7 @@ public class WorkflowScriptRest {
             }
         }
 
-        Map<String, ProjectInfo> affectedProject = new HashMap<>();
+        Map<String, ProjectValueDto> affectedProject = new HashMap<>();
         Set<Long> statuses = new HashSet<>();
 
         for (WorkflowScript workflowScript: scripts) {
@@ -92,14 +92,14 @@ public class WorkflowScriptRest {
             if (workflowProjectKeysMap.containsKey(workflowScript.getWorkflowId())) {
                 for (String projectKey : workflowProjectKeysMap.get(workflowScript.getWorkflowId())) {
                     if (!affectedProject.containsKey(projectKey)) {
-                        affectedProject.put(projectKey, new ProjectInfoImpl(projectsMap.get(projectKey)));
+                        affectedProject.put(projectKey, new ProjectValueDto(projectsMap.get(projectKey)));
                     }
                 }
                 workflowScript.addProjectKeys(workflowProjectKeysMap.get(workflowScript.getWorkflowId()));
             }
         }
 
-        return new WorkflowScriptsResponse(scripts, affectedProject.values(), statusManager.getByIds(statuses));
+        return new WorkflowScriptsDto(scripts, affectedProject.values(), statusManager.getByIds(statuses).stream().map(StatusValueDto::new).toList());
     }
 
     @PostMapping("/scripts")

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
-import { computed, PropType, useTemplateRef } from "vue";
-import { ProjectInfo } from "luna";
-import { $i18n } from "@/utils/i18n.ts";
+import { computed, type PropType, useTemplateRef } from "vue";
+import { type ProjectValueDto } from "luna";
+import { $i18n } from "@/utils/i18n";
 import { PopoverComponent } from "luna";
-import { ComponentExposed } from "vue-component-type-helpers";
+import { type ComponentExposed } from "vue-component-type-helpers";
 
 const props = defineProps({
-  projects: Array as PropType<Array<ProjectInfo>>,
+  projects: Array as PropType<Array<ProjectValueDto>>,
   keys: Array as PropType<Array<string|number>>,
 });
 
@@ -15,7 +15,7 @@ const popover = useTemplateRef<ComponentExposed<typeof PopoverComponent>>('popov
 const button = useTemplateRef<HTMLButtonElement>('button');
 
 const projectsMap = computed(() => {
-  const out = {};
+  const out: Record<number|string, ProjectValueDto> = {};
   if (props.projects) {
     for (const project of props.projects) {
       out[project.id] = project;

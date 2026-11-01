@@ -1,4 +1,4 @@
-import type { IssueEventType, ProjectInfo } from "luna";
+import type { IssueEventType, ProjectInfoDto } from "luna";
 
 export interface ListenerScript {
   id: number,
@@ -11,13 +11,13 @@ export interface ListenerScript {
   enabled: boolean,
 }
 
-export interface ListenerScriptWithProjects extends ListenerScript {
-  projects: Array<ProjectInfo>;
+export interface ListenerScriptWithProjectsDto extends ListenerScript {
+  projects: Array<ProjectInfoDto>;
 }
 
-export interface ListenerScriptsResponse {
+export interface ListenerScriptsDto {
   scripts: Array<ListenerScript>,
-  projects: Array<ProjectInfo>,
+  projects: Array<ProjectInfoDto>,
   eventTypes: Array<IssueEventType>
 }
 

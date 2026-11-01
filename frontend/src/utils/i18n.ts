@@ -1,4 +1,4 @@
-import { I18N } from "luna";
+import { $i18n as I18N } from "luna";
 
 const loadI18N = async (locale: string) => {
   try {

@@ -1,22 +1,21 @@
-package ru.slie.luna.plugins.gravity.rest.response;
+package ru.slie.luna.plugins.gravity.dto;
 
 import ru.slie.luna.event.type.IssueEventType;
 import ru.slie.luna.plugins.gravity.model.ListenerScript;
 import ru.slie.luna.project.Project;
-import ru.slie.luna.project.ProjectInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListenerScriptsResponse {
+public class ListenerScriptsDto {
     private final List<ListenerScript> scripts;
     private final List<IssueEventType> eventTypes;
-    private final List<ProjectInfo> projects;
+    private final List<ProjectValueDto> projects;
 
-    public ListenerScriptsResponse(List<ListenerScript> scripts, List<IssueEventType> eventTypes, List<Project> projects) {
+    public ListenerScriptsDto(List<ListenerScript> scripts, List<IssueEventType> eventTypes, List<Project> projects) {
         this.scripts = scripts;
         this.eventTypes = eventTypes;
-        this.projects = projects.stream().map(ProjectInfoImpl::new).collect(Collectors.toList());
+        this.projects = projects.stream().map(ProjectValueDto::new).collect(Collectors.toList());
     }
 
     public List<ListenerScript> getScripts() {
@@ -27,7 +26,7 @@ public class ListenerScriptsResponse {
         return eventTypes;
     }
 
-    public List<ProjectInfo> getProjects() {
+    public List<ProjectValueDto> getProjects() {
         return projects;
     }
 }

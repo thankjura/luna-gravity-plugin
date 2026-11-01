@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, PropType, useTemplateRef, watch } from "vue";
+import { onBeforeUnmount, onMounted, type PropType, useTemplateRef, watch } from "vue";
 import type * as MonacoEditorType from 'monaco-editor';
 import {
   registerAutoCompleteService,
   registerGroovyLanguageForMonaco,
   registerSignatureHelpProvider
-} from "@/components/groovy.ts";
-import { loadMonacoInstance } from "@/utils/monaco.ts";
+} from "@/components/groovy";
+import { loadMonacoInstance } from "@/utils/monaco";
 
 const props = defineProps({
   disabled: Boolean,

@@ -5,28 +5,34 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
-    "build": "rm -rf node_modules/.vite_external && vue-tsc --build && vite build",
+    "build": "vue-tsc --build && vite build",
     "i18n": "ts-node generateI18nStrings.ts"
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.7.0",
-    "axios": "^1.17.0",
-    "chart.js": "^4.5.1",
-    "luxon": "^3.7.2",
-    "monaco-editor": "^0.53.0",
-    "vue": "^3.5.33",
-    "vue-router": "^5.0.4"
+    "monaco-editor": "^0.57.0"
   },
   "devDependencies": {
-    "@types/luxon": "^3.7.1",
-    "@vitejs/plugin-vue": "^6.0.6",
-    "sass": "^1.85.0",
-    "terser": "^5.46.0",
+    "@types/luxon": "^3.7.6",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
+    "axios": "^1.21.0",
+    "chart.js": "^4.6.1",
+    "luxon": "^3.7.2",
+    "sass": "^1.107.1",
+    "terser": "^5.51.2",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.2",
-    "vite": "^8.0.10",
-    "vite-plugin-external": "^6.2.2",
-    "vue-component-type-helpers": "^3.1.0",
-    "vue-tsc": "^3.1.0"
+    "typescript": "~6.0.3",
+    "vite": "^8.3.5",
+    "vue": "^3.5.44",
+    "vue-component-type-helpers": "^3.3.14",
+    "vue-router": "^5.4.0",
+    "vue-tsc": "^3.3.14"
+  },
+  "overrides": {
+    "dompurify": "^3.4.17"
+  },
+  "allowScripts": {
+    "@parcel/watcher": true
   }
 }

@@ -1,4 +1,4 @@
-import { ProjectInfo, Status, WorkflowFunctionType } from "luna";
+import type { ProjectValueDto, StatusValueDto, WorkflowFunctionType } from "luna";
 
 export interface WorkflowTransition {
   sourceStatuses: Array<number>,
@@ -21,9 +21,9 @@ export interface WorkflowScript {
   disabled: boolean,
 }
 
-export interface WorkflowScriptsResponse {
+export interface WorkflowScriptsDto {
   scripts: Array<WorkflowScript>,
-  projects: Array<ProjectInfo>,
-  statuses: Array<Status>,
+  projects: Array<ProjectValueDto>,
+  statuses: Array<StatusValueDto>,
 }
 

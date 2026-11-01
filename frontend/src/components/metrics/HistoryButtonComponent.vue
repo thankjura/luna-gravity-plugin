@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, PropType } from "vue";
-import { ScriptRunResult } from "@/interfaces/metrics.ts";
-import { $i18n } from "@/utils/i18n.ts";
+import { computed, type PropType } from "vue";
+import type { ScriptRunResult } from "@/interfaces/metrics.ts";
+import { $i18n } from "@/utils/i18n";
 
 const props = defineProps({
   results: Array as PropType<Array<ScriptRunResult>>,

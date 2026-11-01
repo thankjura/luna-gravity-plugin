@@ -8,8 +8,8 @@ import ru.slie.luna.event.type.IssueEventTypeManager;
 import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.plugins.gravity.model.ListenerScript;
 import ru.slie.luna.plugins.gravity.rest.request.ListenerScriptRequest;
-import ru.slie.luna.plugins.gravity.rest.response.ListenerScriptWithProjects;
-import ru.slie.luna.plugins.gravity.rest.response.ListenerScriptsResponse;
+import ru.slie.luna.plugins.gravity.dto.ListenerScriptWithProjectsDto;
+import ru.slie.luna.plugins.gravity.dto.ListenerScriptsDto;
 import ru.slie.luna.plugins.gravity.script.ScriptManager;
 import ru.slie.luna.project.ProjectManager;
 import tools.jackson.core.type.TypeReference;
@@ -33,33 +33,33 @@ public class ListenerScriptRest {
     }
 
     @GetMapping("/scripts")
-    public ListenerScriptsResponse getScripts() {
+    public ListenerScriptsDto getScripts() {
         List<ListenerScript> scriptList = scriptManager.getListenerScripts();
         Set<Long> projectIds = new HashSet<>();
         for (ListenerScript script: scriptList) {
             projectIds.addAll(script.getProjectIds());
         }
-        return new ListenerScriptsResponse(scriptList, eventTypeManager.getAll(), projectManager.getByIds(projectIds));
+        return new ListenerScriptsDto(scriptList, eventTypeManager.getAll(), projectManager.getByIds(projectIds));
     }
 
     @GetMapping("/scripts/{id}")
-    public ListenerScriptWithProjects getScript(@PathVariable Long id) {
+    public ListenerScriptWithProjectsDto getScript(@PathVariable Long id) {
         Optional<ListenerScript> script = scriptManager.getListenerScript(id);
         if (script.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return new ListenerScriptWithProjects(script.get(), projectManager.getByIds(script.get().getProjectIds()));
+        return new ListenerScriptWithProjectsDto(script.get(), projectManager.getByIds(script.get().getProjectIds()));
     }
 
     @PostMapping("/scripts")
-    public ListenerScriptWithProjects create(@RequestBody ListenerScriptRequest request) throws ValidateException {
+    public ListenerScriptWithProjectsDto create(@RequestBody ListenerScriptRequest request) throws ValidateException {
         ListenerScript script = new ListenerScript(request);
         scriptManager.save(script);
-        return new ListenerScriptWithProjects(script, projectManager.getByIds(script.getProjectIds()));
+        return new ListenerScriptWithProjectsDto(script, projectManager.getByIds(script.getProjectIds()));
     }
 
     @PatchMapping("/scripts/{id}")
-    public ListenerScriptWithProjects patchScript(@PathVariable Long id, @RequestBody Map<String, Object> request) throws ValidateException {
+    public ListenerScriptWithProjectsDto patchScript(@PathVariable Long id, @RequestBody Map<String, Object> request) throws ValidateException {
         ListenerScript script = scriptManager.getListenerScript(id).orElse(null);
         if (script == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -78,7 +78,7 @@ public class ListenerScriptRest {
             }
         }
         scriptManager.save(script);
-        return new ListenerScriptWithProjects(script, projectManager.getByIds(script.getProjectIds()));
+        return new ListenerScriptWithProjectsDto(script, projectManager.getByIds(script.getProjectIds()));
     }
 
     @DeleteMapping("/scripts/{id}")

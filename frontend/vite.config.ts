@@ -1,29 +1,18 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
-import pluginExternal from "vite-plugin-external";
+import { resolve } from 'node:path'
+import { lunaExternalGlobals } from './luna-external-globals.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
   plugins: [
-    pluginExternal({
-      externals: {
-        'luna': '__LUNA_COMPONENTS__',
-        'vue': 'Vue',
-        'axios': 'axios',
-        'I18N': 'I18N',
-        'sortablejs': 'Sortable',
-        'monaco-editor': 'monaco',
-        'chart.js': 'ChartJs',
-        'vue-router': 'VueRouter',
-      }
-    }),
+    lunaExternalGlobals(),
     vue()
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@': resolve(import.meta.dirname, 'src'),
     }
   },
   build: {
@@ -31,11 +20,11 @@ export default defineConfig({
     minify: 'terser',
     lib: {
       entry: [
-        resolve(__dirname, 'src/views/ConsoleView.vue'),
-        resolve(__dirname, 'src/views/WorkflowScriptsView.vue'),
-        resolve(__dirname, 'src/views/ListenerScriptsView.vue'),
-        resolve(__dirname, 'src/components/workflow/BaseViewScriptComponent.vue'),
-        resolve(__dirname, 'src/components/workflow/BaseEditScriptComponent.vue'),
+        resolve(import.meta.dirname, 'src/views/ConsoleView.vue'),
+        resolve(import.meta.dirname, 'src/views/WorkflowScriptsView.vue'),
+        resolve(import.meta.dirname, 'src/views/ListenerScriptsView.vue'),
+        resolve(import.meta.dirname, 'src/components/workflow/BaseViewScriptComponent.vue'),
+        resolve(import.meta.dirname, 'src/components/workflow/BaseEditScriptComponent.vue'),
       ],
       formats: ['es'],
     },
@@ -45,7 +34,7 @@ export default defineConfig({
         exports: 'named',
       },
     },
-    outDir: resolve(__dirname, '../src/main/resources/frontend'),
+    outDir: resolve(import.meta.dirname, '../src/main/resources/frontend'),
     emptyOutDir: true,
   },
 })

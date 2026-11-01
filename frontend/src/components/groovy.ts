@@ -1,6 +1,6 @@
-import { scriptService } from "@/services/scriptService.ts";
+import { scriptService } from "@/services/scriptService";
 import type * as MonacoEditor from 'monaco-editor';
-import { Suggestion } from "@/interfaces/script.ts";
+import { type Suggestion } from "@/interfaces/script";
 
 function getTokens(tokens: string, divider = "|"): string[] {
   return tokens.split(divider);
@@ -42,7 +42,7 @@ const getCodeBeforeCursor = (model: MonacoEditor.editor.ITextModel, position: Mo
 export const registerSignatureHelpProvider = (instance: typeof MonacoEditor, getContext:() => Record<string, string>) => {
   return instance.languages.registerSignatureHelpProvider('groovy', {
     signatureHelpTriggerCharacters: ['(', ','],
-    provideSignatureHelp: async (model, position, token, context) => {
+    provideSignatureHelp: async (model, position, _token, _context) => {
       const textBeforeCursor = getCodeBeforeCursor(model, position);
       const currentContext = getContext();
 
@@ -64,7 +64,7 @@ export const registerAutoCompleteService = (instance: typeof MonacoEditor, getCo
 
   return instance.languages.registerCompletionItemProvider('groovy', {
     triggerCharacters: ["."],
-    provideCompletionItems: async (model, position, context: MonacoEditor.languages.CompletionContext) => {
+    provideCompletionItems: async (model, position, _context: MonacoEditor.languages.CompletionContext) => {
       const textBeforeCursor = getCodeBeforeCursor(model, position);
       const currentContext = getContext();
       const data = await scriptService.getSuggestions(textBeforeCursor, position, currentContext);

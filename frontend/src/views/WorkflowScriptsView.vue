@@ -1,34 +1,37 @@
 <script setup lang="ts">
-import { $i18n } from "@/utils/i18n.ts";
-import { WorkflowScript } from "@/interfaces/workflow.ts";
-import { computed, inject, onMounted, ref, useTemplateRef } from "vue";
-import { workflowService } from "@/services/workflowService.ts";
+import { $i18n } from "@/utils/i18n";
+import type { WorkflowScript } from "@/interfaces/workflow";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
+import { workflowService } from "@/services/workflowService";
 import {
   LoadOverlayComponent,
-  ProjectInfo,
+  type ProjectValueDto,
   MultiSelect,
   StatusComponent,
-  Status,
-  WorkflowFunctionType,
-  SearchResult,
+  type StatusValueDto,
+  $notify,
+  type WorkflowFunctionType,
+  type SearchResult,
   BusyIconComponent,
-  DropDownGroupOption,
-  DropDownButton, DropDownOption, RouteNames, Injections,
+  type DropDownGroupOption,
+  DropDownButton,
+  type DropDownOption,
+  RouteNames,
 } from 'luna';
-import { ScriptRunResult } from "@/interfaces/metrics.ts";
-import { vLazyLoad } from "@/directives/LazyLoad.ts";
-import { metricService } from "@/services/metricService.ts";
+import type { ScriptRunResult } from "@/interfaces/metrics";
+import { vLazyLoad } from "@/directives/LazyLoad";
+import { metricService } from "@/services/metricService";
 import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.vue";
 import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.vue";
-import { ComponentExposed } from "vue-component-type-helpers";
+import type { ComponentExposed } from "vue-component-type-helpers";
 import ProjectListComponent from "@/components/workflow/ProjectListComponent.vue";
 import PerformanceDialog from "@/components/metrics/PerformanceDialog.vue";
 import WorkflowScriptViewDialog from "@/components/metrics/WorkflowScriptViewDialog.vue";
 
 const busy = ref(false);
 const scripts = ref<Array<WorkflowScript>>([]);
-const projects = ref<Array<ProjectInfo>>([]);
-const statuses = ref<Array<Status>>([]);
+const projects = ref<Array<ProjectValueDto>>([]);
+const statuses = ref<Array<StatusValueDto>>([]);
 const term = ref<string>(null);
 const selectedProjects = ref<Array<string>>([]);
 const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
@@ -36,10 +39,9 @@ const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
 const performanceDialog = useTemplateRef<ComponentExposed<typeof PerformanceDialog>>('performanceDialog');
 const workflowScriptViewDialog = useTemplateRef<ComponentExposed<typeof WorkflowScriptViewDialog>>('workflowScriptViewDialog');
-const $notify = inject(Injections.$notify);
 
-const orig2draftMap = computed<Record<string, string>>(() => {
-  const out = {};
+const orig2draftMap = computed<Record<number, number>>(() => {
+  const out: Record<number, number> = {};
   if (scripts.value) {
     for (const s of scripts.value) {
       if (s.workflowOriginalId) {
@@ -50,8 +52,8 @@ const orig2draftMap = computed<Record<string, string>>(() => {
   return out;
 });
 
-const statusesMap = computed<Record<number, Status>>(() => {
-  const out = {};
+const statusesMap = computed<Record<number, StatusValueDto>>(() => {
+  const out: Record<number, StatusValueDto> = {};
   if (statuses.value) {
     for (const status of statuses.value) {
       out[status.id] = status;

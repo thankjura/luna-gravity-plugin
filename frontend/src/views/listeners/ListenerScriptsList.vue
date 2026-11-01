@@ -1,31 +1,34 @@
 <script setup lang="ts">
-import { $i18n } from "@/utils/i18n.ts";
-import { computed, inject, onMounted, ref, useTemplateRef } from "vue";
+import { $i18n } from "@/utils/i18n";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 import {
   LoadOverlayComponent,
-  ProjectInfo,
+  type ProjectValueDto,
+  $notify,
   MultiSelect,
-  SearchResult,
+  type SearchResult,
   BusyIconComponent,
-  DropDownGroupOption,
-  DropDownButton, DropDownOption, Injections, IssueEventType,
+  type DropDownGroupOption,
+  DropDownButton,
+  type DropDownOption,
+  type IssueEventType,
+  projectService,
 } from 'luna';
-import { ScriptRunResult } from "@/interfaces/metrics.ts";
-import { vLazyLoad } from "@/directives/LazyLoad.ts";
-import { metricService } from "@/services/metricService.ts";
+import type { ScriptRunResult } from "@/interfaces/metrics";
+import { vLazyLoad } from "@/directives/LazyLoad";
+import { metricService } from "@/services/metricService";
 import HistoryButtonComponent from "@/components/metrics/HistoryButtonComponent.vue";
 import HistoryExecutionDialog from "@/components/metrics/HistoryExecutionDialog.vue";
-import { ComponentExposed } from "vue-component-type-helpers";
+import type { ComponentExposed } from "vue-component-type-helpers";
 import ProjectListComponent from "@/components/workflow/ProjectListComponent.vue";
 import PerformanceDialog from "@/components/metrics/PerformanceDialog.vue";
-import { ListenerScript } from "@/interfaces/listener.ts";
-import { listenerService } from "@/services/listenerService.ts";
+import type { ListenerScript } from "@/interfaces/listener";
+import { listenerService } from "@/services/listenerService";
 import DeleteListenerScriptDialog from "@/components/workflow/DeleteListenerScriptDialog.vue";
-import { systemService } from "@/services/systemService.ts";
 
 const busy = ref(false);
 const scripts = ref<Array<ListenerScript>>([]);
-const projects = ref<Array<ProjectInfo>>([]);
+const projects = ref<Array<ProjectValueDto>>([]);
 const eventTypes = ref<Array<IssueEventType>>([]);
 const term = ref<string>(null);
 const selectedProjects = ref<Array<number>>([]);
@@ -35,10 +38,9 @@ const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
 const performanceDialog = useTemplateRef<ComponentExposed<typeof PerformanceDialog>>('performanceDialog');
 const deleteDialog = useTemplateRef<ComponentExposed<typeof DeleteListenerScriptDialog>>('deleteDialog');
-const $notify = inject(Injections.$notify);
 
 const eventTypesMap = computed<Record<number, IssueEventType>>(() => {
-  const out = {};
+  const out: Record<number, IssueEventType> = {};
   if (eventTypes.value) {
     for (const eventType of eventTypes.value) {
       out[eventType.id] = eventType;
@@ -187,8 +189,9 @@ const dropDownOptions = (script: ListenerScript): Array<DropDownGroupOption> => 
   ]
 }
 
-const projectOptions = (termValue: string|null, excludes?: Array<number>) => {
-  return systemService.projectSuggestions(termValue, excludes);
+const projectOptions = async (termValue: string|null, excludes?: Array<number>) => {
+  const { data } = await projectService.search({term: termValue}, excludes);
+  return data.results;
 }
 
 onMounted(() => {

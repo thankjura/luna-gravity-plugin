@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { BaseDialog, Option, SingleSelect, DateTimePicker, ButtonBusy } from "luna";
-import { $i18n } from "@/utils/i18n.ts";
+import { BaseDialog, type Option, SingleSelect, DateTimePicker, ButtonBusy } from "luna";
+import { $i18n } from "@/utils/i18n";
 import { computed, ref, useTemplateRef } from "vue";
-import { MetricPointCollection } from "@/interfaces/metrics.ts";
-import { DateTime, DurationLike } from "luxon";
-import { metricService } from "@/services/metricService.ts";
-import { ComponentExposed } from "vue-component-type-helpers";
+import { type MetricPointCollection } from "@/interfaces/metrics";
+import { DateTime, type DurationLike } from "luxon";
+import { metricService } from "@/services/metricService";
+import { type ComponentExposed } from "vue-component-type-helpers";
 import PerformanceChartComponent from "@/components/metrics/PerformanceChartComponent.vue";
 
 const DATE_FORMAT = 'yyyy-LL-dd HH:mm';
