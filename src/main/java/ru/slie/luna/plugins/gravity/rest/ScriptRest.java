@@ -18,10 +18,12 @@ import ru.slie.luna.plugins.gravity.rest.request.ScriptRequest;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
 import ru.slie.luna.plugins.gravity.script.groovy.AutocompleteGroovyService;
 import ru.slie.luna.plugins.gravity.script.groovy.model.AutocompleteResult;
+import ru.slie.luna.plugins.gravity.script.groovy.model.Diagnostic;
 import ru.slie.luna.plugins.gravity.script.groovy.model.SignatureHelp;
 import ru.slie.luna.user.User;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -94,6 +96,15 @@ public class ScriptRest {
         }
 
         return autocompleteService.getSignatureHelp(request.getCode(), request.getLine(), request.getColumn(), getContextVariables(request.getContext()));
+    }
+
+    @PostMapping("/diagnostics")
+    public List<Diagnostic> getDiagnostics(@RequestBody AutocompleteRequest request) {
+        if (request.getCode() == null) {
+            return List.of();
+        }
+
+        return autocompleteService.getDiagnostics(request.getCode(), getContextVariables(request.getContext()));
     }
 
     Map<String, Class<?>> getContextVariables(Map<String, String> context) {

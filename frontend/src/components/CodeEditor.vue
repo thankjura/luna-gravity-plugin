@@ -2,9 +2,11 @@
 import { onBeforeUnmount, onMounted, type PropType, useTemplateRef, watch } from "vue";
 import type * as MonacoEditorType from 'monaco-editor';
 import {
-  registerAutoCompleteService,
+  attachModel,
+  detachModel,
   registerGroovyLanguageForMonaco,
-  registerSignatureHelpProvider
+  registerGroovyProviders,
+  watchDiagnostics
 } from "@/components/groovy";
 import { loadMonacoInstance } from "@/utils/monaco";
 
@@ -16,8 +18,8 @@ const props = defineProps({
 const value = defineModel<string>();
 const container = useTemplateRef<HTMLDivElement>('container');
 let editor: MonacoEditorType.editor.IStandaloneCodeEditor;
-let completionProvider: MonacoEditorType.IDisposable;
-let signatureProvider: MonacoEditorType.IDisposable;
+let diagnostics: MonacoEditorType.IDisposable;
+let unmounted = false;
 
 watch(value, (newValue) => {
   if (editor && newValue !== editor.getValue()) {
@@ -25,22 +27,25 @@ watch(value, (newValue) => {
   }
 });
 
+watch(() => props.disabled, (disabled) => {
+  editor?.updateOptions({readOnly: disabled});
+});
+
 onMounted(async () => {
-  const instance = await loadMonacoInstance();
-  if (!completionProvider) {
-    completionProvider = registerAutoCompleteService(instance as typeof MonacoEditorType, () => props.context);
-  }
-  if (!signatureProvider) {
-    signatureProvider = registerSignatureHelpProvider(instance as typeof MonacoEditorType, () => props.context);
+  const instance = await loadMonacoInstance() as typeof MonacoEditorType;
+  if (unmounted) {
+    return;
   }
 
-  registerGroovyLanguageForMonaco(instance as typeof MonacoEditorType);
+  registerGroovyLanguageForMonaco(instance);
+  registerGroovyProviders(instance);
 
   editor = instance.editor.create(container.value, {
     value: value.value,
     language: "groovy",
     automaticLayout: true,
     suggestOnTriggerCharacters: true,
+    quickSuggestions: {other: true, comments: false, strings: false},
     scrollBeyondLastLine: false,
     readOnly: props.disabled,
     scrollbar: {
@@ -53,10 +58,20 @@ onMounted(async () => {
       bottom: 10
     },
     //fixedOverflowWidgets: true,
+    lightbulb: {enabled: instance.editor.ShowLightbulbIconMode.OnCode},
+    suggestSelection: "first",
     suggest: {
-      showWords: false
+      showWords: false,
+      showStatusBar: true,
+      preview: true,
+      snippetsPreventQuickSuggestions: false,
     },
   });
+
+  attachModel(editor.getModel(), () => props.context);
+  if (!props.disabled) {
+    diagnostics = watchDiagnostics(instance, editor);
+  }
 
   editor.onDidChangeModelContent(() => {
     value.value = editor.getValue();
@@ -65,18 +80,15 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  unmounted = true;
+  diagnostics?.dispose();
   if (editor) {
+    const model = editor.getModel();
+    if (model) {
+      detachModel(model);
+    }
     editor.dispose();
-  }
-
-  if (completionProvider) {
-    completionProvider.dispose();
-    completionProvider = null;
-  }
-
-  if (signatureProvider) {
-    signatureProvider.dispose();
-    signatureProvider = null;
+    model?.dispose();
   }
 });
 

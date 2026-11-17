@@ -1,6 +1,6 @@
 import { baseURL, client } from "@/utils/client";
 import type * as MonacoEditor from 'monaco-editor';
-import type { Signature, Suggestion } from "@/interfaces/script";
+import type { Diagnostic, SignaturesResponse, SuggestionsResponse } from "@/interfaces/script";
 
 
 class ScriptService {
@@ -54,24 +54,33 @@ class ScriptService {
     }
   }
 
-  async getSuggestions(codeText: string, position: MonacoEditor.Position, context: Record<string, string>){
-    const {data} = await client.post<{ suggestions: Array<Suggestion>, range: MonacoEditor.IRange, incomplete: boolean }>('/gravity/script/autocomplete', {
-      code: codeText,
+  async getSuggestions(code: string, position: MonacoEditor.IPosition, context: Record<string, string>, signal?: AbortSignal) {
+    const {data} = await client.post<SuggestionsResponse>('/gravity/script/autocomplete', {
+      code,
       line: position.lineNumber,
       column: position.column,
       context,
-    });
+    }, {signal});
 
     return data;
   }
 
-  async getSignatures(codeText: string, position: MonacoEditor.Position, context: Record<string, string>){
-    const {data} = await client.post<{ signatures: Array<Signature>, activeSignature: number, activeParameter: number }>('/gravity/script/signature', {
-      code: codeText,
+  async getSignatures(code: string, position: MonacoEditor.IPosition, context: Record<string, string>, signal?: AbortSignal) {
+    const {data} = await client.post<SignaturesResponse>('/gravity/script/signature', {
+      code,
       line: position.lineNumber,
       column: position.column,
       context,
-    });
+    }, {signal});
+
+    return data;
+  }
+
+  async getDiagnostics(code: string, context: Record<string, string>, signal?: AbortSignal) {
+    const {data} = await client.post<Array<Diagnostic>>('/gravity/script/diagnostics', {
+      code,
+      context,
+    }, {signal});
 
     return data;
   }

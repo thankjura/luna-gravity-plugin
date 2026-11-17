@@ -1,6 +1,6 @@
 // Luna exposes version: 4.0.0-SNAPSHOT
 declare module 'luna' {
-  import type { ComputedRef, DefineComponent, InjectionKey, Ref, SlotsType } from 'vue';
+  import type { ComponentOptionsMixin, ComputedRef, DefineComponent, InjectionKey, PublicProps, Ref, SlotsType } from 'vue';
   import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
   import type { AxiosResponse } from 'axios';
   import type { SortableEvent } from 'sortablejs';
@@ -25,6 +25,7 @@ declare module 'luna' {
     loadMessages(locale: string): Promise<void>;
     t(text: string, ...args: Array<string|number>): string;
     p(text: string, params: {gender: 'male'|'female'}, ...args: Array<string|number>): string;
+    n(text: string, count: number, ...args: Array<string|number>): string;
   }
 
   export const BusyIconComponent: DefineComponent<
@@ -33,25 +34,16 @@ declare module 'luna' {
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {},
     string,
-    {},
-    {},
+    PublicProps,
+    Readonly<{}>,
     {},
     SlotsType<{}>
   >;
   export const ButtonBusy: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       type?: "button" | "submit" | "reset"
       busy?: boolean
@@ -59,40 +51,45 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      type?: "button" | "submit" | "reset"
+      busy?: boolean
+      disabled?: boolean
+    }>,
+    {},
     SlotsType<{
       default: any
     }>
   >;
   export const LoadOverlayComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       absolute?: boolean
       dim?: boolean
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      absolute?: boolean
+      dim?: boolean
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const PagePaginator: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'setPage'(_page: number): void
-    },
-    'setPage',
     {
       busy?: boolean
       compact?: boolean
@@ -103,10 +100,33 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'setPage'(_page: number): void
+    },
+    'setPage',
+    PublicProps,
+    Readonly<{
+      busy?: boolean
+      compact?: boolean
+      page?: number
+      maxItems?: number
+      limit?: number
+      total: number
+      onSetPage?: (_page: number) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const PopoverComponent: DefineComponent<
-    {},
+    {
+      closeButton?: boolean
+      prefferedAlign?: ALIGN[]
+      group?: string
+    },
     {
       toggle: (event: MouseEvent, target?: HTMLElement) => void
       show: (event: MouseEvent, target?: HTMLElement) => void
@@ -116,54 +136,46 @@ declare module 'luna' {
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'hide'(): void
     },
     'hide',
-    {
+    PublicProps,
+    Readonly<{
       closeButton?: boolean
       prefferedAlign?: ALIGN[]
       group?: string
-    },
-    {},
+      onHide?: () => any
+    }>,
     {},
     SlotsType<{
       default: any
     }>
   >;
   export const StatusComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       name?: string
       category?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      name?: string
+      category?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const TogglePanel: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'toggle'(_state: boolean): void
-      'show'(): void
-    },
-    'toggle' | 'show',
     {
       hideActionsOnCollapse?: boolean
       initState?: boolean
@@ -172,7 +184,31 @@ declare module 'luna' {
       description?: string
       storeKey?: string
     },
+    {
+      expand: () => void
+      toggle: () => void
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'toggle'(_state: boolean): void
+      'show'(): void
+    },
+    'toggle' | 'show',
+    PublicProps,
+    Readonly<{
+      hideActionsOnCollapse?: boolean
+      initState?: boolean
+      hideActionsOnHover?: boolean
+      title?: string
+      description?: string
+      storeKey?: string
+      onToggle?: (_state: boolean) => any
+      onShow?: () => any
+    }>,
     {},
     SlotsType<{
       actions: any
@@ -180,44 +216,60 @@ declare module 'luna' {
     }>
   >;
   export const UserAvatarComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       size?: IconSize
+      radius?: string
       user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      size?: IconSize
+      radius?: string
+      user: { id?: string | number; displayName?: string; login?: string; iconUrl?: string; }
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const UserLinkComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       showIcon?: boolean
+      avatarOnly?: boolean
+      avatarSize?: IconSize
       user?: UserValueDto
       label?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      showIcon?: boolean
+      avatarOnly?: boolean
+      avatarSize?: IconSize
+      user?: UserValueDto
+      label?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const BaseDialog: DefineComponent<
-    {},
+    {
+      busy?: boolean
+      showClose?: boolean
+    },
     {
       show: () => void
       hide: () => void
@@ -225,17 +277,18 @@ declare module 'luna' {
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'closed'(): void
     },
     'closed',
-    {
+    PublicProps,
+    Readonly<{
       busy?: boolean
       showClose?: boolean
-    },
-    {},
+      onClosed?: () => any
+    }>,
     {},
     SlotsType<{
       header: any
@@ -244,15 +297,6 @@ declare module 'luna' {
     }>
   >;
   export const ButtonsGroupComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       max?: number
       moreLabel?: string
@@ -263,22 +307,25 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      max?: number
+      moreLabel?: string
+      maxWidth?: number
+      zIndex?: number
+      group?: string
+      options: DropDownGroupOption[]
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const DropDownButton: DefineComponent<
-    {},
-    {
-      show: () => Promise<void>
-      hide: () => void
-      active: boolean
-    },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       busy?: boolean
       disabled?: boolean
@@ -293,24 +340,63 @@ declare module 'luna' {
       options: DropDownGroupOption[] | OptionsGetterSync | OptionsGetterAsync
       layerClass?: string
     },
+    {
+      show: () => Promise<void>
+      hide: () => void
+      active: boolean
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      busy?: boolean
+      disabled?: boolean
+      maxWidth?: number
+      zIndex?: number | "auto"
+      toggleIcon?: boolean
+      fixed?: boolean
+      align?: "left" | "right" | "auto"
+      cacheOptions?: boolean
+      offset?: { x: number; y: number; }
+      group?: string
+      options: DropDownGroupOption[] | OptionsGetterSync | OptionsGetterAsync
+      layerClass?: string
+    }>,
     {},
     SlotsType<{
       default: any
     }>
   >;
-  export const DropDownLayer: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
+  export const DropDownContextMenu: DefineComponent<
     {
-      'clicked'(_option: DropDownOption, _event: MouseEvent): void
+      maxWidth?: number
+      layerClass?: string
     },
-    'clicked',
+    {
+      show: (options: DropDownGroupOption[] | OptionsGetterSync | OptionsGetterAsync, event: MouseEvent) => Promise<void>
+      hide: () => void
+    },
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      maxWidth?: number
+      layerClass?: string
+    }>,
+    {},
+    SlotsType<{}>
+  >;
+  export const DropDownLayer: DefineComponent<
     {
       busy?: boolean
       prefferedAlign?: "left" | "right"
@@ -323,43 +409,49 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'clicked'(_option: DropDownOption, _event: MouseEvent): void
+    },
+    'clicked',
+    PublicProps,
+    Readonly<{
+      busy?: boolean
+      prefferedAlign?: "left" | "right"
+      maxWidth?: number
+      zIndex?: number
+      fixed?: boolean
+      align?: "left" | "right" | "auto"
+      options?: DropDownGroupOption[]
+      parentPosition?: ElemRect
+      onClicked?: (_option: DropDownOption, _event: MouseEvent) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const DropDownLayerItem: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       option?: DropDownOption
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      option?: DropDownOption
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const CheckBoxesComponent: DefineComponent<
-    {},
-    {
-      focusTerm: () => void
-      addValue: (opt: T) => void
-      delValue: (optId: string | number) => void
-    },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'select'(value: T): void
-      'remove'(value: string | number): void
-      'update:modelValue'(value: (string | number)[]): void
-    },
-    'select' | 'remove' | 'update:modelValue',
     {
       optionGroups: OptionsGroup<T>[]
       valueKey?: keyof T
@@ -369,12 +461,43 @@ declare module 'luna' {
       maxHeight?: string
       modelValue?: (string | number)[]
     },
+    {
+      focusTerm: () => void
+      addValue: (opt: T) => void
+      delValue: (optId: string | number) => void
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'select'(value: T): void
+      'remove'(value: string | number): void
+      'update:modelValue'(value: (string | number)[]): void
+    },
+    'select' | 'remove' | 'update:modelValue',
+    PublicProps,
+    Readonly<{
+      optionGroups: OptionsGroup<T>[]
+      valueKey?: keyof T
+      disabled?: boolean
+      busyValue?: string | number
+      emitsOnly?: boolean
+      maxHeight?: string
+      modelValue?: (string | number)[]
+      onSelect?: (value: T) => any
+      onRemove?: (value: string | number) => any
+      'onUpdate:modelValue'?: (value: (string | number)[]) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const ColorPickerDialog: DefineComponent<
-    {},
+    {
+      manualInput?: boolean
+      manualInputPlaceholder?: string
+    },
     {
       show: (colorValue: string, elementValue: HTMLElement) => void
       colorHex: string
@@ -383,61 +506,70 @@ declare module 'luna' {
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'update'(_color: string): void
     },
     'update',
-    {
+    PublicProps,
+    Readonly<{
       manualInput?: boolean
       manualInputPlaceholder?: string
-    },
-    {},
+      onUpdate?: (_color: string) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const ColorPickerInput: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: string): void
-    },
-    'update:modelValue',
     {
       modelValue?: string
     },
     {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      modelValue?: string
+      'onUpdate:modelValue'?: (value: string) => any
+    }>,
     {},
     SlotsType<{
       default: any
     }>
   >;
   export const ColorPickerLayer: DefineComponent<
-    {},
+    {
+      modelValue?: HSV
+      field?: HTMLElement
+      origValue?: HSV
+    },
     {
       layer: HTMLDivElement
     },
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'update:modelValue'(value: HSV): void
     },
     'update:modelValue',
-    {
+    PublicProps,
+    Readonly<{
       modelValue?: HSV
       field?: HTMLElement
       origValue?: HSV
-    },
-    {},
+      'onUpdate:modelValue'?: (value: HSV) => any
+    }>,
     {},
     SlotsType<{
       default: any
@@ -445,17 +577,6 @@ declare module 'luna' {
     }>
   >;
   export const DateTimePicker: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: string): void
-    },
-    'update:modelValue',
     {
       disabled?: boolean
       withTime?: boolean
@@ -464,48 +585,50 @@ declare module 'luna' {
     },
     {},
     {},
-    SlotsType<{}>
-  >;
-  export const IconSelector: DefineComponent<
     {},
     {},
-    {},
-    {},
-    {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'update:modelValue'(value: string): void
     },
     'update:modelValue',
+    PublicProps,
+    Readonly<{
+      disabled?: boolean
+      withTime?: boolean
+      modelValue?: string
+      placeholder?: string
+      'onUpdate:modelValue'?: (value: string) => any
+    }>,
+    {},
+    SlotsType<{}>
+  >;
+  export const IconSelector: DefineComponent<
     {
       type: IconType
       modelValue?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      type: IconType
+      modelValue?: string
+      'onUpdate:modelValue'?: (value: string) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const MultiSelect: DefineComponent<
-    {},
-    {
-      addValue: (opt: T) => void
-      delValue: (optId: T[K]) => void
-      showLayer: () => void
-      hideLayer: () => void
-    },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'select'(value: T): void
-      'remove'(value: T[K]): void
-      'create'(value: string): void
-      'update:modelValue'(value: T[K][]): void
-    },
-    'select' | 'remove' | 'create' | 'update:modelValue',
     {
       options: T[] | OptionsFunc<T, K>
       modelData?: T[]
@@ -521,23 +644,48 @@ declare module 'luna' {
       missingIconLiteralKey?: keyof T
       modelValue?: T[K][]
     },
+    {
+      addValue: (opt: T) => void
+      delValue: (optId: T[K]) => void
+      showLayer: () => void
+      hideLayer: () => void
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'select'(value: T): void
+      'remove'(value: T[K]): void
+      'create'(value: string): void
+      'update:modelValue'(value: T[K][]): void
+    },
+    'select' | 'remove' | 'create' | 'update:modelValue',
+    PublicProps,
+    Readonly<{
+      options: T[] | OptionsFunc<T, K>
+      modelData?: T[]
+      showIcons?: boolean
+      minTagLen?: number
+      suggestionKey?: keyof T
+      tagLabel?: (term: string) => string
+      labelKey?: keyof T
+      valueKey?: keyof T & K
+      id?: string
+      cropSuggestions?: boolean
+      iconRadius?: string
+      missingIconLiteralKey?: keyof T
+      modelValue?: T[K][]
+      onSelect?: (value: T) => any
+      onRemove?: (value: T[K]) => any
+      onCreate?: (value: string) => any
+      'onUpdate:modelValue'?: (value: T[K][]) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const QsInput: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: string): void
-      'update:error'(value: string): void
-    },
-    'update:modelValue' | 'update:error',
     {
       disabled?: boolean
       maxResult?: number
@@ -547,43 +695,48 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string): void
+      'update:error'(value: string): void
+    },
+    'update:modelValue' | 'update:error',
+    PublicProps,
+    Readonly<{
+      disabled?: boolean
+      maxResult?: number
+      modelValue?: string
+      error?: string
+      initFunc?: () => Promise<QsFormData>
+      'onUpdate:modelValue'?: (value: string) => any
+      'onUpdate:error'?: (value: string) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const QsViewer: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       qs?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      qs?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const SingleSelect: DefineComponent<
-    {},
-    {
-      setValue: (opt: T) => void
-      showLayer: () => void
-      hideLayer: () => void
-    },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'select'(value: T): void
-      'create'(value: string): void
-      'update:modelValue'(value: T[K]): void
-    },
-    'select' | 'create' | 'update:modelValue',
     {
       options: T[] | OptionsFunc<T, K>
       modelData?: T
@@ -605,22 +758,51 @@ declare module 'luna' {
       id?: string
       modelValue?: T[K]
     },
+    {
+      setValue: (opt: T) => void
+      showLayer: () => void
+      hideLayer: () => void
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'select'(value: T): void
+      'create'(value: string): void
+      'update:modelValue'(value: T[K]): void
+    },
+    'select' | 'create' | 'update:modelValue',
+    PublicProps,
+    Readonly<{
+      options: T[] | OptionsFunc<T, K>
+      modelData?: T
+      showIcons?: boolean
+      minTagLen?: number
+      tagLabel?: (term: string) => string
+      suggestionKey?: keyof T
+      valueKey?: keyof T & K
+      labelKey?: keyof T | ((item: T) => string)
+      name?: string
+      cropSuggestions?: boolean
+      disabled?: boolean
+      iconRadius?: string
+      missingIconLiteralKey?: keyof T
+      placeholder?: string
+      nullValueName?: string
+      enableClear?: boolean
+      suggestionsWidth?: string
+      id?: string
+      modelValue?: T[K]
+      onSelect?: (value: T) => any
+      onCreate?: (value: string) => any
+      'onUpdate:modelValue'?: (value: T[K]) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const SliderTrack: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: number): void
-    },
-    'update:modelValue',
     {
       max?: number
       min?: number
@@ -629,66 +811,106 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: number): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      max?: number
+      min?: number
+      step?: number
+      modelValue?: number
+      'onUpdate:modelValue'?: (value: number) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const SortableList: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
     {
-      'update'(value: T[]): void
-      'moved'(optionId: T["id"], prevOptionId: T["id"]): void
-      'deleted'(option: T): void
-      'update:modelValue'(value: T[]): void
-    },
-    'update' | 'moved' | 'deleted' | 'update:modelValue',
-    {
-      modelValue: T[]
       showIcons?: boolean
       removable?: boolean
       emitsOnly?: boolean
       busy?: boolean
+      options?: T[]
+      labelKey?: keyof T
+      valueKey?: keyof T & K
+      modelValue?: T[K][]
     },
     {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'moved'(_optionId: T[K], _prevOptionId: T[K]): void
+      'removed'(_optionId: T[K]): void
+      'updated'(_value: T[K][]): void
+      'update:modelValue'(value: T[K][]): void
+    },
+    'moved' | 'removed' | 'updated' | 'update:modelValue',
+    PublicProps,
+    Readonly<{
+      showIcons?: boolean
+      removable?: boolean
+      emitsOnly?: boolean
+      busy?: boolean
+      options?: T[]
+      labelKey?: keyof T
+      valueKey?: keyof T & K
+      modelValue?: T[K][]
+      onMoved?: (_optionId: T[K], _prevOptionId: T[K]) => any
+      onRemoved?: (_optionId: T[K]) => any
+      onUpdated?: (_value: T[K][]) => any
+      'onUpdate:modelValue'?: (value: T[K][]) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const SortableSelect: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update'(_value: T[]): void
-      'update:modelValue'(value: T[]): void
-    },
-    'update' | 'update:modelValue',
     {
       showIcons?: boolean
-      options: T[] | OptionsFunc<T>
-      modelValue?: T[]
+      options: T[] | OptionsFunc<T, K>
+      labelKey?: keyof T
+      suggestionKey?: keyof T
+      valueKey?: keyof T & K
+      modelData?: T[]
+      placeholder?: string
+      modelValue?: T[K][]
     },
     {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'updated'(_value: T[K][]): void
+      'update:modelValue'(value: T[K][]): void
+    },
+    'updated' | 'update:modelValue',
+    PublicProps,
+    Readonly<{
+      showIcons?: boolean
+      options: T[] | OptionsFunc<T, K>
+      labelKey?: keyof T
+      suggestionKey?: keyof T
+      valueKey?: keyof T & K
+      modelData?: T[]
+      placeholder?: string
+      modelValue?: T[K][]
+      onUpdated?: (_value: T[K][]) => any
+      'onUpdate:modelValue'?: (value: T[K][]) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const SuggestionIconComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       option: T
       missingIconLiteralKey: keyof T
@@ -696,25 +918,22 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      option: T
+      missingIconLiteralKey: keyof T
+      iconRadius?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const SuggestionsComponent: DefineComponent<
-    {},
-    {
-      focusNext: (event?: KeyboardEvent) => void
-      updatePosition: () => void
-    },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'hide'(): void
-      'select'(value: T): void
-      'create'(value: string): void
-    },
-    'hide' | 'select' | 'create',
     {
       suggestions: T[]
       showIcons?: boolean
@@ -729,56 +948,84 @@ declare module 'luna' {
       width?: string
       tagLabel?: (term: string) => string
     },
+    {
+      focusNext: (event?: KeyboardEvent) => void
+      updatePosition: () => void
+    },
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'hide'(): void
+      'select'(value: T): void
+      'create'(value: string): void
+    },
+    'hide' | 'select' | 'create',
+    PublicProps,
+    Readonly<{
+      suggestions: T[]
+      showIcons?: boolean
+      term?: string
+      field?: HTMLElement
+      tag?: string
+      valueKey: keyof T
+      suggestionKey?: keyof T | ((item: T) => string)
+      cropSuggestions: boolean
+      iconRadius?: string
+      missingIconLiteralKey?: keyof T
+      width?: string
+      tagLabel?: (term: string) => string
+      onHide?: () => any
+      onSelect?: (value: T) => any
+      onCreate?: (value: string) => any
+    }>,
     {},
     SlotsType<{}>
   >;
   export const MarkdownEditor: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: string): void
-    },
-    'update:modelValue',
     {
       modelValue?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      modelValue?: string
+      'onUpdate:modelValue'?: (value: string) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const MarkdownViewer: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       value?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      value?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const ProgressBar: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       busy?: boolean
       total?: number
@@ -786,23 +1033,39 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      busy?: boolean
+      total?: number
+      value?: number
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const ProgressComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       total: number
       value: number
     },
     {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      total: number
+      value: number
+    }>,
     {},
     SlotsType<{}>
   >;
@@ -814,44 +1077,35 @@ declare module 'luna' {
     {},
     {},
     {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {},
     string,
-    {},
-    {},
+    PublicProps,
+    Readonly<{}>,
     {},
     SlotsType<{}>
   >;
   export const CopyToBufferButton: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    string,
     {
       value?: string
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      value?: string
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const ToggleComponent: DefineComponent<
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {
-      'update:modelValue'(value: boolean): void
-    },
-    'update:modelValue',
     {
       busy?: boolean
       disabled?: boolean
@@ -861,25 +1115,47 @@ declare module 'luna' {
     },
     {},
     {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: boolean): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      busy?: boolean
+      disabled?: boolean
+      manual?: boolean
+      id?: string
+      modelValue?: boolean
+      'onUpdate:modelValue'?: (value: boolean) => any
+    }>,
+    {},
     SlotsType<{}>
   >;
   export const SortableTable: DefineComponent<
+    {
+      group?: string
+    },
     {},
     {},
     {},
     {},
-    {},
-    {},
-    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
     {
       'updated'(_event: SortableEvent): void
       'changed'(_event: SortableEvent): void
     },
     'updated' | 'changed',
-    {
+    PublicProps,
+    Readonly<{
       group?: string
-    },
-    {},
+      onUpdated?: (_event: SortableEvent) => any
+      onChanged?: (_event: SortableEvent) => any
+    }>,
     {},
     SlotsType<{
       header: any
@@ -887,11 +1163,162 @@ declare module 'luna' {
       footer: any
     }>
   >;
+  export const SwitchButtons: DefineComponent<
+    {
+      index?: number
+    },
+    {
+      calcStyles: () => void
+    },
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      index?: number
+    }>,
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
+  export const FieldMockup: DefineComponent<
+    {
+      multiline?: boolean
+    },
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      multiline?: boolean
+    }>,
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
+  export const ReportMockup: DefineComponent<
+    {},
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{}>,
+    {},
+    SlotsType<{
+      default: any
+    }>
+  >;
+  export const IssueRefFieldView: DefineComponent<
+    {
+      value?: IssueValueDto
+    },
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      value?: IssueValueDto
+    }>,
+    {},
+    SlotsType<{}>
+  >;
+  export const IssueRefFieldEdit: DefineComponent<
+    {
+      modelValue?: string
+      field: IssueFieldDto
+      params?: IssueRefFormParams<IssueValueDto>
+    },
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      modelValue?: string
+      field: IssueFieldDto
+      params?: IssueRefFormParams<IssueValueDto>
+      'onUpdate:modelValue'?: (value: string) => any
+    }>,
+    {},
+    SlotsType<{}>
+  >;
+  export const MultiIssueRefFieldView: DefineComponent<
+    {
+      value?: IssueValueDto[]
+    },
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {},
+    string,
+    PublicProps,
+    Readonly<{
+      value?: IssueValueDto[]
+    }>,
+    {},
+    SlotsType<{}>
+  >;
+  export const MultiIssueRefFieldEdit: DefineComponent<
+    {
+      modelValue?: string[]
+      field: IssueFieldDto
+      params?: IssueRefFormParams<IssueValueDto[]>
+    },
+    {},
+    {},
+    {},
+    {},
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      'update:modelValue'(value: string[]): void
+    },
+    'update:modelValue',
+    PublicProps,
+    Readonly<{
+      modelValue?: string[]
+      field: IssueFieldDto
+      params?: IssueRefFormParams<IssueValueDto[]>
+      'onUpdate:modelValue'?: (value: string[]) => any
+    }>,
+    {},
+    SlotsType<{}>
+  >;
 
   export const $i18n: typeof BundleI18N;
   export const $notify: NotifyComponentInterface;
   export const $bus: Emitter<BusEvents>;
-  export const RouteNames: { readonly home: "home"; readonly dashboard: "dashboard"; readonly navigator: "navigator"; readonly bulkAction: "bulkAction"; readonly bulkActionProgress: "bulkActionProgress"; readonly projects: "projects"; readonly project: { readonly project: "project"; readonly summary: "projectSummary"; readonly issues: "projectIssues"; readonly activity: "projectActivity"; readonly reports: "projectReports"; readonly settings: { readonly settings: "projectSettings"; readonly summary: "projectSettingsSummary"; readonly details: "projectSettingsDetails"; readonly schemas: "projectSettingsSchemas"; readonly users: "projectSettingsUsers"; readonly permissions: "projectSettingsPermissions"; readonly issueTypes: "projectSettingsIssueTypes"; readonly notifications: "projectSettingsNotifications"; readonly priorities: "projectSettingsPriorities"; readonly indexing: "projectSettingsIndexing"; readonly delete: "projectSettingsDelete" } }; readonly login: "login"; readonly logout: "logout"; readonly profile: "profile"; readonly searchFilters: "searchFilters"; readonly issue: "issue"; readonly agile: { readonly boards: "agileBoards"; readonly view: "agileBoardView"; readonly backlog: "agileBoardBacklog"; readonly reports: "agileBoardReports"; readonly settings: "agileBoardSettings" }; readonly admin: { readonly admin: "admin"; readonly users: { readonly users: "adminUsers"; readonly list: "adminUserList"; readonly user: "adminUser"; readonly roles: "adminUserRoles" }; readonly groups: "adminGroups"; readonly issueTypes: "adminIssueTypes"; readonly issueTypeSchemas: "adminIssueTypeSchemas"; readonly priorities: "adminPriorities"; readonly prioritySchemas: "adminPrioritySchemas"; readonly statuses: "adminStatuses"; readonly workflows: "adminWorkflows"; readonly workflowSchemas: "adminWorkflowSchemas"; readonly projects: "adminProjects"; readonly archivedProjects: "adminArchivedProjects"; readonly projectRoles: "adminProjectRoles"; readonly customFields: "adminCustomFields"; readonly screens: "adminScreens"; readonly screenSchemas: "adminScreenSchemas"; readonly issueTypeScreenSchemas: "adminIssueTypeScreenSchemas"; readonly permissionSchemas: "adminPermissionSchemas"; readonly outgoingMailServers: "adminOutgoingMailServers"; readonly outgoingMailQueue: "adminOutgoingMailQueue"; readonly incomingMailServers: "adminIncomingMailServers"; readonly messageHandlers: "adminMessageHandlers"; readonly notificationSchemas: "adminNotificationSchemas"; readonly themes: "adminThemes"; readonly fieldLayouts: "adminFieldLayouts"; readonly fieldLayoutSchemas: "adminFieldLayoutSchemas"; readonly globalPermissions: "adminGlobalPermissions"; readonly properties: "adminProperties"; readonly systemInfo: "adminSystemInfo"; readonly plugins: "adminPlugins"; readonly scheduler: "adminScheduler"; readonly issueLinkTypes: "adminIssueLinkTypes"; readonly directories: "adminDirectories"; readonly indexing: "adminIndexing"; readonly backup: "adminBackup"; readonly projectImport: "adminProjectImport"; readonly logging: "adminLogging"; readonly ranking: "adminRanking"; readonly docs: "adminDocs"; readonly license: "adminLicense"; readonly icons: "adminIcons"; readonly eventTypes: "adminEventTypes"; readonly mailTester: "adminMailTester"; readonly cluster: "adminCluster" }; readonly maintenance: "maintenance" };
+  export const RouteNames: { readonly home: "home"; readonly dashboard: "dashboard"; readonly navigator: "navigator"; readonly bulkAction: "bulkAction"; readonly bulkActionProgress: "bulkActionProgress"; readonly projects: "projects"; readonly project: { readonly root: "projectRoot"; readonly project: "project"; readonly summary: "projectSummary"; readonly issues: "projectIssues"; readonly activity: "projectActivity"; readonly reports: "projectReports"; readonly settings: { readonly root: "projectSettingsRoot"; readonly settings: "projectSettings"; readonly summary: "projectSettingsSummary"; readonly details: "projectSettingsDetails"; readonly schemas: "projectSettingsSchemas"; readonly users: "projectSettingsUsers"; readonly permissions: "projectSettingsPermissions"; readonly issueTypes: "projectSettingsIssueTypes"; readonly notifications: "projectSettingsNotifications"; readonly priorities: "projectSettingsPriorities"; readonly indexing: "projectSettingsIndexing"; readonly calendar: "projectSettingsCalendar"; readonly delete: "projectSettingsDelete" } }; readonly login: "login"; readonly logout: "logout"; readonly profile: "profile"; readonly searchFilters: "searchFilters"; readonly issue: "issue"; readonly agile: { readonly boards: "agileBoards"; readonly view: "agileBoardView"; readonly backlog: "agileBoardBacklog"; readonly reports: "agileBoardReports"; readonly settings: "agileBoardSettings" }; readonly admin: { readonly admin: "admin"; readonly users: { readonly users: "adminUsers"; readonly list: "adminUserList"; readonly user: "adminUser"; readonly roles: "adminUserRoles" }; readonly groups: "adminGroups"; readonly issueTypes: "adminIssueTypes"; readonly issueTypeSchemas: "adminIssueTypeSchemas"; readonly priorities: "adminPriorities"; readonly prioritySchemas: "adminPrioritySchemas"; readonly statuses: "adminStatuses"; readonly workflows: "adminWorkflows"; readonly workflowSchemas: "adminWorkflowSchemas"; readonly projects: "adminProjects"; readonly archivedProjects: "adminArchivedProjects"; readonly projectRoles: "adminProjectRoles"; readonly workCalendars: "adminWorkCalendars"; readonly customFields: "adminCustomFields"; readonly screens: "adminScreens"; readonly screenSchemas: "adminScreenSchemas"; readonly issueTypeScreenSchemas: "adminIssueTypeScreenSchemas"; readonly permissionSchemas: "adminPermissionSchemas"; readonly outgoingMailServers: "adminOutgoingMailServers"; readonly outgoingMailQueue: "adminOutgoingMailQueue"; readonly incomingMailServers: "adminIncomingMailServers"; readonly messageHandlers: "adminMessageHandlers"; readonly notificationSchemas: "adminNotificationSchemas"; readonly themes: "adminThemes"; readonly fieldLayouts: "adminFieldLayouts"; readonly fieldLayoutSchemas: "adminFieldLayoutSchemas"; readonly globalPermissions: "adminGlobalPermissions"; readonly properties: "adminProperties"; readonly systemInfo: "adminSystemInfo"; readonly plugins: "adminPlugins"; readonly scheduler: "adminScheduler"; readonly issueLinkTypes: "adminIssueLinkTypes"; readonly directories: "adminDirectories"; readonly indexing: "adminIndexing"; readonly backup: "adminBackup"; readonly projectImport: "adminProjectImport"; readonly logging: "adminLogging"; readonly ranking: "adminRanking"; readonly docs: "adminDocs"; readonly license: "adminLicense"; readonly icons: "adminIcons"; readonly eventTypes: "adminEventTypes"; readonly mailTester: "adminMailTester"; readonly cluster: "adminCluster" }; readonly maintenance: "maintenance" };
   export const Injections: { issueKey: InjectionKey<Ref<string, string>>; selectedIssues: InjectionKey<ComputedRef<Array<IssueDto>>>; project: InjectionKey<Ref<ProjectInfoDto, ProjectInfoDto>>; board: InjectionKey<Ref<BoardDto, BoardDto>>; workflowAction: InjectionKey<Ref<WorkflowActionDto, WorkflowActionDto>>; workflowFuncType: InjectionKey<Ref<WorkflowFunctionType, WorkflowFunctionType>>; workflowActionFunc: InjectionKey<Ref<WorkflowFunctionDescriptorDto, WorkflowFunctionDescriptorDto>>; };
   export const projectService: ProjectService;
   export const issueTypeService: IssueTypeService;
@@ -979,6 +1406,8 @@ declare module 'luna' {
       iconName?: string;
       route?: RouteLocationRaw,
       href?: string;
+      /** Link target for `route`/`href` options, e.g. `_blank` to open in a new tab. */
+      target?: string;
       cb?: (option: DropDownOption, event: MouseEvent) => boolean|undefined|void;
       children?: Array<DropDownGroupOption>;
       childrenLayerClass?: string;
@@ -1031,6 +1460,8 @@ declare module 'luna' {
     createFieldContext: (fieldId: string, context: Partial<IssueFieldContextDto>) => Promise<AxiosResponse<IssueFieldResolvedDto>>
     updateFieldContext: (fieldId: string, contextId: number, context: Partial<IssueFieldContextDto>) => Promise<AxiosResponse<IssueFieldResolvedDto>>
     deleteFieldContext: (fieldId: string, contextId: number) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    updateContextConfig: (fieldId: string, contextId: number, config: IssueRefConfig | Record<string, unknown> | null) => Promise<AxiosResponse<IssueFieldResolvedDto>>
+    issueRefSuggestions: (fieldId: string, query: IssueRefSuggestionQuery) => Promise<Array<IssueValueDto>>
     getOptions: (fieldId: string, contextId: number) => Promise<AxiosResponse<Array<Option<number>>>>
     createOption: (fieldId: string, contextId: number, option: Partial<Option<number>>) => Promise<AxiosResponse<Option<number>>>
     updateOption: (fieldId: string, contextId: number, optionId: string, option: Partial<Option<number>>) => Promise<AxiosResponse<Option<number>>>
@@ -1041,7 +1472,10 @@ declare module 'luna' {
       key: string,
       name: string,
       description?: string,
-      iconUrl?: string,
+      previewComponent?: string | null,
+      /** Key of the providing plugin; null for built-in types. */
+      pluginKey?: string | null,
+      pluginName?: string | null,
       navigatorComponents?: Array<string>,
       viewComponents?: Array<string>,
       formComponents?: Array<string>,
@@ -1052,6 +1486,7 @@ declare module 'luna' {
       supportedLocales: Array<string>,
       t(text: string, ...args: Array<string|number>): string,
       p(text: string, params: Record<string, any>, ...args: Array<string|number>): string,
+      n(text: string, count: number, ...args: Array<string|number>): string,
   }
   export interface ImageItem {
     id: number,
@@ -1091,8 +1526,8 @@ declare module 'luna' {
   }
   export interface IssueEventService {
     getAll: (force?: boolean) => Promise<AxiosResponse<Array<IssueEventType>>>;
-    create: (name: string, description: string, baseEventTypeId: number) => Promise<AxiosResponse<IssueEventType>>;
-    update: (eventTypeId: number, name: string, description: string, baseEventTypeId: number) => Promise<AxiosResponse<IssueEventType>>;
+    create: (request: IssueEventTypeRequest) => Promise<AxiosResponse<IssueEventType>>;
+    update: (eventTypeId: number, request: IssueEventTypeRequest) => Promise<AxiosResponse<IssueEventType>>;
     delete: (eventTypeId: number) => Promise<AxiosResponse<DeleteResult>>;
   }
   export interface IssueEventType {
@@ -1101,6 +1536,15 @@ declare module 'luna' {
       description: string | null,
       baseEventTypeId: number,
       systemEvent: boolean,
+      notificationDelivery: NotificationDelivery,
+      mailTemplate: string | null,
+  }
+  export interface IssueEventTypeRequest {
+      name?: string,
+      description?: string,
+      baseEventTypeId?: number,
+      notificationDelivery?: NotificationDelivery,
+      mailTemplate?: string | null,
   }
   export interface IssueFieldContextDto {
       id: number,
@@ -1108,7 +1552,9 @@ declare module 'luna' {
       description: string,
       projectIds: Array<number>,
       issueTypeIds: Array<number>,
-      options: Array<Option<number>>
+      options: Array<Option<number>>,
+      /** type specific settings of the context, e.g. {@link IssueRefConfig} */
+      config?: Record<string, unknown>,
   }
   export interface IssueFieldContextResolvedDto extends IssueFieldContextDto {
       projects: Array<ProjectInfoDto>,
@@ -1143,6 +1589,25 @@ declare module 'luna' {
   }
   export interface IssueFieldResolvedDto extends IssueFieldDto {
       contexts: Array<IssueFieldContextResolvedDto>,
+  }
+  export interface IssueRefConfig {
+      scope: IssueRefScope,
+      projectIds: Array<number>,
+      issueTypeIds: Array<number>,
+      jql: string | null,
+  }
+  export interface IssueRefFormParams<V> {
+      value: V | null,
+      projectId: number | null,
+      issueTypeId: number | null,
+  }
+  export interface IssueRefSuggestionQuery {
+      term?: string | null,
+      issueKey?: string | null,
+      projectId?: number | null,
+      issueTypeId?: number | null,
+      excludes?: Array<string>,
+      limit?: number,
   }
   export interface IssueTypeDto extends IssueTypeValueDto {
       iconPath: string,
@@ -1589,6 +2054,8 @@ declare module 'luna' {
   export type IconSize = typeof IconSize[keyof typeof IconSize];
   export type IconType = typeof IconType[keyof typeof IconType];
   export type IssuePermKey = typeof ISSUE_PERMS[number];
+  export type IssueRefScope = 'ANY' | 'SAME_PROJECT' | 'PROJECTS';
+  export type NotificationDelivery = "DIGEST" | "SEPARATE";
   export type OptionsFunc<T extends BaseOption, K extends keyof T = 'id'> = (term: string | null, selected: Array<T[K]>) => Promise<Array<T>>;
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
   export type OptionsGetterSync = () => DropDownGroupOption[]

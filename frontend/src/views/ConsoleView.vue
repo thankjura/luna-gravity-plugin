@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import CodeEditor from "@/components/CodeEditor.vue";
 import { ref } from "vue";
-import { ButtonBusy, type Errors, $notify } from "luna";
+import { ButtonBusy, type Errors, $notify, SwitchButtons } from "luna";
 import { scriptService } from "@/services/scriptService";
 import { $i18n } from "@/utils/i18n";
 
 const value = ref<string>("System.out.println(\"Hello\");\nlog.info(\"hello world\")");
 const busy = ref(false);
 const out = ref<Array<string>>([]);
-const activeTab = ref<'log'|'result'>('result');
+const activeTab = ref(0);
 const result = ref<string>(null);
 const LIMIT = 300;
 const errors = ref<Errors>({});
+
+const RESULT_TAB = 0;
+const LOGS_TAB = 1;
 
 const onResultFetch = (resp: {log?: string, result?: string, error?: any}) => {
   if (resp.log) {
@@ -25,7 +28,7 @@ const onResultFetch = (resp: {log?: string, result?: string, error?: any}) => {
   if (resp.result != undefined) {
     result.value = resp.result;
     busy.value = false;
-    activeTab.value = 'result';
+    activeTab.value = RESULT_TAB;
   }
 
   if (resp.error != undefined) {
@@ -49,7 +52,7 @@ const runScript = () => {
   result.value = null;
   out.value = [];
   errors.value = {};
-  activeTab.value = 'log';
+  activeTab.value = LOGS_TAB;
   busy.value = true;
   scriptService.runScript(value.value, {}, onResultFetch);
 }
@@ -69,26 +72,20 @@ const runScript = () => {
       <ButtonBusy :busy="busy" :disabled="busy" @click="runScript">{{ $i18n.t("Execute") }}</ButtonBusy>
     </div>
 
-
-    <div class="tabs-header no-border">
-      <ul>
-        <li :class="{active: activeTab == 'result'}">
-          <button type="button" @click="activeTab='result'">{{ $i18n.t("Result") }}</button>
-        </li>
-        <li :class="{active: activeTab == 'log'}">
-          <button type="button" @click="activeTab='log'">{{ $i18n.t("Logs") }}</button>
-        </li>
-      </ul>
+    <div class="pad-y">
+      <SwitchButtons :index="activeTab">
+        <button type="button" @click="activeTab=RESULT_TAB">{{ $i18n.t("Result") }}</button>
+        <button type="button" @click="activeTab=LOGS_TAB">{{ $i18n.t("Logs") }}</button>
+      </SwitchButtons>
     </div>
-
-    <div v-if="activeTab=='log'" class="panel pad log-tab">
+    <div v-if="activeTab==LOGS_TAB" class="panel pad log-tab">
       <div v-for="(line, idx) in out" :key="idx">{{ line }}</div>
       <div class="error" v-if="errors.message">
         {{ errors.message }}
       </div>
     </div>
 
-    <div v-if="activeTab=='result'" class="panel pad result-tab">
+    <div v-if="activeTab==RESULT_TAB" class="panel pad result-tab">
       {{ result }}
     </div>
 

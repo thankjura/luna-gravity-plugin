@@ -1,12 +1,12 @@
 import { scriptService } from "@/services/scriptService";
 import type * as MonacoEditor from 'monaco-editor';
-import { type Suggestion } from "@/interfaces/script";
+import type { Diagnostic, Suggestion } from "@/interfaces/script";
 
 function getTokens(tokens: string, divider = "|"): string[] {
   return tokens.split(divider);
 }
 
-const wordPattern = /(-?\d*\.\d\w*)|([^`~!@#%^&*()\-=+[{\]}\\|;:'",./?\s]+)/g;
+const wordPattern = /(-?\d*\.\d\w*)|([a-zA-Z_$][\w$]*)/g;
 
 const brackets: MonacoEditor.languages.CharacterPair[] = [
   ["{", "}"],
@@ -28,61 +28,171 @@ const surroundingPairs = autoClosingPairs;
 const id = "groovy";
 const label = "Groovy";
 
-const getCodeBeforeCursor = (model: MonacoEditor.editor.ITextModel, position: MonacoEditor.Position) => {
-  const range = {
-    startLineNumber: 1,
-    startColumn: 1,
-    endLineNumber: position.lineNumber,
-    endColumn: position.column
-  };
+const MARKER_OWNER = "gravity";
+const MARKER_SOURCE = "groovy";
 
-  return model.getValueInRange(range);
+type ContextGetter = () => Record<string, string> | undefined;
+
+/** Script context (available variables) per editor model: providers are registered once per language. */
+const modelContexts = new Map<string, ContextGetter>();
+/** Last diagnostics per model, used by quick fixes. */
+const modelDiagnostics = new Map<string, Array<Diagnostic>>();
+
+const contextOf = (model: MonacoEditor.editor.ITextModel) => modelContexts.get(model.uri.toString())?.() || {};
+
+const abortOn = (token: MonacoEditor.CancellationToken) => {
+  const controller = new AbortController();
+  token.onCancellationRequested(() => controller.abort());
+  return controller.signal;
 }
 
-export const registerSignatureHelpProvider = (instance: typeof MonacoEditor, getContext:() => Record<string, string>) => {
-  return instance.languages.registerSignatureHelpProvider('groovy', {
-    signatureHelpTriggerCharacters: ['(', ','],
-    provideSignatureHelp: async (model, position, _token, _context) => {
-      const textBeforeCursor = getCodeBeforeCursor(model, position);
-      const currentContext = getContext();
-
-      const data = await scriptService.getSignatures(textBeforeCursor, position, currentContext);
-
-      return {
-        value: data,
-        dispose: () => {}
-      };
-    }
-  });
+export const attachModel = (model: MonacoEditor.editor.ITextModel, getContext: ContextGetter) => {
+  modelContexts.set(model.uri.toString(), getContext);
 }
 
-export const registerAutoCompleteService = (instance: typeof MonacoEditor, getContext:() => Record<string, string>) => {
+export const detachModel = (model: MonacoEditor.editor.ITextModel) => {
+  modelContexts.delete(model.uri.toString());
+  modelDiagnostics.delete(model.uri.toString());
+}
 
-  // instance.languages.registerHoverProvider // документация
-  // instance.languages.registerSignatureHelpProvider // сигнатура метода
-  // instance.languages.registerCodeActionProvider // лампочка
+let providersRegistered = false;
 
-  return instance.languages.registerCompletionItemProvider('groovy', {
+export const registerGroovyProviders = (instance: typeof MonacoEditor) => {
+  if (providersRegistered) {
+    return;
+  }
+  providersRegistered = true;
+
+  instance.languages.registerCompletionItemProvider(id, {
     triggerCharacters: ["."],
-    provideCompletionItems: async (model, position, _context: MonacoEditor.languages.CompletionContext) => {
-      const textBeforeCursor = getCodeBeforeCursor(model, position);
-      const currentContext = getContext();
-      const data = await scriptService.getSuggestions(textBeforeCursor, position, currentContext);
-      return {
-        incomplete: data.incomplete,
-        suggestions: data.suggestions.map((item: Suggestion) => ({
-          label: item.label,
-          kind: item.kind,
-          insertText: item.insertText,
-          detail: item.detail,
-          documentation: item.doc,
-          additionalTextEdits: item.additionalTextEdits,
-          range: data.range,
-          insertTextRules: item.insertTextRules,
-        }))
+    provideCompletionItems: async (model, position, _context, token) => {
+      const word = model.getWordUntilPosition(position);
+      const fullWord = model.getWordAtPosition(position);
+      const insert = new instance.Range(position.lineNumber, word.startColumn, position.lineNumber, position.column);
+      const replace = new instance.Range(position.lineNumber, word.startColumn, position.lineNumber, fullWord ? fullWord.endColumn : position.column);
+
+      try {
+        const data = await scriptService.getSuggestions(model.getValue(), position, contextOf(model), abortOn(token));
+        return {
+          incomplete: data.incomplete,
+          suggestions: data.suggestions.map((item: Suggestion) => ({
+            label: {label: item.label, detail: item.labelDetail, description: item.labelDescription},
+            kind: item.kind,
+            insertText: item.insertText,
+            insertTextRules: item.insertTextRules,
+            detail: item.detail,
+            documentation: item.doc,
+            sortText: item.sortText,
+            filterText: item.filterText,
+            additionalTextEdits: item.additionalTextEdits,
+            range: {insert, replace},
+            command: item.triggerSignature ? {id: "editor.action.triggerParameterHints", title: ""} : undefined,
+          }))
+        };
+      } catch (e) {
+        return {suggestions: []};
       }
     }
   });
+
+  instance.languages.registerSignatureHelpProvider(id, {
+    signatureHelpTriggerCharacters: ["(", ","],
+    signatureHelpRetriggerCharacters: [","],
+    provideSignatureHelp: async (model, position, token) => {
+      try {
+        const data = await scriptService.getSignatures(model.getValue(), position, contextOf(model), abortOn(token));
+        if (!data.signatures.length) {
+          return null;
+        }
+        return {value: data, dispose: () => {}};
+      } catch (e) {
+        return null;
+      }
+    }
+  });
+
+  instance.languages.registerCodeActionProvider(id, {
+    provideCodeActions: (model, _range, context) => {
+      const diagnostics = modelDiagnostics.get(model.uri.toString()) || [];
+      const actions: Array<MonacoEditor.languages.CodeAction> = [];
+      for (const marker of context.markers) {
+        if (marker.source !== MARKER_SOURCE) {
+          continue;
+        }
+        const diagnostic = diagnostics.find(d => d.message === marker.message
+            && d.range.startLineNumber === marker.startLineNumber && d.range.startColumn === marker.startColumn);
+        for (const fix of diagnostic?.fixes || []) {
+          actions.push({
+            title: fix.title,
+            kind: "quickfix",
+            isPreferred: fix.preferred,
+            diagnostics: [marker],
+            edit: {
+              edits: fix.edits.map(edit => ({
+                resource: model.uri,
+                textEdit: edit,
+                versionId: model.getVersionId(),
+              }))
+            }
+          });
+        }
+      }
+      return {actions, dispose: () => {}};
+    }
+  }, {providedCodeActionKinds: ["quickfix"]});
+}
+
+/**
+ * Highlights script errors while typing (debounced). Returns a disposable that clears markers.
+ */
+export const watchDiagnostics = (instance: typeof MonacoEditor, editor: MonacoEditor.editor.IStandaloneCodeEditor, delay = 600) => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let controller: AbortController | undefined;
+
+  const run = async () => {
+    const model = editor.getModel();
+    if (!model) {
+      return;
+    }
+    controller?.abort();
+    controller = new AbortController();
+    const version = model.getVersionId();
+    try {
+      const diagnostics = await scriptService.getDiagnostics(model.getValue(), contextOf(model), controller.signal);
+      if (model.isDisposed() || model.getVersionId() !== version) {
+        return;
+      }
+      modelDiagnostics.set(model.uri.toString(), diagnostics);
+      instance.editor.setModelMarkers(model, MARKER_OWNER, diagnostics.map(d => ({
+        ...d.range,
+        message: d.message,
+        severity: d.severity,
+        source: MARKER_SOURCE,
+      })));
+    } catch (e) {
+      // request aborted or failed: keep previous markers
+    }
+  };
+
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = setTimeout(run, delay);
+  };
+
+  const listener = editor.onDidChangeModelContent(schedule);
+  schedule();
+
+  return {
+    dispose: () => {
+      clearTimeout(timer);
+      controller?.abort();
+      listener.dispose();
+      const model = editor.getModel();
+      if (model && !model.isDisposed()) {
+        instance.editor.setModelMarkers(model, MARKER_OWNER, []);
+      }
+    }
+  };
 }
 
 export const registerGroovyLanguageForMonaco = (instance: typeof MonacoEditor) => {
