@@ -145,7 +145,7 @@ public class WorkflowScriptRest {
             }
         }
 
-        return new WorkflowScript(workflow.get(), action, actionFunction, functionType);
+        return scriptManager.toWorkflowScript(workflow.get(), action, actionFunction, functionType);
     }
 
     private WorkflowActionFunction getConditionParams(WorkflowActionConditionGroup group, String functionId) {

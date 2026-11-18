@@ -276,7 +276,7 @@ onMounted(() => {
               <BusyIconComponent v-else></BusyIconComponent>
             </td>
             <td>
-              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-dots" :cache-options="false"></DropDownButton>
+              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-ellipsis-vertical" :cache-options="false"></DropDownButton>
             </td>
           </tr>
         </tbody>

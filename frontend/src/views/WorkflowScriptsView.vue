@@ -13,6 +13,7 @@ import {
   type WorkflowFunctionType,
   type SearchResult,
   BusyIconComponent,
+  SingleSelect,
   type DropDownGroupOption,
   DropDownButton,
   type DropDownOption,
@@ -34,6 +35,11 @@ const projects = ref<Array<ProjectValueDto>>([]);
 const statuses = ref<Array<StatusValueDto>>([]);
 const term = ref<string>(null);
 const selectedProjects = ref<Array<string>>([]);
+const sourceFilter = ref<'inline' | 'file' | null>(null);
+const sourceOptions = computed(() => [
+  {id: 'inline', name: $i18n.t('Inline script')},
+  {id: 'file', name: $i18n.t('Script file')},
+]);
 const results = ref<Record<string, SearchResult<ScriptRunResult>>>({});
 const resultsBusy = ref<Record<string, boolean>>({});
 const historyExecutionDialog = useTemplateRef<ComponentExposed<typeof HistoryExecutionDialog>>('historyExecutionDialog');
@@ -63,7 +69,7 @@ const statusesMap = computed<Record<number, StatusValueDto>>(() => {
 });
 
 const filteredScripts = computed<Array<WorkflowScript>>(() => {
-  if (!term.value && selectedProjects.value.length == 0) {
+  if (!term.value && selectedProjects.value.length == 0 && !sourceFilter.value) {
     return scripts.value;
   }
 
@@ -71,11 +77,17 @@ const filteredScripts = computed<Array<WorkflowScript>>(() => {
 
   const defaultNote = $i18n.t("Custom script").toLowerCase();
 
+  const lowerTerm = term.value?.toLowerCase();
   for (const s of scripts.value) {
-    if (term.value && (
-        (s.scriptNote == null && !defaultNote.includes(term.value)) ||
-        (s.scriptNote && !s.scriptNote.toLowerCase().includes(term.value.toLowerCase())))
-    ) {
+    if (lowerTerm) {
+      const note = s.scriptNote ? s.scriptNote.toLowerCase() : defaultNote;
+      const file = s.file ? s.file.toLowerCase() : '';
+      if (!note.includes(lowerTerm) && !file.includes(lowerTerm)) {
+        continue;
+      }
+    }
+
+    if (sourceFilter.value && s.source !== sourceFilter.value) {
       continue;
     }
 
@@ -174,6 +186,15 @@ const dropDownOptions = (script: WorkflowScript): Array<DropDownGroupOption> => 
     }
   ];
 
+  if (script.source === 'file' && script.file) {
+    options.push({
+      id: 'editor',
+      label: $i18n.t('Open in script editor'),
+      route: {name: 'gravityScripts', query: {path: script.file}},
+      iconName: 'icon-external-link'
+    });
+  }
+
   if (script.workflowOriginalId || !orig2draftMap.value[script.workflowId]) {
     options.push(
         {
@@ -214,7 +235,11 @@ onMounted(() => {
       <form class="ui horizontal" @submit.prevent>
         <div class="field-group">
           <label for="gravity-workflow-term">{{ $i18n.t("Filter") }}</label>
-          <input type="text" v-model="term" id="gravity-workflow-term" :placeholder="$i18n.t('note...')">
+          <input type="text" v-model="term" id="gravity-workflow-term" :placeholder="$i18n.t('note or file...')">
+        </div>
+        <div class="field-group">
+          <label for="gravity-workflow-source">{{ $i18n.t("Source") }}</label>
+          <SingleSelect id="gravity-workflow-source" v-model="sourceFilter" :options="sourceOptions" :enable-clear="true" :placeholder="$i18n.t('Any')"></SingleSelect>
         </div>
         <div class="field-group">
           <label for="gravity-workflow-project">{{ $i18n.t("Projects") }}</label>
@@ -243,6 +268,12 @@ onMounted(() => {
                 <span :class="[s.disabled ? 'icon-blocked' : 'icon-ok-circle']" :title="s.disabled? $i18n.t('Disabled') : $i18n.t('Enabled')"></span>
                 {{ s.scriptNote ?? $i18n.t("Custom script") }}
               </span>
+              <div v-if="s.source === 'file'" class="workflow-script-file">
+                <router-link :to="{name: 'gravityScripts', query: {path: s.file}}" class="iconed" :title="$i18n.t('Open in script editor')">
+                  <span class="icon-file"></span> {{ s.file }}
+                </router-link>
+                <div class="error" v-if="s.fileError">{{ s.fileError }}</div>
+              </div>
             </td>
             <td>
               <ProjectListComponent :projects="projects" :keys="s.projectKeys"></ProjectListComponent>
@@ -276,7 +307,7 @@ onMounted(() => {
               <HistoryButtonComponent v-else :results="[]"></HistoryButtonComponent>
             </td>
             <td>
-              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-dots" :cache-options="false"></DropDownButton>
+              <DropDownButton :options="() => dropDownOptions(s)" :toggle-icon="false" class="button button-icon button-transparent icon-ellipsis-vertical" :cache-options="false"></DropDownButton>
             </td>
           </tr>
         </tbody>
@@ -299,6 +330,12 @@ onMounted(() => {
 
   .workflow-scripts-table-container {
     position: relative;
+
+    .workflow-script-file {
+      margin-top: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
     min-height: 200px;
 
     .transition {

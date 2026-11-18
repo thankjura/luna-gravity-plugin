@@ -81,7 +81,7 @@ export const registerGroovyProviders = (instance: typeof MonacoEditor) => {
             insertText: item.insertText,
             insertTextRules: item.insertTextRules,
             detail: item.detail,
-            documentation: item.doc,
+            documentation: item.doc ?? undefined,
             sortText: item.sortText,
             filterText: item.filterText,
             additionalTextEdits: item.additionalTextEdits,
@@ -104,7 +104,18 @@ export const registerGroovyProviders = (instance: typeof MonacoEditor) => {
         if (!data.signatures.length) {
           return null;
         }
-        return {value: data, dispose: () => {}};
+        // Monaco renders a non-string documentation as markdown and fails on null: drop nulls
+        const value: MonacoEditor.languages.SignatureHelp = {
+          activeSignature: data.activeSignature,
+          activeParameter: data.activeParameter,
+          signatures: data.signatures.map(signature => ({
+            label: signature.label,
+            documentation: signature.documentation ?? undefined,
+            activeParameter: signature.activeParameter ?? undefined,
+            parameters: (signature.parameters ?? []).map(p => ({label: p.label, documentation: p.documentation ?? undefined})),
+          })),
+        };
+        return {value, dispose: () => {}};
       } catch (e) {
         return null;
       }

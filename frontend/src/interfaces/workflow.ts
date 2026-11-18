@@ -19,6 +19,9 @@ export interface WorkflowScript {
   functionType: WorkflowFunctionType,
   transition: WorkflowTransition,
   disabled: boolean,
+  source: 'inline' | 'file',
+  file: string | null,
+  fileError: string | null,
 }
 
 export interface WorkflowScriptsDto {

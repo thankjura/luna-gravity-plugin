@@ -8,6 +8,7 @@ import ru.slie.luna.issue.workflow.WorkflowTransientVars;
 import ru.slie.luna.issue.workflow.validator.WorkflowValidator;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
+import ru.slie.luna.plugins.gravity.script.file.ScriptFileManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,9 @@ import java.util.Map;
 public class GravityScriptValidator extends AbstractGravityFunction implements WorkflowValidator {
     private final static Logger log = LoggerFactory.getLogger(GravityScriptValidator.class);
 
-    public GravityScriptValidator(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ApplicationEventPublisher eventPublisher) {
-        super(i18n, scriptRunnerService, eventPublisher);
+    public GravityScriptValidator(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ScriptFileManager scriptFileManager,
+                                  ApplicationEventPublisher eventPublisher) {
+        super(i18n, scriptRunnerService, scriptFileManager, eventPublisher);
     }
 
     @Override
@@ -25,13 +27,12 @@ public class GravityScriptValidator extends AbstractGravityFunction implements W
         if (isDisabled(funcParams)) {
             return;
         }
-        String script = funcParams.get(SCRIPT_KEY);
         Map<String, Object> scriptEnv = new HashMap<>();
         scriptEnv.put("user", transientVars.getUser());
         scriptEnv.put("issue", transientVars.getIssue());
         scriptEnv.put("transientVars", transientVars);
         try {
-            scriptRunnerService.executeWithMetrics(transientVars.getActionFunction().getName(), script, scriptEnv, false);
+            runScript(transientVars.getActionFunction().getId(), funcParams, scriptEnv, false);
         } catch (Exception e) {
             if (e instanceof ValidateException) {
                 throw (ValidateException) e;

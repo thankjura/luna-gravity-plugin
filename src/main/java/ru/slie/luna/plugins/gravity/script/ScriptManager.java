@@ -18,7 +18,9 @@ import ru.slie.luna.plugins.gravity.db.ScriptListenerEntity;
 import ru.slie.luna.plugins.gravity.model.ListenerScript;
 import ru.slie.luna.plugins.gravity.model.WorkflowFunctionType;
 import ru.slie.luna.plugins.gravity.model.WorkflowScript;
+import ru.slie.luna.plugins.gravity.script.file.ScriptFileManager;
 import ru.slie.luna.plugins.gravity.utils.SetUtils;
+import ru.slie.luna.plugins.gravity.workflow.AbstractGravityFunction;
 import ru.slie.luna.regolith.ActiveDocManager;
 
 import java.time.LocalDateTime;
@@ -33,11 +35,14 @@ public class ScriptManager implements InitializingBean {
     private final Map<Long, ListenerScript> listenerScriptMap = new ConcurrentHashMap<>();
     private final PlatformTransactionManager transactionManager;
     private final I18nResolver i18n;
+    private final ScriptFileManager scriptFileManager;
 
     public ScriptManager(ActiveDocManager activeDocManager,
                          WorkflowManager workflowManager,
                          PlatformTransactionManager transactionManager,
+                         ScriptFileManager scriptFileManager,
                          I18nResolver i18n) {
+        this.scriptFileManager = scriptFileManager;
         this.activeDocManager = activeDocManager;
         this.workflowManager = workflowManager;
         this.transactionManager = transactionManager;
@@ -49,7 +54,37 @@ public class ScriptManager implements InitializingBean {
             return;
         }
 
-        scripts.add(new WorkflowScript(workflow, action, workflowFunction, functionType));
+        scripts.add(toWorkflowScript(workflow, action, workflowFunction, functionType));
+    }
+
+    public WorkflowScript toWorkflowScript(Workflow workflow, WorkflowAction action, WorkflowActionFunction function, WorkflowFunctionType functionType) {
+        String file = AbstractGravityFunction.getScriptFile(function.getParams());
+        if (file == null) {
+            return new WorkflowScript(workflow, action, function, functionType);
+        }
+        ScriptFileManager.CompiledScript compiled = scriptFileManager.getCompiled(file);
+        return new WorkflowScript(workflow, action, function, functionType, compiled.content(), compiled.error());
+    }
+
+    /**
+     * Workflow functions using the script file {@code path}, or any file under it when it is a directory.
+     * Drafts are included: deleting a file used by a draft would break the draft once published.
+     */
+    public List<WorkflowScript> getFileUsages(String path) {
+        String key = scriptFileManager.normalizeKey(path);
+        String prefix = key.isEmpty() ? "" : key + "/";
+        List<WorkflowScript> out = new ArrayList<>();
+        for (WorkflowScript script : getWorkflowScripts()) {
+            String file = script.getFile();
+            if (file == null) {
+                continue;
+            }
+            String fileKey = scriptFileManager.normalizeKey(file);
+            if (fileKey.equals(key) || fileKey.startsWith(prefix)) {
+                out.add(script);
+            }
+        }
+        return out;
     }
 
     private void extractScriptFromCondition(Workflow workflow, WorkflowAction action, WorkflowActionConditionGroup conditionGroup, List<WorkflowScript> scripts) {

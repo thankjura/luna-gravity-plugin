@@ -478,6 +478,55 @@ public class AutocompleteGroovyService {
             }
             out.add(diagnostic);
         }
+        if (parsed.module() != null) {
+            out.addAll(notImportedClasses(parsed.module(), imports, contextVariables));
+        }
+        return out;
+    }
+
+    /**
+     * {@code ComponentAccessor.getIssueManager()} without an import compiles (Groovy takes the name for a binding
+     * variable) but fails at runtime: warn and offer the import.
+     */
+    private List<Diagnostic> notImportedClasses(org.codehaus.groovy.ast.ModuleNode module, ImportsInfo imports,
+                                                Map<String, Class<?>> contextVariables) {
+        List<Diagnostic> out = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        org.codehaus.groovy.ast.ClassCodeVisitorSupport visitor = new org.codehaus.groovy.ast.ClassCodeVisitorSupport() {
+            @Override
+            public void visitVariableExpression(org.codehaus.groovy.ast.expr.VariableExpression expression) {
+                String name = expression.getName();
+                if (expression.getAccessedVariable() instanceof org.codehaus.groovy.ast.DynamicVariable
+                        && !name.isEmpty() && Character.isUpperCase(name.charAt(0))
+                        && !contextVariables.containsKey(name) && expression.getLineNumber() > 0
+                        && seen.add(expression.getLineNumber() + ":" + expression.getColumnNumber())) {
+                    List<ClassEntry> candidates = index.bySimpleName(name);
+                    if (!candidates.isEmpty()) {
+                        Diagnostic d = new Diagnostic(new AutocompleteRange(expression.getLineNumber(), expression.getColumnNumber(),
+                                                                            expression.getLineNumber(), expression.getColumnNumber() + name.length()),
+                                                      "Class " + name + " is not imported", Diagnostic.SEVERITY_WARNING);
+                        boolean first = true;
+                        for (ClassEntry entry : candidates.stream().limit(6).toList()) {
+                            TextEdit edit = imports.importEdit(entry.fqn());
+                            if (edit != null) {
+                                d.addFix(new Diagnostic.QuickFix("Import " + entry.fqn(), List.of(edit), first));
+                                first = false;
+                            }
+                        }
+                        out.add(d);
+                    }
+                }
+                super.visitVariableExpression(expression);
+            }
+
+            @Override
+            protected org.codehaus.groovy.control.SourceUnit getSourceUnit() {
+                return null;
+            }
+        };
+        for (org.codehaus.groovy.ast.ClassNode classNode : module.getClasses()) {
+            visitor.visitClass(classNode);
+        }
         return out;
     }
 

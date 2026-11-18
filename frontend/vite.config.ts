@@ -23,6 +23,7 @@ export default defineConfig({
         resolve(import.meta.dirname, 'src/views/ConsoleView.vue'),
         resolve(import.meta.dirname, 'src/views/WorkflowScriptsView.vue'),
         resolve(import.meta.dirname, 'src/views/ListenerScriptsView.vue'),
+        resolve(import.meta.dirname, 'src/views/ScriptFilesView.vue'),
         resolve(import.meta.dirname, 'src/components/workflow/BaseViewScriptComponent.vue'),
         resolve(import.meta.dirname, 'src/components/workflow/BaseEditScriptComponent.vue'),
       ],

@@ -2,6 +2,7 @@ package ru.slie.luna.plugins.gravity.script;
 
 import groovy.lang.*;
 import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.exception.ValidateException;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static ru.slie.luna.plugins.gravity.utils.MetricsHelper.getPayloadString;
 
@@ -39,6 +41,15 @@ public class ScriptRunnerService {
     }
 
     public Object executeWithMetrics(String scriptId, String script, Map<String, Object> scriptEnv, boolean scripValidators) throws ValidateException {
+        return executeWithMetrics(scriptId, binding -> new GroovyShell(binding).parse(script), scriptEnv, scripValidators);
+    }
+
+    /** Runs an already compiled script class (scripts from files are compiled once and cached). */
+    public Object executeWithMetrics(String scriptId, Class<? extends Script> scriptClass, Map<String, Object> scriptEnv, boolean scripValidators) throws ValidateException {
+        return executeWithMetrics(scriptId, binding -> InvokerHelper.createScript(scriptClass, binding), scriptEnv, scripValidators);
+    }
+
+    private Object executeWithMetrics(String scriptId, Function<Binding, Script> factory, Map<String, Object> scriptEnv, boolean scripValidators) throws ValidateException {
         ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
         boolean isCpuTimeSupported = threadBean.isCurrentThreadCpuTimeSupported();
         LocalDateTime now = LocalDateTime.now();
@@ -50,7 +61,7 @@ public class ScriptRunnerService {
         String payload = getPayloadString(scriptEnv);
 
         try {
-            return execute(script, scriptEnv, builder::append);
+            return execute(factory, scriptEnv, builder::append);
         } catch (Exception e) {
             if (!scripValidators || !(e instanceof ValidateException)) {
                 stackTrace = MetricsHelper.stackTraceToString(e);
@@ -69,13 +80,41 @@ public class ScriptRunnerService {
         }
     }
 
+    /**
+     * Compiles a script into a class. Each script gets its own class loader, so a replaced script can be unloaded.
+     *
+     * @param name file name used in stack traces
+     */
+    @SuppressWarnings("unchecked")
+    public Class<? extends Script> compile(String scriptContent, String name) throws ScriptParseErrorException {
+        try {
+            GroovyShell shell = new GroovyShell();
+            GroovyCodeSource source = new GroovyCodeSource(scriptContent, scriptClassName(name), GroovyShell.DEFAULT_CODE_BASE);
+            source.setCachable(false);
+            return (Class<? extends Script>) shell.getClassLoader().parseClass(source, false);
+        } catch (CompilationFailedException e) {
+            throw new ScriptParseErrorException(e);
+        }
+    }
+
+    private static String scriptClassName(String name) {
+        String base = name.replaceAll("\\.groovy$", "").replaceAll("[^A-Za-z0-9_]", "_");
+        if (base.isEmpty() || !Character.isJavaIdentifierStart(base.charAt(0))) {
+            base = "_" + base;
+        }
+        return base + ".groovy";
+    }
+
     public Object execute(String scriptContent, Map<String, Object> params, Consumer<String> logConsumer) throws ValidateException {
+        return execute(binding -> new GroovyShell(binding).parse(scriptContent), params, logConsumer);
+    }
+
+    private Object execute(Function<Binding, Script> factory, Map<String, Object> params, Consumer<String> logConsumer) throws ValidateException {
         try (ScriptLogger logger = new ScriptLogger("GravityScript", logConsumer)) {
             Binding binding = new Binding(params);
             binding.setVariable("out", new ConsumerWriter(logConsumer));
             binding.setVariable("log", logger.getlogger());
-            GroovyShell shell = new GroovyShell(binding);
-            Script script = shell.parse(scriptContent);
+            Script script = factory.apply(binding);
             return script.run();
         } catch (MissingMethodException e) {
             String text = i18n.getText("gravity.script.method_not_found", e.getMethod());

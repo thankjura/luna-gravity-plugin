@@ -60,6 +60,8 @@ onMounted(async () => {
     //fixedOverflowWidgets: true,
     lightbulb: {enabled: instance.editor.ShowLightbulbIconMode.OnCode},
     suggestSelection: "first",
+    // the container clips overflowing widgets: show hovers below the line so they fit on the first lines
+    hover: {above: false},
     suggest: {
       showWords: false,
       showStatusBar: true,
@@ -100,12 +102,16 @@ onBeforeUnmount(() => {
 
 <style>
   .gravity-code-editor {
+    /* no overflow: hidden here: hovers, parameter hints and suggestions must be able to leave the editor box */
     border-radius: 6px;
-    overflow: hidden;
     min-height: 400px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     text-align: left;
     position: relative;
+
+    .monaco-editor, .monaco-editor .overflow-guard {
+      border-radius: 5px;
+    }
 
     .monaco-editor {
       .suggest-widget.message {

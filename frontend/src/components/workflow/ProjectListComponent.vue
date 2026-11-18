@@ -41,7 +41,7 @@ const showMoreProjects = (event: MouseEvent) => {
       </span>
     </li>
     <li v-if="keys.length > 3">
-      <button class="item icon-dots" :title="$i18n.t('More')" ref="button" @click="showMoreProjects"></button>
+      <button class="item icon-ellipsis" :title="$i18n.t('More')" ref="button" @click="showMoreProjects"></button>
       <PopoverComponent group="projects" ref="popover">
         <div class="popover-body">
           <ul class="project-list">

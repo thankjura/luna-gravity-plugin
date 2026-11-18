@@ -8,6 +8,7 @@ import ru.slie.luna.issue.workflow.WorkflowTransientVars;
 import ru.slie.luna.issue.workflow.condition.WorkflowCondition;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.gravity.script.ScriptRunnerService;
+import ru.slie.luna.plugins.gravity.script.file.ScriptFileManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +16,9 @@ import java.util.Map;
 public class GravityScriptCondition extends AbstractGravityFunction implements WorkflowCondition {
     private static final Logger log = LoggerFactory.getLogger(GravityScriptCondition.class);
 
-    public GravityScriptCondition(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ApplicationEventPublisher eventPublisher) {
-        super(i18n, scriptRunnerService, eventPublisher);
+    public GravityScriptCondition(I18nResolver i18n, ScriptRunnerService scriptRunnerService, ScriptFileManager scriptFileManager,
+                                  ApplicationEventPublisher eventPublisher) {
+        super(i18n, scriptRunnerService, scriptFileManager, eventPublisher);
     }
 
     @Override
@@ -24,14 +26,13 @@ public class GravityScriptCondition extends AbstractGravityFunction implements W
         if (isDisabled(params)) {
             return true;
         }
-        String script = params.get(SCRIPT_KEY);
         Map<String, Object> scriptEnv = new HashMap<>();
         scriptEnv.put("user", transientVars.getUser());
         scriptEnv.put("issue", transientVars.getIssue());
         scriptEnv.put("action", transientVars.getAction());
         scriptEnv.put("transientVars", transientVars);
         try {
-            Object val = scriptRunnerService.executeWithMetrics(transientVars.getActionFunction().getId(), script, scriptEnv, true);
+            Object val = runScript(transientVars.getActionFunction().getId(), params, scriptEnv, true);
             return switch (val) {
                 case null -> false;
                 case String string -> !string.isBlank();

@@ -126,6 +126,11 @@ public class ScriptRest {
                     map.put("user", User.class);
                     map.put("transientVars", WorkflowTransientVars.class);
                 }
+                case "workflowFile" -> {
+                    map.put("issue", MutableIssue.class);
+                    map.put("user", User.class);
+                    map.put("transientVars", WorkflowTransientVars.class);
+                }
                 case "listener" -> {
                     map.put("issue", Issue.class);
                     map.put("user", User.class);

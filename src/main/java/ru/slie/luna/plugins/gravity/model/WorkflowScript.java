@@ -16,11 +16,28 @@ public class WorkflowScript {
     private final WorkflowFunctionType functionType;
     private final Set<String> projectKeys;
     private final WorkflowTransition transition;
+    private final String fileContent;
+    private final String fileError;
 
     public WorkflowScript(Workflow workflow,
                           WorkflowAction action,
                           WorkflowActionFunction function,
                           WorkflowFunctionType functionType) {
+        this(workflow, action, function, functionType, null, null);
+    }
+
+    /**
+     * @param fileContent content of the script file when the function uses one
+     * @param fileError   why the script file can not be used (missing, does not compile)
+     */
+    public WorkflowScript(Workflow workflow,
+                          WorkflowAction action,
+                          WorkflowActionFunction function,
+                          WorkflowFunctionType functionType,
+                          String fileContent,
+                          String fileError) {
+        this.fileContent = fileContent;
+        this.fileError = fileError;
         this.workflow = workflow;
         this.action = action;
         this.function = function;
@@ -57,8 +74,26 @@ public class WorkflowScript {
         return action.getName();
     }
 
+    /** Script that is executed: inline script or the content of the script file. */
     public String getScript() {
-        return function.getParams().get("script");
+        if (AbstractGravityFunction.isFileSource(function.getParams())) {
+            return fileContent;
+        }
+        return function.getParams().get(AbstractGravityFunction.SCRIPT_KEY);
+    }
+
+    /** {@code inline} or {@code file}. */
+    public String getSource() {
+        return AbstractGravityFunction.isFileSource(function.getParams()) ? AbstractGravityFunction.SOURCE_FILE : AbstractGravityFunction.SOURCE_INLINE;
+    }
+
+    /** Script file path (relative to the scripts root), null for inline scripts. */
+    public String getFile() {
+        return AbstractGravityFunction.getScriptFile(function.getParams());
+    }
+
+    public String getFileError() {
+        return fileError;
     }
 
     public WorkflowFunctionType getFunctionType() {
